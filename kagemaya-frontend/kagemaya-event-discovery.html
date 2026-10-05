@@ -191,24 +191,28 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:72px 0 40
 <!-- NAVBAR -->
 <header class="nav">
   <div class="wrap">
+    <!-- Logo -->
+    <a class="logo" href="kagemaya-landing-page-visual-anchor.html" aria-label="Kagemaya beranda">
+      <b>KAGEMAYA</b><i>影幻</i>
+    </a>
 
-    <a class="logo" href="kagemaya-landing-page-visual-anchor.html" aria-label="Kagemaya beranda"><b>KAGEMAYA</b><i>影幻</i></a>
-    <nav aria-label="Utama"><ul>
-      <li><a href="kagemaya-event-discovery.html" aria-current="page">Event</a></li>
-      <li><a href="#">Kategori</a></li>
-      <li><a href="kagemaya-organizer-profile.html">Organizer</a></li>
-    </ul></nav>
-    <div class="nav-r">
-      <button class="icon-btn" aria-label="Cari"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg></button>
+    <!-- Menu Navigasi Utama -->
+    <nav aria-label="Utama">
+      <ul>
+        <li><a href="kagemaya-event-discovery.html" aria-current="page">Event</a></li>
+        <li><a href="#">Kategori</a></li>
+        <li><a href="kagemaya-organizer-profile.html">Organizer</a></li>
+      </ul>
+    </nav>
 
-    <a class="logo" href="#" aria-label="Kagemaya beranda"><b>KAGEMAYA</b><i>影幻</i></a>
-    <nav aria-label="Utama"><ul>
-      <li><a href="#" aria-current="page">Event</a></li>
-      <li><a href="#">Kategori</a></li>
-      <li><a href="#">Organizer</a></li>
-    </ul></nav>
+    <!-- Area Tombol Aksi / Auth State -->
     <div class="nav-r" id="nav-actions-container">
-
+      <button class="icon-btn" aria-label="Cari">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">
+          <circle cx="11" cy="11" r="7"/>
+          <path d="M20 20l-3.6-3.6"/>
+        </svg>
+      </button>
       <a class="login" href="kagemaya-login.html">Login</a>
       <a class="btn btn-red btn-sm" href="kagemaya-register.html">Daftar</a>
     </div>
