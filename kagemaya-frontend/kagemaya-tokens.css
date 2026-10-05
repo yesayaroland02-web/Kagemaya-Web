@@ -1,0 +1,713 @@
+/**
+ * =====================================================================
+ * KAGEMAYA DESIGN SYSTEM — MASTER STYLESHEET & TOKENS
+ * =====================================================================
+ * Product: kagemaya.id
+ * Brand Identity: "Cinematic Japanese Noir + Indonesian Warmth"
+ * Source: PRD v1.1 & desain kagemaya-id prompt.txt (Sections 3, 5, 8, 9)
+ *
+ * "Di balik bayangan, ilusi menjadi nyata."
+ * =====================================================================
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap');
+
+/* ─── 1. DESIGN TOKENS & SYSTEM VARIABLES ─────────────────────────── */
+:root {
+  color-scheme: dark;
+
+  /* ── 1.1 COLOR PALETTE ── */
+  /* Dominant Dark Surfaces (60% Ratio) */
+  --kage-black: #0B0B0D;     /* Main page background, hero background, cinema deep */
+  --yoru: #121216;           /* Cards, panels, surfaces, sidebars */
+  --yoru-light: #1C1C22;     /* Elevated cards, dropdowns, modals, hover states */
+
+  /* Action & Brand Accents (5% Ratio) */
+  --torii-red: #C62828;      /* Primary CTA, active states, torii red accent */
+  --vermilion: #E5484D;      /* Hover states, focused CTA, highlights */
+  --maya-gold: #D6A85F;      /* Premium accents, ratings, special tags, gold foil */
+  --maya-gold-dim: rgba(214, 168, 95, 0.16);
+  --torii-red-dim: rgba(198, 40, 40, 0.15);
+
+  /* Editorial & Body Typography (10% Ratio) */
+  --washi: #F4F0E8;          /* Primary text, prominent headings, paper tone */
+  --mist: #B8B5B0;           /* Secondary text, metadata, descriptions, cool fog */
+  --mist-dim: #85837F;       /* Tertiary text, captions, hints */
+
+  /* Structural Borders & Dividers */
+  --border: #292930;         /* Card borders, input borders, hairline dividers */
+  --border-light: #3D3D47;   /* Hover borders, active outlines, separator lines */
+
+  /* Semantic Feedback Colors */
+  --success: #4CAF7D;        /* Verified, payment confirmed, done, green badge */
+  --success-dim: rgba(76, 175, 125, 0.12);
+  --warning: #D6A84F;        /* Approaching expiry, caution */
+  --warning-dim: rgba(214, 168, 79, 0.12);
+  --error: #E05252;          /* Rejected, expired, canceled, form errors */
+  --error-dim: rgba(224, 82, 82, 0.12);
+  --info: #3A7BD5;           /* System notices, informative alerts */
+  --info-dim: rgba(58, 123, 213, 0.12);
+
+  /* Semantic Short Aliases */
+  --bg: var(--kage-black);
+  --surface: var(--yoru);
+  --elev: var(--yoru-light);
+  --red: var(--torii-red);
+  --red-hi: var(--vermilion);
+  --gold: var(--maya-gold);
+  --text: var(--washi);
+  --text2: var(--mist);
+  --text3: var(--mist-dim);
+  --green: #4ADE80;
+
+  /* ── 1.2 TYPOGRAPHY PAIRINGS ── */
+  --font-serif: 'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', Georgia, serif;
+  --font-sans: 'Inter', 'Noto Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --serif: var(--font-serif);
+  --sans: var(--font-sans);
+
+  /* Font Scales */
+  --fs-hero: clamp(38px, 5.2vw, 68px);
+  --fs-h1: clamp(28px, 3.6vw, 42px);
+  --fs-h2: clamp(22px, 2.5vw, 30px);
+  --fs-h3: clamp(18px, 2vw, 22px);
+  --fs-body-lg: 18px;
+  --fs-body: 15px;
+  --fs-body-sm: 13.5px;
+  --fs-caption: 12px;
+
+  /* ── 1.3 SPACING (4px / 8px Modular System) ── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  /* ── 1.4 RADIUS (Restrained Editorial) ── */
+  --r-xs: 2px;
+  --r-sm: 4px;
+  --r-md: 8px;
+  --r-lg: 12px;
+  --r-pill: 9999px;
+  --r: var(--r-xs);
+
+  /* ── 1.5 SHADOWS & BLURS ── */
+  --shadow-subtle: 0 4px 20px rgba(0, 0, 0, 0.4);
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.6);
+  --shadow-elevated: 0 16px 54px rgba(0, 0, 0, 0.8);
+  --shadow-glow-red: 0 0 24px rgba(198, 40, 40, 0.35);
+  --shadow-glow-gold: 0 0 20px rgba(214, 168, 95, 0.25);
+
+  /* ── 1.6 TRANSITIONS ── */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+  --transition-slow: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Layout Consts */
+  --nav-height: 84px;
+  --max-width: 1296px;
+}
+
+/* ─── 2. BASE CSS RESET & FOUNDATIONS ────────────────────────────── */
+html {
+  box-sizing: border-box;
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--nav-height) + 16px);
+  background: var(--bg);
+  color: var(--text);
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: var(--fs-body);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+svg {
+  display: block;
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+/* ─── 3. CINEMATIC TEXTURES & UTILITIES ──────────────────────────── */
+/* Film-grain overlay used across cinematic imagery */
+.grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.18;
+  mix-blend-mode: overlay;
+  width: 100%;
+  height: 100%;
+}
+
+/* Atmospheric Ambient Projector Glow */
+@keyframes kagePulseBeam {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 0.85; transform: scale(1.04); }
+}
+.kage-beam {
+  animation: kagePulseBeam 8s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .kage-beam { animation: none; }
+}
+
+/* Layout Wrappers */
+.wrap {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 0 32px;
+  width: 100%;
+}
+
+.wrap-sm {
+  max-width: 840px;
+  margin: 0 auto;
+  padding: 0 24px;
+  width: 100%;
+}
+
+/* ─── 4. TYPOGRAPHY SYSTEM UTILITIES ─────────────────────────────── */
+.kage-hero-title {
+  font-family: var(--serif);
+  font-weight: 300;
+  font-size: var(--fs-hero);
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.kage-h1 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: var(--fs-h1);
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+}
+
+.kage-h2 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: var(--fs-h2);
+  line-height: 1.3;
+}
+
+.kage-h3 {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: var(--fs-h3);
+  line-height: 1.35;
+}
+
+.text-gold { color: var(--gold) !important; }
+.text-red { color: var(--red-hi) !important; }
+.text-mist { color: var(--text2) !important; }
+.text-dim { color: var(--text3) !important; }
+.text-washi { color: var(--text) !important; }
+
+/* Section Header Editorial Label */
+.sec-label {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: 13px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.sec-label::before {
+  content: "";
+  height: 1px;
+  width: 20px;
+  background: var(--gold);
+  opacity: 0.6;
+}
+
+/* ─── 5. BUTTON COMPONENT LIBRARY ────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: 500 14px/1 var(--sans);
+  padding: 12px 24px;
+  border-radius: var(--r);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  letter-spacing: 0.01em;
+  gap: 8px;
+  white-space: nowrap;
+  user-select: none;
+  min-height: 42px;
+}
+
+/* Primary Torii Red */
+.btn-red, .btn-primary {
+  background: var(--red);
+  color: var(--text);
+  border-color: transparent;
+}
+.btn-red:hover, .btn-primary:hover {
+  background: var(--red-hi);
+  box-shadow: 0 0 16px rgba(198, 40, 40, 0.4);
+}
+.btn-red:active, .btn-primary:active {
+  transform: translateY(1px);
+}
+.btn-red:disabled, .btn-primary:disabled {
+  background: var(--elev);
+  color: var(--text3);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* Secondary / Outline Line */
+.btn-line, .btn-secondary {
+  border-color: rgba(244, 240, 232, 0.28);
+  color: var(--text);
+  background: transparent;
+}
+.btn-line:hover, .btn-secondary:hover {
+  border-color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Gold Accent Button */
+.btn-gold {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: transparent;
+}
+.btn-gold:hover {
+  background: var(--gold-dim);
+  border-color: #e5bd75;
+}
+
+/* Destructive / Ghost Red */
+.btn-ghost-red {
+  background: transparent;
+  border-color: rgba(224, 82, 82, 0.3);
+  color: var(--red-hi);
+}
+.btn-ghost-red:hover {
+  background: rgba(224, 82, 82, 0.1);
+  border-color: var(--red-hi);
+}
+
+/* Ghost / Transparent */
+.btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--text2);
+}
+.btn-ghost:hover {
+  color: var(--text);
+  background: var(--elev);
+}
+
+/* Sizes */
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 12.5px;
+  min-height: 34px;
+}
+.btn-lg {
+  padding: 16px 36px;
+  font-size: 15.5px;
+  min-height: 52px;
+}
+
+/* Loading Spinner state */
+.btn.loading {
+  position: relative;
+  pointer-events: none;
+}
+.btn.loading .btn-text {
+  visibility: hidden;
+}
+.btn.loading::after {
+  content: "";
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(244, 240, 232, 0.3);
+  border-top-color: var(--text);
+  border-radius: 50%;
+  animation: kageSpin 0.7s linear infinite;
+}
+@keyframes kageSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* ─── 6. BADGES & STATUS INDICATORS ──────────────────────────────── */
+.kage-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 1px solid;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: var(--r);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.kage-badge-gold {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(214, 168, 95, 0.08);
+}
+.kage-badge-red {
+  border-color: var(--red-hi);
+  color: var(--red-hi);
+  background: rgba(229, 72, 77, 0.08);
+}
+.kage-badge-green {
+  border-color: var(--green);
+  color: var(--green);
+  background: rgba(74, 222, 128, 0.08);
+}
+.kage-badge-dim {
+  border-color: var(--border);
+  color: var(--text2);
+  background: var(--elev);
+}
+
+/* Six Transaction Status Badges */
+.kage-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 10px;
+  border-radius: var(--r);
+  font-size: 12px;
+  font-weight: 500;
+  border: 1px solid transparent;
+}
+.kage-status .s-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+.s-waiting-pay {
+  background: rgba(198, 40, 40, 0.08);
+  border-color: rgba(198, 40, 40, 0.35);
+  color: var(--red-hi);
+}
+.s-waiting-org {
+  background: rgba(214, 168, 95, 0.08);
+  border-color: rgba(214, 168, 95, 0.35);
+  color: var(--gold);
+}
+.s-done {
+  background: rgba(74, 222, 128, 0.08);
+  border-color: rgba(74, 222, 128, 0.3);
+  color: #4ade80;
+}
+.s-rejected {
+  background: rgba(229, 72, 77, 0.08);
+  border-color: rgba(229, 72, 77, 0.3);
+  color: var(--red-hi);
+}
+.s-expired {
+  background: rgba(184, 181, 176, 0.08);
+  border-color: rgba(184, 181, 176, 0.25);
+  color: var(--mist);
+}
+.s-canceled {
+  background: rgba(184, 181, 176, 0.06);
+  border-color: rgba(184, 181, 176, 0.2);
+  color: var(--mist-dim);
+}
+
+/* ─── 7. FORM INPUTS & CONTROLS ──────────────────────────────────── */
+.form-group {
+  margin-bottom: 20px;
+}
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+
+.kage-input, .kage-select, .kage-textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  color: var(--text);
+  font: 400 14px var(--sans);
+  padding: 12px 14px;
+  outline: none;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+.kage-input:focus, .kage-select:focus, .kage-textarea:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold-dim);
+}
+.kage-input::placeholder, .kage-textarea::placeholder {
+  color: var(--text3);
+}
+
+.kage-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23B8B5B0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+
+.input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  transition: border-color var(--transition-fast);
+}
+.input-wrap:focus-within {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold-dim);
+}
+.input-wrap.has-error {
+  border-color: var(--error) !important;
+}
+.input-wrap.is-valid {
+  border-color: var(--success);
+}
+.input-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--text3);
+  pointer-events: none;
+}
+.input-wrap input {
+  padding-left: 42px;
+}
+
+/* Custom Dark Checkbox */
+.kage-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  cursor: pointer;
+  display: grid;
+  place-content: center;
+  transition: all var(--transition-fast);
+  margin: 0;
+  flex: none;
+}
+.kage-checkbox:checked {
+  background: var(--red);
+  border-color: var(--red);
+}
+.kage-checkbox:checked::after {
+  content: "";
+  width: 4px;
+  height: 8px;
+  border: solid var(--text);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) translate(-1px, -1px);
+}
+
+/* ─── 8. EVENT CARDS ─────────────────────────────────────────────── */
+.kage-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: border-color var(--transition-normal), transform var(--transition-normal);
+}
+.kage-card:hover {
+  border-color: var(--border-light);
+  transform: translateY(-2px);
+}
+.kage-card .img {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  background: #09090b;
+}
+.kage-card .img img, .kage-card .img svg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.kage-card .body {
+  padding: 22px 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.kage-card .foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+  margin-top: auto;
+}
+
+/* ─── 9. MODAL COMPONENT BASE ────────────────────────────────────── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(11, 11, 13, 0.88);
+  backdrop-filter: blur(8px);
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.modal-overlay.active {
+  display: flex;
+}
+.modal-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  width: 100%;
+  max-width: 520px;
+  box-shadow: var(--shadow-elevated);
+  position: relative;
+  overflow: hidden;
+  animation: kageFadeIn 0.2s ease;
+}
+@keyframes kageFadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ─── 10. CANONICAL NAVBAR ───────────────────────────────────────── */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding-top: env(safe-area-inset-top, 0px);
+  background: rgba(11, 11, 13, 0.88);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.nav .wrap {
+  display: flex;
+  align-items: center;
+  height: var(--nav-height);
+}
+.logo {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex: none;
+  margin-right: 40px;
+}
+.logo b {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 21px;
+  letter-spacing: 0.34em;
+  margin-right: -0.34em;
+}
+.logo i {
+  font-family: var(--serif);
+  font-style: normal;
+  color: var(--red-hi);
+  font-size: 17px;
+  font-weight: 400;
+}
+.nav nav {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+.nav ul {
+  display: flex;
+  gap: 36px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.nav ul a {
+  font-size: 14px;
+  color: var(--text2);
+  transition: color var(--transition-fast);
+}
+.nav ul a:hover {
+  color: var(--text);
+}
+.nav-r {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+/* ─── 11. CANONICAL MINIMAL DARK FOOTER ───────────────────────────── */
+footer.kage-footer {
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  padding: 64px 0 36px;
+  margin-top: auto;
+}
+
+/* ─── 12. RESPONSIVE BREAKPOINTS ─────────────────────────────────── */
+@media (max-width: 1024px) {
+  .nav ul { gap: 24px; }
+}
+
+@media (max-width: 768px) {
+  .nav ul { display: none; }
+  .wrap { padding: 0 20px; }
+  .kage-hero-title { font-size: 34px; }
+}

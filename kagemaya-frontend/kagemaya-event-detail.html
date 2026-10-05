@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Yūgen: Film 4D Kolaborasi Tokyo–Jakarta — Kagemaya</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: dark;
+  --bg:#0B0B0D; --surface:#121216; --elev:#1C1C22;
+  --red:#C62828; --red-hi:#E5484D; --gold:#D6A85F;
+  --text:#F4F0E8; --text2:#B8B5B0; --border:#292930;
+  --serif:'Noto Serif JP','Hiragino Mincho ProN','Yu Mincho',Georgia,serif;
+  --sans:'Inter','Noto Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);background:var(--bg);scroll-behavior:smooth}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.wrap{max-width:1296px;margin:0 auto;padding:0 32px}
+svg{display:block}
+.grain{position:absolute;inset:0;pointer-events:none;opacity:.22;mix-blend-mode:overlay;width:100%;height:100%}
+
+/* NAV (identical to landing) */
+.nav{position:absolute;top:0;left:0;right:0;z-index:20;padding-top:env(safe-area-inset-top,0px)}
+.nav .wrap{display:flex;align-items:center;height:84px;gap:0}
+.logo{display:flex;align-items:baseline;gap:12px;flex:none;margin-right:40px}
+.logo b{font-family:var(--serif);font-weight:500;font-size:21px;letter-spacing:.34em;margin-right:-.34em}
+.logo i{font-family:var(--serif);font-style:normal;color:var(--red-hi);font-size:17px;font-weight:400}
+.nav nav{flex:1;display:flex;justify-content:center}
+.nav ul{display:flex;gap:36px;list-style:none;margin:0;padding:0}
+.nav ul a{font-size:14px;color:var(--text2);transition:color .2s}
+.nav ul a:hover,.nav ul a[aria-current]{color:var(--text)}
+.nav-r{display:flex;align-items:center;gap:26px}
+.icon-btn{background:none;border:0;color:var(--text2);padding:6px;cursor:pointer;display:grid;place-items:center}
+.icon-btn:hover{color:var(--text)}
+.login{font-size:14px;color:var(--text2)}
+.btn{display:inline-flex;align-items:center;justify-content:center;font:500 14px/1 var(--sans);padding:14px 26px;border-radius:2px;border:1px solid transparent;cursor:pointer;transition:background .2s,border-color .2s,color .2s;letter-spacing:.01em;gap:10px}
+.btn-red{background:var(--red);color:var(--text)}
+.btn-red:hover{background:var(--red-hi)}
+.btn-red[disabled]{background:var(--elev);color:#85837f;cursor:not-allowed}
+.btn-line{border-color:rgba(244,240,232,.32);color:var(--text);background:rgba(11,11,13,.25)}
+.btn-line:hover{border-color:var(--text)}
+.btn-sm{padding:11px 22px}
+
+/* HERO */
+.hero{position:relative;height:620px;overflow:hidden;background:#07070a;border-bottom:1px solid var(--border)}
+.hero-art{position:absolute;inset:0}
+.hero-art svg.scene{width:100%;height:100%}
+.hero::after{content:"";position:absolute;inset:0;background:
+  linear-gradient(90deg,rgba(11,11,13,.9) 0%,rgba(11,11,13,.55) 42%,rgba(11,11,13,.05) 75%),
+  linear-gradient(0deg,#0B0B0D 0%,rgba(11,11,13,0) 45%),
+  linear-gradient(180deg,rgba(11,11,13,.7) 0%,rgba(11,11,13,0) 20%)}
+.hero-in{position:relative;z-index:10;height:100%;display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:56px}
+.crumb{font-size:13.5px;color:var(--text2);margin-bottom:22px;display:flex;gap:10px;align-items:center}
+.crumb a:hover{color:var(--text)}
+.crumb span[aria-hidden]{opacity:.5}
+.hero h1{font-family:var(--serif);font-weight:300;font-size:clamp(36px,4.6vw,64px);line-height:1.18;letter-spacing:-.01em;margin:0 0 26px;max-width:14em}
+.meta{display:flex;flex-wrap:wrap;gap:12px 40px;margin:0 0 30px;padding:0;list-style:none}
+.meta li{display:flex;align-items:center;gap:11px;font-size:15.5px}
+.meta svg{width:19px;height:19px;stroke:var(--gold);fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.hero-act{display:flex;align-items:center;gap:28px;flex-wrap:wrap}
+.by{display:flex;align-items:center;gap:12px;font-size:14px;color:var(--text2)}
+.by b{color:var(--text);font-weight:500}
+.mini-av{width:34px;height:34px;border-radius:50%;overflow:hidden;border:1px solid #3a3a44}
+.save[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
+.save[aria-pressed="true"] svg{fill:var(--gold)}
+.save svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linejoin:round}
+
+/* LAYOUT */
+.main{display:grid;grid-template-columns:minmax(0,1fr) 400px;gap:72px;padding-top:80px;align-items:start}
+.sec{padding-bottom:72px;margin-bottom:72px;border-bottom:1px solid var(--border)}
+.sec:last-child{border-bottom:0;margin-bottom:0;padding-bottom:0}
+h2.t{font-family:var(--serif);font-weight:400;font-size:30px;line-height:1.25;margin:0 0 26px;letter-spacing:-.005em}
+.lead{font-family:var(--serif);font-weight:300;font-size:22px;line-height:1.75;color:var(--text);margin:0 0 22px;max-width:30em}
+.prose p{color:var(--text2);font-size:16.5px;line-height:1.8;margin:0 0 18px;max-width:38em}
+
+/* experiences */
+.exp{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--border);border-radius:2px}
+.exp>div{padding:30px 28px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--surface)}
+.exp>div:nth-child(2n){border-right:0}
+.exp>div:nth-last-child(-n+2){border-bottom:0}
+.exp svg{width:32px;height:32px;stroke:var(--gold);fill:none;stroke-width:1.2;stroke-linecap:round;stroke-linejoin:round;margin-bottom:20px}
+.exp h3{font-family:var(--serif);font-weight:500;font-size:19px;margin:0 0 8px}
+.exp p{margin:0;color:var(--text2);font-size:14.5px;line-height:1.65}
+
+/* location */
+.loc{display:grid;grid-template-columns:1fr 1.15fr;border:1px solid var(--border);border-radius:2px;overflow:hidden;background:var(--surface)}
+.loc .info{padding:30px 28px;display:flex;flex-direction:column;gap:18px}
+.loc h3{font-family:var(--serif);font-weight:500;font-size:20px;margin:0}
+.loc .addr{color:var(--text2);font-size:15px;line-height:1.7;margin:0}
+.loc ul{list-style:none;padding:0;margin:0;display:grid;gap:10px;font-size:14px;color:var(--text2)}
+.loc li{display:flex;gap:10px;align-items:flex-start}
+.loc li svg{width:17px;height:17px;stroke:var(--gold);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;margin-top:3px;flex:none}
+.loc .map{position:relative;min-height:300px;background:#0d0d10}
+.loc .map svg{position:absolute;inset:0;width:100%;height:100%}
+.link{font-size:14px;color:var(--text);border-bottom:1px solid var(--border);padding-bottom:3px;align-self:flex-start;transition:border-color .2s}
+.link:hover{border-color:var(--gold)}
+
+/* schedule */
+.sched{display:grid;grid-template-columns:260px 1fr;gap:48px}
+.date-big{border:1px solid var(--border);background:var(--surface);padding:28px;border-radius:2px}
+.date-big .d{font-family:var(--serif);font-weight:300;font-size:76px;line-height:1;color:var(--text)}
+.date-big .m{font-family:var(--serif);font-size:20px;margin-top:8px}
+.date-big .y{color:var(--text2);font-size:14px;margin-top:4px}
+.date-big a{display:inline-block;margin-top:22px}
+.tl{list-style:none;padding:0;margin:0;position:relative}
+.tl::before{content:"";position:absolute;left:5px;top:10px;bottom:10px;width:1px;background:var(--border)}
+.tl li{position:relative;padding:0 0 28px 38px;display:grid;grid-template-columns:104px 1fr;gap:12px}
+.tl li:last-child{padding-bottom:0}
+.tl li::before{content:"";position:absolute;left:0;top:8px;width:11px;height:11px;border-radius:50%;background:var(--bg);border:1px solid var(--gold)}
+.tl li.main::before{background:var(--gold)}
+.tl .tm{font-family:var(--serif);font-size:18px}
+.tl .ds b{display:block;font-weight:500;font-size:15.5px}
+.tl .ds span{color:var(--text2);font-size:14px}
+
+/* organizer */
+.orgc{display:grid;grid-template-columns:auto 1fr auto;gap:28px;align-items:center;background:var(--surface);border:1px solid var(--border);border-radius:2px;padding:32px;position:relative;overflow:hidden}
+.orgc::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--gold)}
+.avatar{width:84px;height:84px;border-radius:50%;overflow:hidden;border:1px solid #3a3a44}
+.avatar svg{width:100%;height:100%}
+.orgc h3{font-family:var(--serif);font-weight:500;font-size:24px;margin:0 0 4px}
+.orgc .kind{color:var(--text2);font-size:14.5px;margin-bottom:16px}
+.stats{display:flex;gap:30px;font-size:13px;color:var(--text2)}
+.stats b{display:block;color:var(--text);font-weight:500;font-size:16px}
+.star{color:var(--gold)}
+.org-act{display:flex;flex-direction:column;gap:10px;min-width:150px}
+.follow[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
+
+/* Q&A */
+.qa{display:grid;gap:18px;margin-bottom:28px}
+.q{background:var(--surface);border:1px solid var(--border);border-radius:2px;padding:24px 26px}
+.q.pinned{border-color:#4a3f2a}
+.q .ask{display:flex;justify-content:space-between;gap:16px;font-weight:500;font-size:16px;margin-bottom:6px}
+.q .who{color:var(--text2);font-size:13px}
+.ans{margin-top:18px;padding:18px 20px;background:var(--elev);border-radius:2px;display:grid;gap:8px}
+.ans .head{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:14px}
+.badge{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--gold);color:var(--gold);font-size:12px;padding:2px 9px;border-radius:2px;font-weight:500}
+.pin{display:inline-flex;align-items:center;gap:6px;color:var(--gold);font-size:12.5px;margin-left:auto}
+.pin svg,.badge svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.ans p{margin:0;color:var(--text);font-size:15.5px}
+.q.open .ans{display:none}
+.q.open .wait{display:block}
+.wait{display:none;margin-top:14px;color:var(--text2);font-size:14px}
+.ask-box{display:flex;border:1px solid var(--border);background:var(--surface);border-radius:2px}
+.ask-box:focus-within{border-color:var(--gold)}
+.ask-box input{flex:1;background:none;border:0;color:var(--text);font:400 15.5px var(--sans);padding:20px 24px;min-width:0}
+.ask-box input::placeholder{color:#8d8b87}
+.ask-box input:focus-visible{outline:none}
+.ask-box button{background:none;border:0;border-left:1px solid var(--border);color:var(--text);font:500 14px var(--sans);padding:0 28px;cursor:pointer;transition:color .2s}
+.ask-box button:hover{color:var(--gold)}
+
+/* reviews */
+.rev{display:grid;grid-template-columns:240px 1fr;gap:48px}
+.score .n{font-family:var(--serif);font-weight:300;font-size:72px;line-height:1}
+.score .n small{font-size:22px;color:var(--text2)}
+.stars{color:var(--gold);letter-spacing:.14em;font-size:18px;margin:12px 0 6px}
+.score .c{color:var(--text2);font-size:14px;margin-bottom:24px}
+.bars{display:grid;gap:9px;font-size:13px;color:var(--text2)}
+.bars div{display:grid;grid-template-columns:12px 1fr 28px;gap:10px;align-items:center}
+.bars i{display:block;height:3px;background:var(--elev);position:relative}
+.bars i::after{content:"";position:absolute;left:0;top:0;bottom:0;width:var(--w);background:var(--gold)}
+.rlist{display:grid;gap:18px}
+.r{background:var(--surface);border:1px solid var(--border);border-radius:2px;padding:24px 26px}
+.r .top{display:flex;align-items:center;gap:14px;margin-bottom:14px}
+.r .ini{width:40px;height:40px;border-radius:50%;background:var(--elev);border:1px solid #3a3a44;display:grid;place-items:center;font-family:var(--serif);font-size:15px}
+.r .nm{font-weight:500;font-size:15px;line-height:1.3}
+.r .ev{font-size:12.5px;color:var(--text2)}
+.r .st{margin-left:auto;color:var(--gold);letter-spacing:.1em;font-size:14px}
+.r p{margin:0;color:var(--text2);font-size:15.5px;line-height:1.75}
+
+/* TICKET CARD */
+aside{position:sticky;top:24px}
+.ticket{background:var(--surface);border:1px solid var(--border);border-radius:2px;overflow:hidden}
+.ticket .th{padding:28px 28px 22px;border-bottom:1px solid var(--border)}
+.ticket h2{font-family:var(--serif);font-weight:400;font-size:26px;margin:0 0 6px}
+.ticket .when{color:var(--text2);font-size:14px;line-height:1.55}
+.tix{list-style:none;margin:0;padding:8px 0}
+.tk{display:grid;grid-template-columns:1fr auto;gap:6px 16px;align-items:center;padding:20px 28px;border-left:2px solid transparent;transition:background .2s,border-color .2s}
+.tk+.tk{border-top:1px solid var(--border)}
+.tk.on{background:var(--elev);border-left-color:var(--gold)}
+.tk .nm{font-family:var(--serif);font-size:19px;font-weight:500}
+.tk .pr{font-size:15.5px;margin-top:2px}
+.tk .qt{font-size:12.5px;color:var(--text2);margin-top:2px}
+.tk .qt.low{color:var(--gold)}
+.tk .perk{font-size:12.5px;color:var(--text2);grid-column:1/-1;margin-top:-2px}
+.step{display:flex;align-items:center;border:1px solid var(--border);border-radius:2px;background:var(--bg)}
+.step button{width:36px;height:38px;background:none;border:0;color:var(--text);font-size:18px;cursor:pointer;transition:color .2s}
+.step button:hover:not([disabled]){color:var(--gold)}
+.step button[disabled]{color:#4b4b52;cursor:not-allowed}
+.step output{min-width:28px;text-align:center;font-size:15.5px;font-weight:500}
+.tf{padding:22px 28px 28px;border-top:1px solid var(--border);display:grid;gap:16px}
+.tot{display:flex;justify-content:space-between;align-items:baseline;color:var(--text2);font-size:14px}
+.tot b{font-family:var(--serif);font-weight:500;font-size:26px;color:var(--text)}
+.tf .btn{width:100%;padding:19px;font-size:15px}
+.note{font-size:12.5px;color:var(--text2);margin:0;line-height:1.6;display:flex;gap:8px}
+.note svg{width:15px;height:15px;stroke:var(--gold);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none;margin-top:2px}
+
+/* mobile sticky CTA (hidden on desktop) */
+.mbar{display:none}
+
+/* RELATED */
+.related{padding:120px 0 0}
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:44px;gap:24px}
+.sec-head h2{font-family:var(--serif);font-weight:400;font-size:36px;line-height:1.2;margin:0}
+.sec-head p{margin:10px 0 0;color:var(--text2)}
+.more{font-size:14px;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:4px;white-space:nowrap}
+.more:hover{color:var(--text);border-color:var(--gold)}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:2px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .25s}
+.card:hover{border-color:#3d3d47}
+.card .img{position:relative;aspect-ratio:4/3;overflow:hidden;background:#09090b}
+.card .img svg.scene{width:100%;height:100%}
+.card .img::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(18,18,22,.9),rgba(18,18,22,0) 45%)}
+.wish{position:absolute;top:16px;right:16px;z-index:3;width:40px;height:40px;border-radius:50%;border:1px solid rgba(244,240,232,.28);background:rgba(11,11,13,.45);color:var(--text);display:grid;place-items:center;cursor:pointer;transition:border-color .2s,color .2s}
+.wish:hover{border-color:var(--gold);color:var(--gold)}
+.tag{position:absolute;left:16px;bottom:16px;z-index:3;font-size:12.5px;color:var(--gold);display:flex;align-items:center;gap:8px}
+.tag::before{content:"";width:18px;height:1px;background:var(--gold)}
+.card .body{padding:24px 24px 26px}
+.card h3{font-family:var(--serif);font-weight:400;font-size:22px;line-height:1.35;margin:0 0 6px}
+.card .sub{color:var(--text2);font-size:14.5px;margin:0 0 22px}
+.card .foot{display:flex;justify-content:space-between;align-items:flex-end;border-top:1px solid var(--border);padding-top:18px;gap:12px}
+.card .whn{font-size:13.5px;color:var(--text2);line-height:1.55}
+.card .whn span{color:var(--text)}
+.price{text-align:right;font-size:12.5px;color:var(--text2);line-height:1.3}
+.price b{display:block;font-family:var(--serif);font-weight:500;font-size:20px;color:var(--text);margin-top:2px}
+
+/* FOOTER */
+footer{background:var(--bg);border-top:1px solid var(--border);padding:72px 0 40px;margin-top:140px}
+.f-top{display:grid;grid-template-columns:1.4fr repeat(5,auto);gap:48px;align-items:start}
+.f-brand p{color:var(--text2);font-size:14px;margin:16px 0 0;max-width:20em}
+.f-top a.l{font-size:14px;color:var(--text2);padding:2px 0;display:block}
+.f-top a.l:hover{color:var(--text)}
+.f-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:64px;padding-top:28px;border-top:1px solid var(--border);color:#85837f;font-size:13px;gap:20px;flex-wrap:wrap}
+.soc{display:flex;gap:10px}
+.soc a{width:38px;height:38px;border:1px solid var(--border);border-radius:50%;display:grid;place-items:center;color:var(--text2);transition:border-color .2s,color .2s}
+.soc a:hover{border-color:var(--gold);color:var(--text)}
+.soc svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+
+@keyframes beam{0%,100%{opacity:.82}50%{opacity:1}}
+.beam{animation:beam 7s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.beam{animation:none}html{scroll-behavior:auto}}
+
+/* RESPONSIVE — ticket card becomes a bottom sheet CTA */
+@media (max-width:1100px){
+  .main{grid-template-columns:1fr;gap:0}
+  aside{position:static;order:-1;margin-bottom:64px}
+  .cards{grid-template-columns:1fr 1fr}
+  .cards .card:last-child{display:none}
+  .f-top{grid-template-columns:1fr 1fr 1fr}.f-brand{grid-column:1/-1}
+  .tf .btn{display:none}
+  .tf{grid-template-columns:1fr}
+  .mbar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:50;align-items:center;justify-content:space-between;gap:16px;padding:14px 20px calc(14px + env(safe-area-inset-bottom,0px));background:rgba(18,18,22,.96);border-top:1px solid var(--border);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+  .mbar small{display:block;color:var(--text2);font-size:12px;line-height:1.3}
+  .mbar b{font-family:var(--serif);font-weight:500;font-size:20px}
+  .mbar .btn{padding:16px 30px;font-size:15px}
+  body{padding-bottom:84px}
+}
+@media (max-width:760px){
+  .wrap{padding:0 20px}
+  .nav ul,.login{display:none}
+  .nav .wrap{gap:16px}.nav-r{margin-left:auto;gap:12px}
+  .hero{height:auto;min-height:640px}
+  .hero::after{background:linear-gradient(0deg,#0B0B0D 0%,rgba(11,11,13,.6) 60%,rgba(11,11,13,.8) 100%)}
+  .main{padding-top:48px}
+  .sec{padding-bottom:48px;margin-bottom:48px}
+  .exp,.loc,.sched,.rev{grid-template-columns:1fr}
+  .exp>div{border-right:0!important;border-bottom:1px solid var(--border)!important}
+  .exp>div:last-child{border-bottom:0!important}
+  .loc .map{min-height:220px}
+  .sched,.rev{gap:32px}
+  .tl li{grid-template-columns:84px 1fr}
+  .orgc{grid-template-columns:auto 1fr}
+  .org-act{grid-column:1/-1;flex-direction:row}
+  .org-act .btn{flex:1}
+  .cards{grid-template-columns:1fr}
+  .cards .card:last-child{display:flex}
+  .f-top{grid-template-columns:1fr 1fr}
+  .related{padding-top:88px}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="7" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+    <pattern id="kawung" width="36" height="36" patternUnits="userSpaceOnUse">
+      <g fill="none" stroke="#D6A85F" stroke-width=".8" opacity=".55">
+        <ellipse cx="18" cy="9" rx="8" ry="5"/><ellipse cx="18" cy="27" rx="8" ry="5"/>
+        <ellipse cx="9" cy="18" rx="5" ry="8"/><ellipse cx="27" cy="18" rx="5" ry="8"/>
+      </g>
+    </pattern>
+  </defs>
+</svg>
+
+<!-- NAVBAR -->
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="#" aria-label="Kagemaya beranda"><b>KAGEMAYA</b><i>影幻</i></a>
+    <nav aria-label="Utama"><ul>
+      <li><a href="#" aria-current="page">Event</a></li>
+      <li><a href="#">Kategori</a></li>
+      <li><a href="#">Organizer</a></li>
+    </ul></nav>
+    <div class="nav-r">
+      <button class="icon-btn" aria-label="Cari"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg></button>
+      <a class="login" href="#">Login</a>
+      <a class="btn btn-red btn-sm" href="#">Daftar</a>
+    </div>
+  </div>
+</header>
+
+<!-- HERO EVENT -->
+<section class="hero" aria-label="Yūgen">
+  <div class="hero-art" aria-hidden="true">
+    <svg class="scene" viewBox="0 0 1440 620" preserveAspectRatio="xMidYMid slice">
+      <defs>
+        <linearGradient id="y-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b0b0d"/><stop offset="1" stop-color="#2a0e10"/></linearGradient>
+        <radialGradient id="y-moon" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#F4E3C4"/><stop offset=".25" stop-color="#E5484D" stop-opacity=".6"/><stop offset="1" stop-color="#C62828" stop-opacity="0"/></radialGradient>
+        <filter id="y-b"><feGaussianBlur stdDeviation="26"/></filter>
+      </defs>
+      <rect width="1440" height="620" fill="url(#y-sky)"/>
+      <g class="beam"><circle cx="1010" cy="250" r="340" fill="url(#y-moon)"/></g>
+      <circle cx="1010" cy="250" r="96" fill="#F1DFC0" opacity=".93"/>
+      <rect x="914" y="250" width="192" height="1" fill="none"/>
+      <!-- Tokyo, left of moon -->
+      <g fill="#09090b">
+        <rect x="560" y="400" width="70" height="220"/><rect x="636" y="340" width="58" height="280"/><rect x="700" y="420" width="90" height="200"/>
+        <rect x="796" y="360" width="52" height="260"/><rect x="854" y="410" width="96" height="210"/>
+        <path d="M672 340 l8 -92 l8 92z"/>
+      </g>
+      <circle cx="680" cy="244" r="5" fill="#E5484D"/>
+      <g fill="#D6A85F" opacity=".6">
+        <rect x="570" y="430" width="5" height="6"/><rect x="586" y="470" width="5" height="6"/><rect x="648" y="380" width="5" height="6"/><rect x="662" y="420" width="5" height="6"/>
+        <rect x="712" y="450" width="5" height="6"/><rect x="808" y="394" width="5" height="6"/><rect x="822" y="440" width="5" height="6"/><rect x="870" y="450" width="5" height="6"/>
+      </g>
+      <!-- Jakarta, right of moon -->
+      <g fill="#09090b">
+        <rect x="1070" y="420" width="90" height="200"/><rect x="1168" y="330" width="62" height="290"/><rect x="1238" y="390" width="84" height="230"/>
+        <rect x="1330" y="340" width="56" height="280"/><rect x="1392" y="410" width="60" height="210"/>
+        <path d="M1104 420 l8 -110 l8 110z"/>
+      </g>
+      <circle cx="1112" cy="304" r="6" fill="#E5484D"/>
+      <g fill="#D6A85F" opacity=".6">
+        <rect x="1180" y="364" width="5" height="6"/><rect x="1194" y="404" width="5" height="6"/><rect x="1252" y="424" width="5" height="6"/>
+        <rect x="1344" y="376" width="5" height="6"/><rect x="1080" y="456" width="5" height="6"/><rect x="1406" y="446" width="5" height="6"/>
+      </g>
+      <!-- water -->
+      <rect x="0" y="540" width="1440" height="80" fill="#07070a"/>
+      <g stroke="#E5484D" stroke-width="1.4" opacity=".5"><path d="M970 548 h80"/><path d="M940 562 h140" opacity=".7"/><path d="M905 578 h210" opacity=".5"/><path d="M870 596 h280" opacity=".35"/></g>
+      <ellipse cx="1010" cy="540" rx="380" ry="36" fill="#C62828" opacity=".22" filter="url(#y-b)"/>
+    </svg>
+    <svg class="grain" viewBox="0 0 1440 620" preserveAspectRatio="none"><rect width="1440" height="620" filter="url(#grain)"/></svg>
+  </div>
+
+  <div class="wrap hero-in">
+    <nav class="crumb" aria-label="Breadcrumb"><a href="#">Event</a><span aria-hidden="true">/</span><a href="#">Film 4D</a><span aria-hidden="true">/</span><span>Yūgen</span></nav>
+    <h1>Yūgen: Film 4D Kolaborasi Tokyo–Jakarta</h1>
+    <ul class="meta">
+      <li><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1.500"/><path d="M3 10h18M3 14h18M8 5v14M16 5v14"/></svg>Film 4D</li>
+      <li><svg viewBox="0 0 24 24"><path d="M12 21s-7-5.500-7-11a7 7 0 0114 0c0 5.500-7 11-7 11z"/><circle cx="12" cy="10" r="2.500"/></svg>Jakarta</li>
+      <li><svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="1.500"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>12 Oktober 2026</li>
+      <li><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.500"/><path d="M12 7v5l3.500 2"/></svg>19:00–21:30 WIB</li>
+    </ul>
+    <div class="hero-act">
+      <button class="btn btn-line save" id="save" aria-pressed="false"><svg viewBox="0 0 24 24"><path d="M12 20s-7-4.400-7-10a4 4 0 017-2.600A4 4 0 0119 10c0 5.600-7 10-7 10z"/></svg><span>Simpan Event</span></button>
+      <a class="by" href="#organizer">
+        <span class="mini-av"><svg viewBox="0 0 72 72" width="34" height="34" aria-hidden="true"><rect width="72" height="72" fill="#1c1c22"/><circle cx="36" cy="30" r="15" fill="#C62828"/><path d="M0 52 L22 40 L36 48 L52 36 L72 50 V72 H0z" fill="#0b0b0d"/></svg></span>
+        <span>Diselenggarakan oleh <b>Aozora Collective</b></span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- MAIN -->
+<div class="wrap main">
+  <main>
+
+    <section class="sec" id="tentang">
+      <h2 class="t">Tentang Event</h2>
+      <p class="lead">Dua kota, satu bayangan. Yūgen mempertemukan sineas Tokyo dan Jakarta dalam satu film 4D berdurasi 90 menit.</p>
+      <div class="prose">
+        <p>Film ini dibangun dari cerita tentang cahaya dan bayangan: wayang kulit di Yogyakarta, lorong hujan di Shinjuku, dan hal-hal yang hanya terlihat saat lampu dimatikan. Di ruang teater, angin, kabut tipis, getaran kursi, dan aroma ikut bergerak mengikuti layar.</p>
+        <p>Setelah pemutaran, sutradara dari kedua negara akan berbincang singkat dengan penonton. Kursi terbatas, jadi pilih tiketmu lebih awal.</p>
+      </div>
+    </section>
+
+    <section class="sec" id="pengalaman">
+      <h2 class="t">Pengalaman yang Akan Kamu Dapatkan</h2>
+      <div class="exp">
+        <div>
+          <svg viewBox="0 0 32 32"><path d="M4 12h14a3 3 0 10-3-3M4 18h20a3.500 3.500 0 11-3.500 3.500M4 24h10"/></svg>
+          <h3>Efek 4D penuh</h3><p>Angin, kabut, percikan air, dan getaran kursi yang disusun mengikuti adegan.</p>
+        </div>
+        <div>
+          <svg viewBox="0 0 32 32"><rect x="4" y="7" width="24" height="16" rx="1.500"/><path d="M12 28h8M16 23v5"/></svg>
+          <h3>Layar sinematik besar</h3><p>Proyeksi resolusi tinggi dengan tata suara surround di teater berkapasitas terbatas.</p>
+        </div>
+        <div>
+          <svg viewBox="0 0 32 32"><rect x="13" y="4" width="6" height="14" rx="3"/><path d="M8 15a8 8 0 0016 0M16 23v5M11 28h10"/></svg>
+          <h3>Obrolan dengan sutradara</h3><p>Sesi tanya jawab 20 menit bersama sineas Jepang dan Indonesia setelah film.</p>
+        </div>
+        <div>
+          <svg viewBox="0 0 32 32"><path d="M6 10h20v6a4 4 0 01-4 4h-12a4 4 0 01-4-4zM26 12h2a2 2 0 010 6h-2M10 25h12"/></svg>
+          <h3>Suguhan Indo-Jepang</h3><p>Teh hijau dan jajanan pasar tradisional tersedia di lobi sebelum pemutaran.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="lokasi">
+      <h2 class="t">Lokasi</h2>
+      <div class="loc">
+        <div class="info">
+          <h3>Teater Sinar Maya</h3>
+          <p class="addr">Jl. H. R. Rasuna Said Kav. 12, Kuningan, Jakarta Selatan 12940</p>
+          <ul>
+            <li><svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 17V7h4a3 3 0 010 6H9"/></svg>Area parkir tersedia di basement</li>
+            <li><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="14" rx="3"/><path d="M5 11h14M8 21l2-4M16 21l-2-4"/></svg>8 menit jalan kaki dari stasiun terdekat</li>
+          </ul>
+          <a class="link" href="#">Buka di peta</a>
+        </div>
+        <div class="map" aria-hidden="true">
+          <svg viewBox="0 0 520 320" preserveAspectRatio="xMidYMid slice">
+            <rect width="520" height="320" fill="#0d0d10"/>
+            <g stroke="#1f1f26" stroke-width="10" fill="none" stroke-linecap="round">
+              <path d="M-10 90 H530"/><path d="M-10 210 H530"/><path d="M110 -10 V330"/><path d="M300 -10 V330"/><path d="M430 -10 V330"/>
+            </g>
+            <g stroke="#2a2a33" stroke-width="2" fill="none"><path d="M-10 90 H530"/><path d="M-10 210 H530"/><path d="M110 -10 V330"/><path d="M300 -10 V330"/><path d="M430 -10 V330"/></g>
+            <path d="M-10 290 C140 240 260 280 530 160" stroke="#16222b" stroke-width="18" fill="none"/>
+            <g fill="#121216" stroke="#22222a"><rect x="130" y="108" width="150" height="84"/><rect x="320" y="108" width="90" height="84"/><rect x="20" y="108" width="70" height="84"/><rect x="130" y="20" width="150" height="50"/><rect x="320" y="20" width="90" height="50"/></g>
+            <circle cx="250" cy="150" r="62" fill="#D6A85F" opacity=".08"/>
+            <circle cx="250" cy="150" r="9" fill="#D6A85F"/>
+            <circle cx="250" cy="150" r="20" fill="none" stroke="#D6A85F" stroke-opacity=".6"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="waktu">
+      <h2 class="t">Tanggal &amp; Waktu</h2>
+      <div class="sched">
+        <div class="date-big">
+          <div class="d">12</div><div class="m">Oktober</div><div class="y">2026 · Senin</div>
+          <a class="link" href="#">Tambahkan ke kalender</a>
+        </div>
+        <ol class="tl">
+          <li><span class="tm">18:30</span><span class="ds"><b>Pintu dibuka</b><span>Registrasi ulang, suguhan di lobi</span></span></li>
+          <li class="main"><span class="tm">19:00</span><span class="ds"><b>Pemutaran Yūgen</b><span>Film 4D, durasi 90 menit</span></span></li>
+          <li><span class="tm">20:45</span><span class="ds"><b>Obrolan bersama sutradara</b><span>Tanya jawab dengan penonton</span></span></li>
+          <li><span class="tm">21:30</span><span class="ds"><b>Selesai</b><span>Waktu WIB</span></span></li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="sec" id="organizer">
+      <h2 class="t">Organizer</h2>
+      <div class="orgc">
+        <div class="avatar"><svg viewBox="0 0 72 72" aria-hidden="true"><rect width="72" height="72" fill="#1c1c22"/><circle cx="36" cy="30" r="15" fill="#C62828"/><path d="M0 52 L22 40 L36 48 L52 36 L72 50 V72 H0z" fill="#0b0b0d"/></svg></div>
+        <div>
+          <h3>Aozora Collective</h3>
+          <div class="kind">Film &amp; sinema 4D · Jakarta</div>
+          <div class="stats"><div><b><span class="star">★</span> 4,8</b>Rating</div><div><b id="fcount">124</b>Pengikut</div><div><b>9</b>Event</div></div>
+        </div>
+        <div class="org-act">
+          <button class="btn btn-line follow" id="follow" aria-pressed="false">Follow</button>
+          <a class="btn btn-line" href="#">Lihat Profil</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="sec" id="qa">
+      <h2 class="t">Pertanyaan &amp; Jawaban</h2>
+      <div class="qa">
+        <div class="q pinned">
+          <div class="ask"><span>Apakah venue menyediakan parkir?</span></div>
+          <div class="who">Dinda R. · 3 hari lalu</div>
+          <div class="ans">
+            <div class="head">
+              <span class="badge"><svg viewBox="0 0 24 24"><path d="M5 12l4.500 4.500L19 7"/></svg>Organizer</span>
+              <b>Aozora Collective</b>
+              <span class="pin"><svg viewBox="0 0 24 24"><path d="M9 4h6l-1 6 3 3H7l3-3zM12 13v8"/></svg>Jawaban disematkan</span>
+            </div>
+            <p>Ya, tersedia area parkir di venue.</p>
+          </div>
+        </div>
+        <div class="q">
+          <div class="ask"><span>Apakah film memakai subtitle bahasa Indonesia?</span></div>
+          <div class="who">Raka P. · 5 hari lalu</div>
+          <div class="ans">
+            <div class="head"><span class="badge"><svg viewBox="0 0 24 24"><path d="M5 12l4.500 4.500L19 7"/></svg>Organizer</span><b>Aozora Collective</b></div>
+            <p>Ya. Dialog bahasa Jepang dan Inggris diberi subtitle bahasa Indonesia.</p>
+          </div>
+        </div>
+      </div>
+      <div class="ask-box">
+        <input id="qin" type="text" placeholder="Tulis pertanyaan…" aria-label="Tulis pertanyaan">
+        <button type="button" id="qsend">Kirim</button>
+      </div>
+    </section>
+
+    <section class="sec" id="ulasan">
+      <h2 class="t">Ulasan Peserta</h2>
+      <div class="rev">
+        <div class="score">
+          <div class="n">4,8<small> / 5</small></div>
+          <div class="stars" aria-label="Rating 4,8 dari 5">★★★★★</div>
+          <div class="c">dari 62 ulasan event Aozora Collective</div>
+          <div class="bars">
+            <div><span>5</span><i style="--w:84%"></i><span>52</span></div>
+            <div><span>4</span><i style="--w:14%"></i><span>9</span></div>
+            <div><span>3</span><i style="--w:2%"></i><span>1</span></div>
+            <div><span>2</span><i style="--w:0%"></i><span>0</span></div>
+            <div><span>1</span><i style="--w:0%"></i><span>0</span></div>
+          </div>
+        </div>
+        <div class="rlist">
+          <article class="r">
+            <div class="top"><div class="ini">A</div><div><div class="nm">Ayu Lestari</div><div class="ev">Hadir di Nippon Nights, 2025</div></div><div class="st">★★★★★</div></div>
+            <p>Kabut dan angin di adegan hujan terasa nyata sekali. Aku keluar teater dengan rambut sedikit basah dan senyum lebar.</p>
+          </article>
+          <article class="r">
+            <div class="top"><div class="ini">B</div><div><div class="nm">Bimo Adinegara</div><div class="ev">Hadir di Workshop Foley, 2025</div></div><div class="st">★★★★★</div></div>
+            <p>Organisasi rapi dari antre sampai duduk. Sesi tanya jawab dengan sutradara jadi bagian favoritku.</p>
+          </article>
+          <article class="r">
+            <div class="top"><div class="ini">K</div><div><div class="nm">Keiko Tanaka</div><div class="ev">Hadir di Yūgen Preview, 2026</div></div><div class="st">★★★★☆</div></div>
+            <p>Tata suaranya luar biasa. Satu bintang kurang karena kursi VIP terasa agak rapat, tapi pengalamannya tetap berkesan.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- STICKY TICKET CARD -->
+  <aside aria-label="Pembelian tiket">
+    <div class="ticket">
+      <div class="th">
+        <h2>Pilih Tiket</h2>
+        <div class="when">Senin, 12 Oktober 2026 · 19:00–21:30 WIB<br>Teater Sinar Maya, Jakarta</div>
+      </div>
+      <ul class="tix">
+        <li class="tk" data-price="150000" data-quota="84">
+          <div><div class="nm">Regular</div><div class="pr">Rp150.000</div><div class="qt">Tersisa 84 tiket</div></div>
+          <div class="step"><button type="button" aria-label="Kurangi Regular" data-d="-1" disabled>−</button><output>0</output><button type="button" aria-label="Tambah Regular" data-d="1">+</button></div>
+        </li>
+        <li class="tk" data-price="250000" data-quota="32">
+          <div><div class="nm">Premium</div><div class="pr">Rp250.000</div><div class="qt">Tersisa 32 tiket</div></div>
+          <div class="step"><button type="button" aria-label="Kurangi Premium" data-d="-1" disabled>−</button><output>0</output><button type="button" aria-label="Tambah Premium" data-d="1">+</button></div>
+          <div class="perk">Kursi tengah + suguhan lobi</div>
+        </li>
+        <li class="tk" data-price="400000" data-quota="9">
+          <div><div class="nm">VIP</div><div class="pr">Rp400.000</div><div class="qt low">Tersisa 9 tiket</div></div>
+          <div class="step"><button type="button" aria-label="Kurangi VIP" data-d="-1" disabled>−</button><output>0</output><button type="button" aria-label="Tambah VIP" data-d="1">+</button></div>
+          <div class="perk">Baris depan, meet &amp; greet sutradara</div>
+        </li>
+      </ul>
+      <div class="tf">
+        <div class="tot"><span id="cnt">Belum ada tiket dipilih</span><b id="tot">Rp0</b></div>
+        <button class="btn btn-red" id="buy" type="button" disabled>Pilih Tiket</button>
+        <p class="note"><svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.500 8-8 9-4.500-1-8-4-8-9V6z"/></svg>Maksimal 5 tiket per transaksi. Pembayaran aman dan e-tiket dikirim lewat email.</p>
+      </div>
+    </div>
+  </aside>
+</div>
+
+<!-- RELATED -->
+<section class="related" aria-labelledby="rel">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><h2 id="rel">Event Serupa</h2><p>Pengalaman lain dari dunia yang sama.</p></div>
+      <a class="more" href="#">Lihat semua event</a>
+    </div>
+    <div class="cards">
+      <article class="card">
+        <div class="img">
+          <button class="wish" aria-label="Simpan ke wishlist"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 20s-7-4.400-7-10a4 4 0 017-2.600A4 4 0 0119 10c0 5.600-7 10-7 10z"/></svg></button>
+          <svg class="scene" viewBox="0 0 480 360" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <defs><linearGradient id="n-b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E5484D" stop-opacity="0"/><stop offset=".5" stop-color="#E5484D" stop-opacity=".55"/><stop offset="1" stop-color="#E5484D" stop-opacity="0"/></linearGradient><filter id="n-bl"><feGaussianBlur stdDeviation="10"/></filter></defs>
+            <rect width="480" height="360" fill="#0a0a0c"/>
+            <polygon points="-20,40 500,150 500,230" fill="url(#n-b)" filter="url(#n-bl)"/>
+            <g transform="rotate(-14 240 190)"><rect x="-40" y="140" width="560" height="100" fill="#141418" stroke="#2f2f38"/>
+              <rect x="10" y="164" width="86" height="56" fill="#2a1012"/><rect x="108" y="164" width="86" height="56" fill="#3a1a14"/><rect x="206" y="164" width="86" height="56" fill="#5a2418"/><rect x="304" y="164" width="86" height="56" fill="#1d1d24"/><rect x="402" y="164" width="86" height="56" fill="#2a1012"/>
+              <circle cx="249" cy="192" r="15" fill="#F1DFC0" opacity=".9"/><path d="M326 214 l20 -34 l16 22 l10 -12 l14 24z" fill="#0a0a0c"/>
+              <g fill="#0a0a0c"><rect x="8" y="148" width="14" height="10" rx="2"/><rect x="72" y="148" width="14" height="10" rx="2"/><rect x="136" y="148" width="14" height="10" rx="2"/><rect x="200" y="148" width="14" height="10" rx="2"/><rect x="264" y="148" width="14" height="10" rx="2"/><rect x="328" y="148" width="14" height="10" rx="2"/><rect x="392" y="148" width="14" height="10" rx="2"/><rect x="456" y="148" width="14" height="10" rx="2"/>
+              <rect x="8" y="222" width="14" height="10" rx="2"/><rect x="72" y="222" width="14" height="10" rx="2"/><rect x="136" y="222" width="14" height="10" rx="2"/><rect x="200" y="222" width="14" height="10" rx="2"/><rect x="264" y="222" width="14" height="10" rx="2"/><rect x="328" y="222" width="14" height="10" rx="2"/><rect x="392" y="222" width="14" height="10" rx="2"/><rect x="456" y="222" width="14" height="10" rx="2"/></g></g>
+          </svg>
+          <svg class="grain" viewBox="0 0 480 360" preserveAspectRatio="none" aria-hidden="true"><rect width="480" height="360" filter="url(#grain)"/></svg>
+          <span class="tag">Film 4D</span>
+        </div>
+        <div class="body"><h3>Nippon Nights: Marathon Film Pendek 4D</h3><p class="sub">Tujuh film pendek, satu malam penuh.</p>
+          <div class="foot"><div class="whn"><span>Surabaya</span><br>Jum, 4 Des 2026</div><div class="price">Mulai dari<b>Rp150.000</b></div></div></div>
+      </article>
+
+      <article class="card">
+        <div class="img">
+          <button class="wish" aria-label="Simpan ke wishlist"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 20s-7-4.400-7-10a4 4 0 017-2.600A4 4 0 0119 10c0 5.600-7 10-7 10z"/></svg></button>
+          <svg class="scene" viewBox="0 0 480 360" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <defs><radialGradient id="f-lamp" cx=".5" cy=".3" r=".6"><stop offset="0" stop-color="#D6A85F" stop-opacity=".55"/><stop offset="1" stop-color="#D6A85F" stop-opacity="0"/></radialGradient></defs>
+            <rect width="480" height="360" fill="#0d0d10"/><rect width="480" height="360" fill="url(#f-lamp)"/>
+            <path d="M410 360 V150 l-120 -60" stroke="#2c2c34" stroke-width="3" fill="none"/>
+            <g transform="translate(250,70) rotate(-28)"><rect x="-16" y="-8" width="64" height="30" rx="15" fill="#1c1c22" stroke="#3a3a44"/></g>
+            <ellipse cx="150" cy="292" rx="120" ry="14" fill="#050506"/>
+            <ellipse cx="108" cy="270" rx="34" ry="24" fill="#1c1c22" stroke="#3f3a32"/><ellipse cx="186" cy="276" rx="30" ry="21" fill="#17171c" stroke="#3f3a32"/>
+            <g stroke="#E5484D" stroke-width="2.400" stroke-linecap="round"><path d="M40 180v-6M52 180v-18M64 180v-34M76 180v-14M88 180v-44M100 180v-62M112 180v-30M124 180v-52M136 180v-20M148 180v-38M160 180v-70M172 180v-24M184 180v-46M196 180v-12"/></g>
+          </svg>
+          <svg class="grain" viewBox="0 0 480 360" preserveAspectRatio="none" aria-hidden="true"><rect width="480" height="360" filter="url(#grain)"/></svg>
+          <span class="tag">Workshop Kreatif</span>
+        </div>
+        <div class="body"><h3>Workshop Foley ala Anime</h3><p class="sub">Buat suara langkah, hujan, dan pedang.</p>
+          <div class="foot"><div class="whn"><span>Bandung</span><br>Min, 22 Nov 2026</div><div class="price">Mulai dari<b>Rp120.000</b></div></div></div>
+      </article>
+
+      <article class="card">
+        <div class="img">
+          <button class="wish" aria-label="Simpan ke wishlist"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 20s-7-4.400-7-10a4 4 0 017-2.600A4 4 0 0119 10c0 5.600-7 10-7 10z"/></svg></button>
+          <svg class="scene" viewBox="0 0 480 360" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <defs><radialGradient id="t-g" cx=".5" cy=".4" r=".55"><stop offset="0" stop-color="#C62828" stop-opacity=".4"/><stop offset="1" stop-color="#C62828" stop-opacity="0"/></radialGradient></defs>
+            <rect width="480" height="360" fill="#0b0b0d"/><rect width="480" height="360" fill="url(#t-g)"/>
+            <rect x="170" y="70" width="140" height="80" fill="#2a1012" stroke="#D6A85F" stroke-opacity=".3"/>
+            <rect x="170" y="70" width="140" height="80" fill="url(#kawung)" opacity=".4"/>
+            <g fill="#050506"><rect x="60" y="230" width="360" height="12"/><rect x="90" y="242" width="8" height="70"/><rect x="382" y="242" width="8" height="70"/>
+              <ellipse cx="200" cy="200" rx="18" ry="20"/><path d="M180 232 q20 -36 40 0z"/><ellipse cx="280" cy="198" rx="18" ry="20"/><path d="M260 230 q20 -36 40 0z"/></g>
+            <path d="M178 192 q22 -20 44 0M258 190 q22 -20 44 0" fill="none" stroke="#F4E3C4" stroke-opacity=".3"/>
+          </svg>
+          <svg class="grain" viewBox="0 0 480 360" preserveAspectRatio="none" aria-hidden="true"><rect width="480" height="360" filter="url(#grain)"/></svg>
+          <span class="tag">Talkshow Budaya</span>
+        </div>
+        <div class="body"><h3>Bayang &amp; Wayang: Obrolan Sinema Indo-Jepang</h3><p class="sub">Dari wayang kulit hingga sinema modern.</p>
+          <div class="foot"><div class="whn"><span>Yogyakarta</span><br>Sab, 5 Des 2026</div><div class="price">Mulai dari<b>Rp90.000</b></div></div></div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="f-top">
+      <div class="f-brand"><a class="logo" href="#"><b>KAGEMAYA</b><i>影幻</i></a><p>Di balik bayangan, ilusi menjadi nyata.</p></div>
+      <a class="l" href="#">Event</a><a class="l" href="#">Kategori</a><a class="l" href="#">Organizer</a><a class="l" href="#">Tentang Kagemaya</a><a class="l" href="#">Bantuan</a>
+    </div>
+    <div class="f-bottom">
+      <span>© 2026 Kagemaya. Semua hak dilindungi.</span>
+      <div class="soc">
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3.500" y="3.500" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r=".6"/></svg></a>
+        <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="3.500"/><path d="M10 9.500v5l4.500-2.500z"/></svg></a>
+        <a href="#" aria-label="X"><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></a>
+        <a href="#" aria-label="TikTok"><svg viewBox="0 0 24 24"><path d="M14 4v10.500a3.500 3.500 0 11-3.500-3.500M14 4c.4 2.600 2 4 4.500 4.200"/></svg></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Mobile: ticket CTA becomes a sticky bottom bar -->
+<div class="mbar" aria-hidden="false">
+  <div><small id="mcnt">Mulai dari</small><b id="mtot">Rp150.000</b></div>
+  <button class="btn btn-red" id="mbuy" type="button">Pilih Tiket</button>
+</div>
+
+<script>
+(function(){
+  var fmt=function(n){return 'Rp'+n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.')};
+  var rows=[].slice.call(document.querySelectorAll('.tk'));
+  var MAX=5;
+  function update(){
+    var q=0,t=0;
+    rows.forEach(function(r){var n=+r.querySelector('output').textContent;q+=n;t+=n*(+r.dataset.price);r.classList.toggle('on',n>0)});
+    rows.forEach(function(r){
+      var o=r.querySelector('output'),n=+o.textContent,quota=+r.dataset.quota,b=r.querySelectorAll('button');
+      b[0].disabled=n<=0; b[1].disabled=q>=MAX||n>=quota;
+    });
+    document.getElementById('cnt').textContent=q?q+' tiket dipilih':'Belum ada tiket dipilih';
+    document.getElementById('tot').textContent=fmt(t);
+    document.getElementById('buy').disabled=!q;
+    document.getElementById('mcnt').textContent=q?q+' tiket dipilih':'Mulai dari';
+    document.getElementById('mtot').textContent=q?fmt(t):'Rp150.000';
+  }
+  rows.forEach(function(r){
+    r.addEventListener('click',function(e){
+      var b=e.target.closest('button[data-d]'); if(!b||b.disabled)return;
+      var o=r.querySelector('output'); o.textContent=Math.max(0,+o.textContent+(+b.dataset.d)); update();
+    });
+  });
+  document.getElementById('mbuy').addEventListener('click',function(){
+    if(!document.querySelector('.tk.on')){document.querySelector('aside').scrollIntoView({behavior:'smooth'})}
+  });
+  var save=document.getElementById('save');
+  save.addEventListener('click',function(){
+    var p=save.getAttribute('aria-pressed')==='true';
+    save.setAttribute('aria-pressed',!p); save.querySelector('span').textContent=p?'Simpan Event':'Tersimpan';
+  });
+  var fo=document.getElementById('follow'),fc=document.getElementById('fcount');
+  fo.addEventListener('click',function(){
+    var p=fo.getAttribute('aria-pressed')==='true';
+    fo.setAttribute('aria-pressed',!p); fo.textContent=p?'Follow':'Mengikuti'; fc.textContent=p?'124':'125';
+  });
+  var qin=document.getElementById('qin');
+  function send(){
+    var v=qin.value.trim(); if(!v)return;
+    var d=document.createElement('div'); d.className='q open';
+    var a=document.createElement('div'); a.className='ask';
+    var s=document.createElement('span'); s.textContent=v; a.appendChild(s);
+    var w=document.createElement('div'); w.className='who'; w.textContent='Kamu · baru saja';
+    var x=document.createElement('div'); x.className='wait'; x.textContent='Menunggu jawaban dari organizer.';
+    d.appendChild(a); d.appendChild(w); d.appendChild(x);
+    document.querySelector('.qa').appendChild(d); qin.value='';
+  }
+  document.getElementById('qsend').addEventListener('click',send);
+  qin.addEventListener('keydown',function(e){if(e.key==='Enter')send()});
+  update();
+})();
+</script>
+</body>
+</html>
