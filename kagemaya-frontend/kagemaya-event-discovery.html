@@ -191,6 +191,7 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:72px 0 40
 <!-- NAVBAR -->
 <header class="nav">
   <div class="wrap">
+
     <a class="logo" href="kagemaya-landing-page-visual-anchor.html" aria-label="Kagemaya beranda"><b>KAGEMAYA</b><i>影幻</i></a>
     <nav aria-label="Utama"><ul>
       <li><a href="kagemaya-event-discovery.html" aria-current="page">Event</a></li>
@@ -199,6 +200,15 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:72px 0 40
     </ul></nav>
     <div class="nav-r">
       <button class="icon-btn" aria-label="Cari"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg></button>
+
+    <a class="logo" href="#" aria-label="Kagemaya beranda"><b>KAGEMAYA</b><i>影幻</i></a>
+    <nav aria-label="Utama"><ul>
+      <li><a href="#" aria-current="page">Event</a></li>
+      <li><a href="#">Kategori</a></li>
+      <li><a href="#">Organizer</a></li>
+    </ul></nav>
+    <div class="nav-r" id="nav-actions-container">
+
       <a class="login" href="kagemaya-login.html">Login</a>
       <a class="btn btn-red btn-sm" href="kagemaya-register.html">Daftar</a>
     </div>
@@ -286,6 +296,7 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:72px 0 40
 </div>
 
 <script>
+
 // 1. Konfigurasi Base API URL
 const API_BASE_URL = 'http://localhost:5000/api';
 
@@ -546,11 +557,194 @@ function renderPagination(pagination) {
   pagerEl.style.display = 'flex';
   let html = '';
 
+
+const API_BASE = 'http://localhost:5000/api';
+const HEART = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.6-7 10-7 10z"/></svg>';
+
+let currentPage = 1;
+const itemsPerPage = 6;
+let searchTimer = null;
+let currentTotalPages = 1;
+
+// Format Rupiah
+function formatRupiah(amount) {
+  if (!amount && amount !== 0) return 'Gratis';
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    maximumFractionDigits: 0
+  }).format(amount);
+}
+
+function escapeHtml(text) {
+  if (!text) return '';
+  return text.replace(/[&<>"']/g, m => ({
+    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;'
+  })[m]);
+}
+
+// Map label kategori ke slug
+function getCategorySlug(label) {
+  const map = {
+    'Film 4D': 'film-4d',
+    'Workshop Kreatif': 'workshop-kreatif',
+    'Talkshow Budaya': 'talkshow-budaya',
+    'Anime & Manga': 'anime-dan-manga'
+  };
+  return map[label] || label;
+}
+
+// 1. Fetch Events dari API Backend
+async function loadEvents(page = 1) {
+  currentPage = page;
+  const qInput = document.getElementById('q');
+  const fcInput = document.getElementById('fc');
+  const fkInput = document.getElementById('fk');
+  const cardsContainer = document.getElementById('cards');
+  const countLabel = document.getElementById('count');
+
+  const search = qInput ? qInput.value.trim() : '';
+  const categoryLabel = fcInput ? fcInput.value : '';
+  const city = fkInput ? fkInput.value : '';
+  const categorySlug = categoryLabel ? getCategorySlug(categoryLabel) : '';
+
+  // Tampilkan Skeleton / Loading
+  cardsContainer.innerHTML = `
+    <div style="grid-column: 1 / -1; text-align: center; padding: 72px 0; color: var(--text2);">
+      <p style="font-family: var(--serif); font-size: 18px;">Memuat kurasi event...</p>
+    </div>
+  `;
+
+  // Update URL Query Params agar bisa di-share/bookmark
+  const params = new URLSearchParams();
+  if (search) params.set('q', search);
+  if (categoryLabel) params.set('cat', categorySlug);
+  if (city) params.set('city', city);
+  if (page > 1) params.set('page', page);
+  const newUrl = window.location.pathname + (params.toString() ? '?' + params.toString() : '');
+  window.history.replaceState({}, '', newUrl);
+
+  // Update Chips
+  updateActiveChips(search, categoryLabel, city);
+
+  try {
+    const apiQuery = new URLSearchParams({
+      page: currentPage,
+      limit: itemsPerPage
+    });
+    if (search) apiQuery.set('search', search);
+    if (categorySlug) apiQuery.set('category', categorySlug);
+    if (city) apiQuery.set('city', city);
+
+    const res = await fetch(`${API_BASE}/events?${apiQuery.toString()}`);
+    const data = await res.json();
+
+    if (!res.ok || !data.data) {
+      throw new Error(data.message || 'Gagal memuat event');
+    }
+
+    const events = data.data;
+    const pagination = data.pagination || { total: events.length, totalPages: 1, page: 1 };
+    currentTotalPages = pagination.totalPages || 1;
+
+    // Render Event Cards
+    renderEventList(events);
+
+    // Update Result Count
+    const totalCount = pagination.total || events.length;
+    countLabel.textContent = `${totalCount} event ditemukan`;
+    document.body.classList.toggle('state-empty', events.length === 0);
+
+    // Render Pagination Controls
+    renderPagination(pagination.page, currentTotalPages);
+
+  } catch (err) {
+    console.error('Fetch events failed:', err);
+    cardsContainer.innerHTML = `
+      <div style="grid-column: 1 / -1; text-align: center; padding: 60px 0; color: #ff8b8b;">
+        <p style="margin-bottom: 12px;">Terjadi kendala saat menghubungkan ke server.</p>
+        <button class="btn btn-line" onclick="loadEvents(1)">Coba Lagi</button>
+      </div>
+    `;
+    document.body.classList.remove('state-empty');
+  }
+}
+
+// 2. Render Komponen EventCard
+function renderEventList(events) {
+  const container = document.getElementById('cards');
+  if (!events || events.length === 0) {
+    container.innerHTML = '';
+    return;
+  }
+
+  container.innerHTML = events.map(event => {
+    const dateFormatted = new Date(event.start_date).toLocaleDateString('id-ID', {
+      weekday: 'short',
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric'
+    });
+
+    const banner = event.banner_url || 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=600';
+    const catName = event.category?.name || 'Budaya';
+    const isSoldOut = event.is_sold_out;
+
+    return `
+      <article class="card">
+        <div class="img">
+          <button class="wish" aria-pressed="false" aria-label="Simpan ke wishlist" onclick="toggleWishlist(this, event)">
+            ${HEART}
+          </button>
+          <img src="${banner}" alt="${escapeHtml(event.title)}" style="width: 100%; height: 100%; object-fit: cover;">
+          <svg class="grain" viewBox="0 0 480 360" preserveAspectRatio="none" aria-hidden="true">
+            <rect width="480" height="360" filter="url(#grain)"/>
+          </svg>
+          <span class="tag">${escapeHtml(catName)}</span>
+        </div>
+        <div class="body">
+          <h3>
+            <a href="kagemaya-event-detail.html?id=${event.id}" style="color: inherit; text-decoration: none;">
+              ${escapeHtml(event.title)}
+            </a>
+          </h3>
+          <p class="s">${escapeHtml(event.description ? event.description.substring(0, 90) + '...' : '')}</p>
+          <div class="foot">
+            <div class="whn">
+              <span>${escapeHtml(event.city)}</span><br>
+              ${dateFormatted}
+            </div>
+            <div class="price">
+              ${isSoldOut ? '<span style="color:#ff8b8b;font-weight:600">Habis Terjual</span>' : 'Mulai dari<b>' + formatRupiah(event.starting_price) + '</b>'}
+            </div>
+          </div>
+        </div>
+      </article>
+    `;
+  }).join('');
+}
+
+// 3. Render Pagination
+function renderPagination(page, totalPages) {
+  const pager = document.querySelector('.pager');
+  if (!pager) return;
+
+  if (totalPages <= 1) {
+    pager.style.display = 'none';
+    return;
+  }
+  pager.style.display = 'flex';
+
+  let html = '';
+
+  // Tombol Previous
+
   if (page > 1) {
     html += `<a href="#" onclick="changePage(${page - 1}); return false;">‹&nbsp; Previous</a>`;
   } else {
     html += `<a class="off" href="#" aria-disabled="true">‹&nbsp; Previous</a>`;
   }
+
 
   for (let i = 1; i <= totalPages; i++) {
     if (i === page) {
@@ -559,6 +753,7 @@ function renderPagination(pagination) {
       html += `<a href="#" class="pn" onclick="changePage(${i}); return false;">${i}</a>`;
     }
   }
+
 
   if (page < totalPages) {
     html += `<a href="#" onclick="changePage(${page + 1}); return false;">Next &nbsp;›</a>`;
@@ -629,6 +824,175 @@ document.addEventListener('DOMContentLoaded', async () => {
   await loadCategories();
   loadEvents(1);
 });
+
+  pager.innerHTML = html;
+}
+
+function changePage(p) {
+  loadEvents(p);
+  window.scrollTo({ top: document.querySelector('.results').offsetTop - 60, behavior: 'smooth' });
+}
+
+// 4. Update Chips Filter
+function updateActiveChips(search, categoryLabel, city) {
+  const chipsEl = document.getElementById('chips');
+  if (!chipsEl) return;
+
+  const chips = [];
+  if (search) chips.push({ key: 'q', label: `“${search}”` });
+  if (categoryLabel) chips.push({ key: 'fc', label: categoryLabel });
+  if (city) chips.push({ key: 'fk', label: city });
+
+  chipsEl.hidden = chips.length === 0;
+  if (chips.length === 0) {
+    chipsEl.innerHTML = '';
+    return;
+  }
+
+  chipsEl.innerHTML = chips.map(c => `
+    <span class="chip">
+      ${escapeHtml(c.label)}
+      <button onclick="removeFilter('${c.key}')" aria-label="Hapus filter">×</button>
+    </span>
+  `).join('') + `<button class="chip clear" onclick="resetFilters()">Reset Filter</button>`;
+}
+
+function removeFilter(key) {
+  const input = document.getElementById(key);
+  if (input) input.value = '';
+  loadEvents(1);
+}
+
+function resetFilters() {
+  const q = document.getElementById('q');
+  const fc = document.getElementById('fc');
+  const fk = document.getElementById('fk');
+  if (q) q.value = '';
+  if (fc) fc.value = '';
+  if (fk) fk.value = '';
+  loadEvents(1);
+}
+
+function toggleWishlist(btn, e) {
+  e.preventDefault();
+  e.stopPropagation();
+  const isPressed = btn.getAttribute('aria-pressed') === 'true';
+  btn.setAttribute('aria-pressed', !isPressed);
+}
+
+// 5. Inisialisasi Event Listener dengan Debounce
+document.addEventListener('DOMContentLoaded', () => {
+  // Setup Navbar Auth
+  const token = localStorage.getItem('kagemaya_token');
+  const userJson = localStorage.getItem('kagemaya_user');
+  if (token && userJson) {
+    try {
+      const user = JSON.parse(userJson);
+      renderLoggedInNavbar(user);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  // Baca URL Params awal
+  const urlParams = new URLSearchParams(window.location.search);
+  const initialQ = urlParams.get('q');
+  const initialCat = urlParams.get('cat');
+  const initialCity = urlParams.get('city');
+  const initialPage = parseInt(urlParams.get('page')) || 1;
+
+  const qInput = document.getElementById('q');
+  const fcInput = document.getElementById('fc');
+  const fkInput = document.getElementById('fk');
+
+  if (initialQ && qInput) qInput.value = initialQ;
+  if (initialCity && fkInput) fkInput.value = initialCity;
+  if (initialCat && fcInput) {
+    // Cari opsi yang sesuai dengan slug
+    Array.from(fcInput.options).forEach(opt => {
+      if (getCategorySlug(opt.value) === initialCat) {
+        fcInput.value = opt.value;
+      }
+    });
+  }
+
+  // DEBOUNCE SEARCH INPUT (350ms delay)
+  if (qInput) {
+    qInput.addEventListener('input', () => {
+      clearTimeout(searchTimer);
+      searchTimer = setTimeout(() => {
+        loadEvents(1);
+      }, 350);
+    });
+  }
+
+  // Filter Dropdown Change Listener
+  if (fcInput) fcInput.addEventListener('change', () => loadEvents(1));
+  if (fkInput) fkInput.addEventListener('change', () => loadEvents(1));
+
+  // Reset button listener
+  const resetBtn = document.getElementById('reset');
+  if (resetBtn) resetBtn.addEventListener('click', resetFilters);
+
+  // Initial Load
+  loadEvents(initialPage);
+});
+
+// Render Logged In Navbar
+function renderLoggedInNavbar(user) {
+  const navRight = document.getElementById('nav-actions-container');
+  if (!navRight) return;
+
+  let displayName = user.name || user.email || 'User';
+  const nameParts = displayName.trim().split(' ');
+  if (nameParts.length > 1) {
+    displayName = `${nameParts[0]} ${nameParts[1].charAt(0).toUpperCase()}.`;
+  } else {
+    displayName = nameParts[0];
+  }
+
+  const orderLink = (user.role === 'ORGANIZER' || user.role === 'organizer')
+    ? 'kagemaya-organizer-dashboard.html'
+    : 'kagemaya-order-history.html';
+
+  navRight.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 16px; position: relative;">
+      <span id="userNameBtn" style="color: #E2B857; font-weight: 500; font-size: 14px; cursor: pointer;">
+        ${displayName}
+      </span>
+      <a href="${orderLink}" style="
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: transparent;
+        color: #FFFFFF;
+        padding: 6px 16px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+      ">
+        ${(user.role === 'ORGANIZER' || user.role === 'organizer') ? 'Dashboard' : 'Pesananku'}
+      </a>
+      <button id="logoutBtn" style="
+        background: none;
+        border: none;
+        color: #ff4d4d;
+        font-size: 13px;
+        cursor: pointer;
+        padding: 4px 8px;
+      ">
+        Keluar
+      </button>
+    </div>
+  `;
+
+  document.getElementById('logoutBtn')?.addEventListener('click', () => {
+    localStorage.removeItem('kagemaya_token');
+    localStorage.removeItem('kagemaya_user');
+    window.location.reload();
+  });
+}
+
 </script>
 </body>
 </html>

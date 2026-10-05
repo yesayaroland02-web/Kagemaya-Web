@@ -123,3 +123,151 @@ export const getCategoriesService = async () => {
     },
   });
 };
+
+export const getEventByIdService = async (id: string) => {
+  const event = await prisma.event.findUnique({
+    where: { id },
+    include: {
+      category: {
+        select: { id: true, name: true, slug: true },
+      },
+      organizer: {
+        select: {
+          id: true,
+          name: true,
+          email: true,
+          profile_picture: true,
+          organizer_profile: {
+            select: {
+              organization_name: true,
+              bio: true,
+            },
+          },
+          _count: {
+            select: {
+              events: true,
+              following: true,
+            },
+          },
+        },
+      },
+      ticket_types: {
+        orderBy: { price: 'asc' },
+        select: {
+          id: true,
+          name: true,
+          price: true,
+          quota: true,
+          available_quota: true,
+        },
+      },
+      vouchers: {
+        where: {
+          end_date: { gte: new Date() },
+        },
+        select: {
+          id: true,
+          code: true,
+          discount_type: true,
+          discount_value: true,
+          start_date: true,
+          end_date: true,
+        },
+      },
+      reviews: {
+        select: {
+          id: true,
+          rating: true,
+          comment: true,
+          created_at: true,
+          customer: {
+            select: {
+              id: true,
+              name: true,
+              profile_picture: true,
+            },
+          },
+        },
+        orderBy: { created_at: 'desc' },
+      },
+    },
+  });
+
+  if (!event) {
+    throw new Error('Event tidak ditemukan');
+  }
+
+  const totalReviews = event.reviews.length;
+  const avgRating = totalReviews > 0
+    ? Number((event.reviews.reduce((acc, r) => acc + r.rating, 0) / totalReviews).toFixed(1))
+    : 0;
+
+  const prices = event.ticket_types.map((t) => t.price);
+  const startingPrice = prices.length > 0 ? Math.min(...prices) : 0;
+  const isSoldOut = event.ticket_types.every((t) => t.available_quota <= 0);
+
+  return {
+    ...event,
+    starting_price: startingPrice,
+    is_sold_out: isSoldOut,
+    review_stats: {
+      total_reviews: totalReviews,
+      average_rating: avgRating,
+    },
+  };
+};
+
+// Fungsi untuk mengecek kuota tiket secara presisi sebelum checkout
+export const validateTicketStockService = async (ticketTypeId: string, requestedQty: number) => {
+  const ticket = await prisma.ticketType.findUnique({
+    where: { id: ticketTypeId },
+    select: {
+      id: true,
+      name: true,
+      price: true,
+      quota: true,
+      available_quota: true,
+      event: {
+        select: {
+          id: true,
+          title: true,
+          start_date: true,
+        },
+      },
+    },
+  });
+
+  if (!ticket) {
+    throw new Error('Jenis tiket tidak ditemukan');
+  }
+
+  // 1. Cek apakah tiket sudah habis (Sold Out)
+  if (ticket.available_quota <= 0) {
+    return {
+      is_available: false,
+      reason: 'SOLD_OUT',
+      message: `Tiket "${ticket.name}" telah habis terjual.`,
+      ticket,
+    };
+  }
+
+  // 2. Cek apakah jumlah tiket yang diminta melebihi sisa kuota
+  if (requestedQty > ticket.available_quota) {
+    return {
+      is_available: false,
+      reason: 'INSUFFICIENT_QUOTA',
+      message: `Hanya tersisa ${ticket.available_quota} tiket untuk jenis "${ticket.name}".`,
+      remaining_quota: ticket.available_quota,
+      ticket,
+    };
+  }
+
+  // 3. Tiket tersedia secara valid
+  return {
+    is_available: true,
+    reason: 'AVAILABLE',
+    message: 'Ketersediaan kuota tiket valid.',
+    remaining_quota: ticket.available_quota,
+    ticket,
+  };
+};

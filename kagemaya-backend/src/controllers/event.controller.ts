@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { errorResponse, successResponse } from '../utils/response';
-import { getCategoriesService, getEventsService } from '../services/event.service';
+import { getCategoriesService, getEventByIdService, getEventsService } from '../services/event.service';
+
+import { validateTicketStockService } from '../services/event.service';
 
 export const getEvents = async (req: Request, res: Response) => {
   try {
@@ -36,5 +38,30 @@ export const getCategories = async (_req: Request, res: Response) => {
     return successResponse(res, 'Daftar kategori berhasil diambil', categories, 200);
   } catch (error: any) {
     return errorResponse(res, error.message || 'Gagal memuat kategori', 500, error);
+  }
+};
+
+export const getEventById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const event = await getEventByIdService(id);
+    return successResponse(res, 'Detail event berhasil diambil', event, 200);
+  } catch (error: any) {
+    const statusCode = error.message === 'Event tidak ditemukan' ? 404 : 500;
+    return errorResponse(res, error.message || 'Gagal memuat detail event', statusCode, error);
+  }
+};
+
+export const checkTicketStock = async (req: Request, res: Response) => {
+  try {
+    const { ticketTypeId } = req.params;
+    const qty = req.query.qty ? Number(req.query.qty) : 1;
+    const result = await validateTicketStockService(ticketTypeId, qty);
+    if (!result.is_available) {
+      return errorResponse(res, result.message, 400, result);
+    }
+    return successResponse(res, result.message, result, 200);
+  } catch (error: any) {
+    return errorResponse(res, error.message || 'Gagal memvalidasi kuota tiket', 500, error);
   }
 };

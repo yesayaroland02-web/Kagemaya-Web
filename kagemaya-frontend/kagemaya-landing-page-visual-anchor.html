@@ -353,10 +353,16 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:72px 0 40
     <div class="search" role="search">
       <label class="field">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
-        <input type="search" placeholder="Cari event, kota, atau kategori…" aria-label="Cari event, kota, atau kategori">
+        <input type="search" id="heroSearchInput" placeholder="Cari event, kota, atau kategori…" aria-label="Cari event, kota, atau kategori" onkeydown="if(event.key==='Enter'){event.preventDefault();doHeroSearch();}">
       </label>
-      <button class="btn btn-red" type="button" onclick="window.location.href='kagemaya-event-discovery.html'">Cari</button>
+      <button class="btn btn-red" type="button" onclick="doHeroSearch()">Cari</button>
     </div>
+    <script>
+      function doHeroSearch() {
+        const val = document.getElementById('heroSearchInput')?.value.trim();
+        window.location.href = val ? 'kagemaya-event-discovery.html?q=' + encodeURIComponent(val) : 'kagemaya-event-discovery.html';
+      }
+    </script>
   </div>
   <div class="hero-meta">
     <strong>Yūgen</strong>

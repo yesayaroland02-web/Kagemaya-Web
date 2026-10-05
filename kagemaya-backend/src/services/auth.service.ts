@@ -47,29 +47,41 @@ export const registerUser = async (payload: z.infer<typeof registerSchema>) => {
       },
     });
 
+    // Buat profil organizer otomatis jika role ORGANIZER
+    if (role === 'ORGANIZER') {
+      await tx.organizerProfile.create({
+        data: {
+          user_id: newUser.id,
+          organization_name: name,
+        },
+      });
+    }
+
     if (referrerUser) {
-  const expiresAt = new Date();
-  expiresAt.setMonth(expiresAt.getMonth() + 3);
+      const expiresAt = new Date();
+      expiresAt.setMonth(expiresAt.getMonth() + 3);
 
-  // Ubah tx.pointHistory menjadi tx.point_history
-  await (tx as any).point_history.create({
-    data: {
-      userId: referrerUser.id, // Sesuaikan jika di schema dinamai user_id
-      amount: 10000,
-      expiresAt,
-    },
-  });
+      // Pemberi referral mendapat +10.000 Poin
+      await tx.pointTransaction.create({
+        data: {
+          user_id: referrerUser.id,
+          amount: 10000,
+          remaining_amount: 10000,
+          type: 'EARN',
+          expires_at: expiresAt,
+        },
+      });
 
-  // Ubah tx.userVoucher menjadi tx.user_voucher
-  await (tx as any).user_voucher.create({
-    data: {
-      userId: newUser.id, // Sesuaikan jika di schema dinamai user_id
-      discountPercentage: 10,
-      expiresAt,
-      isUsed: false,
-    },
-  });
-}
+      // Pendaftar baru mendapat Kupon Diskon Referral
+      await tx.coupon.create({
+        data: {
+          user_id: newUser.id,
+          discount_amount: 25000,
+          expires_at: expiresAt,
+          is_used: false,
+        },
+      });
+    }
     // WAJIB mengembalikan data user baru dari dalam callback transaction
     return {
       id: newUser.id,
@@ -125,7 +137,7 @@ export const getAllUsers = async () => {
       email: true,
       role: true,
       referral_code: true,
-      createdAt: true,
+      created_at: true,
     },
   });
 };
