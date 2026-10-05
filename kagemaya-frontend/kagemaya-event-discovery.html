@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Temukan Event — Kagemaya</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme: dark;
+  --bg:#0B0B0D; --surface:#121216; --elev:#1C1C22;
+  --red:#C62828; --red-hi:#E5484D; --gold:#D6A85F;
+  --text:#F4F0E8; --text2:#B8B5B0; --border:#292930;
+  --serif:'Noto Serif JP','Hiragino Mincho ProN','Yu Mincho',Georgia,serif;
+  --sans:'Inter','Noto Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px);background:var(--bg);scroll-behavior:smooth}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button,select,input{font-family:inherit}
+svg{display:block}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.wrap{max-width:1296px;margin:0 auto;padding:0 32px}
+.grain{position:absolute;inset:0;pointer-events:none;opacity:.22;mix-blend-mode:overlay;width:100%;height:100%}
+
+/* NAV (identik dengan Event Detail) */
+.nav{position:relative;z-index:20}
+.nav .wrap{display:flex;align-items:center;height:84px;gap:0}
+.logo{display:flex;align-items:baseline;gap:12px;flex:none;margin-right:40px}
+.logo b{font-family:var(--serif);font-weight:500;font-size:21px;letter-spacing:.34em;margin-right:-.34em}
+.logo i{font-family:var(--serif);font-style:normal;color:var(--red-hi);font-size:17px;font-weight:400}
+.nav nav{flex:1;display:flex;justify-content:center}
+.nav ul{display:flex;gap:36px;list-style:none;margin:0;padding:0}
+.nav ul a{font-size:14px;color:var(--text2);transition:color .2s}
+.nav ul a:hover,.nav ul a[aria-current]{color:var(--text)}
+.nav-r{display:flex;align-items:center;gap:26px}
+.icon-btn{background:none;border:0;color:var(--text2);padding:6px;cursor:pointer;display:grid;place-items:center}
+.icon-btn:hover{color:var(--text)}
+.login{font-size:14px;color:var(--text2)}
+.btn{display:inline-flex;align-items:center;justify-content:center;font:500 14px/1 var(--sans);padding:14px 26px;border-radius:2px;border:1px solid transparent;cursor:pointer;transition:background .2s,border-color .2s,color .2s;letter-spacing:.01em;gap:10px}
+.btn-red{background:var(--red);color:var(--text)}
+.btn-red:hover{background:var(--red-hi)}
+.btn-line{border-color:rgba(244,240,232,.32);color:var(--text);background:rgba(11,11,13,.25)}
+.btn-line:hover{border-color:var(--text)}
+.btn-sm{padding:11px 22px}
+
+/* HEADER */
+.head{position:relative;margin-top:-84px;padding-top:84px;overflow:hidden;border-bottom:1px solid var(--border);background:
+  radial-gradient(60% 90% at 88% 0%,rgba(198,40,40,.16),rgba(198,40,40,0) 70%),#0B0B0D}
+.head .wrap{position:relative;z-index:2;padding-top:72px;padding-bottom:64px}
+.crumb{font-size:13.5px;color:var(--text2);margin-bottom:28px;display:flex;gap:10px;align-items:center}
+.crumb span[aria-hidden]{opacity:.5}
+.eyebrow{font-size:12.5px;color:var(--gold);display:flex;align-items:center;gap:12px;margin-bottom:22px;letter-spacing:.04em}
+.eyebrow::before{content:"";width:28px;height:1px;background:var(--gold)}
+h1{font-family:var(--serif);font-weight:300;font-size:64px;line-height:1.15;letter-spacing:-.01em;margin:0 0 22px}
+.sub{font-family:var(--serif);font-weight:300;font-size:19px;line-height:1.8;color:var(--text2);margin:0 0 52px;max-width:30em}
+
+/* SEARCH */
+.search{display:flex;align-items:center;border:1px solid var(--border);background:var(--surface);border-radius:2px;transition:border-color .2s;position:relative}
+.search:focus-within{border-color:var(--gold)}
+.search::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--gold)}
+.search svg{width:22px;height:22px;stroke:var(--gold);fill:none;stroke-width:1.5;stroke-linecap:round;margin:0 18px 0 30px;flex:none}
+.search input{flex:1;min-width:0;background:none;border:0;color:var(--text);font:300 22px var(--serif);padding:28px 0}
+.search input::placeholder{color:#8d8b87}
+.search input:focus-visible{outline:none}
+.search button{align-self:stretch;background:none;border:0;border-left:1px solid var(--border);color:var(--text);font:500 14px var(--sans);padding:0 40px;cursor:pointer;transition:color .2s}
+.search button:hover{color:var(--gold)}
+
+/* FILTERS */
+.filters{display:grid;grid-template-columns:repeat(4,1fr) 1px 1.15fr;gap:0;margin-top:20px;border:1px solid var(--border);border-radius:2px;background:var(--surface)}
+.f{position:relative;padding:14px 22px 14px;border-right:1px solid var(--border)}
+.f:nth-child(4){border-right:0}
+.f label{display:block;font-size:11.5px;color:var(--text2);letter-spacing:.08em;text-transform:uppercase;margin-bottom:2px}
+.f select{width:100%;appearance:none;-webkit-appearance:none;background:none;border:0;color:var(--text);font:400 15.5px var(--sans);padding:4px 24px 4px 0;cursor:pointer}
+.f select option{background:var(--surface);color:var(--text)}
+.f select:focus-visible{outline:none}
+.f:focus-within{box-shadow:inset 0 -2px 0 var(--gold)}
+.f::after{content:"";position:absolute;right:22px;bottom:24px;width:7px;height:7px;border-right:1.5px solid var(--gold);border-bottom:1.5px solid var(--gold);transform:rotate(45deg);pointer-events:none}
+.div{background:var(--border)}
+.f.sort{border-right:0;background:var(--bg)}
+.f.sort select{font-family:var(--serif)}
+
+/* RESULTS */
+.results{padding:88px 0 0}
+.sec-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:44px;gap:24px}
+.sec-head h2{font-family:var(--serif);font-weight:400;font-size:36px;line-height:1.2;margin:0}
+.sec-head p{margin:10px 0 0;color:var(--text2)}
+.chips{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:40px}
+.chip{display:inline-flex;align-items:center;gap:10px;font-size:13px;color:var(--text2);border:1px solid var(--border);border-radius:2px;padding:7px 12px;background:var(--surface)}
+.chip button{background:none;border:0;color:var(--text2);cursor:pointer;font-size:15px;line-height:1;padding:0}
+.chip button:hover{color:var(--gold)}
+.chips .clear{background:none;border:0;border-bottom:1px solid var(--border);border-radius:0;padding:0 0 3px;cursor:pointer;color:var(--text2)}
+.chips .clear:hover{color:var(--text);border-color:var(--gold)}
+.chips[hidden]{display:none}
+
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:2px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .25s}
+.card:hover{border-color:#3d3d47}
+.card .img{position:relative;aspect-ratio:4/3;overflow:hidden;background:#09090b}
+.card .img svg.scene{width:100%;height:100%}
+.card .img::after{content:"";position:absolute;inset:0;background:linear-gradient(0deg,rgba(18,18,22,.9),rgba(18,18,22,0) 45%)}
+.wish{position:absolute;top:16px;right:16px;z-index:3;width:40px;height:40px;border-radius:50%;border:1px solid rgba(244,240,232,.28);background:rgba(11,11,13,.45);color:var(--text);display:grid;place-items:center;cursor:pointer;transition:border-color .2s,color .2s}
+.wish:hover{border-color:var(--gold);color:var(--gold)}
+.wish[aria-pressed="true"]{border-color:var(--gold);color:var(--gold)}
+.wish[aria-pressed="true"] svg{fill:var(--gold)}
+.tag{position:absolute;left:16px;bottom:16px;z-index:3;font-size:12.5px;color:var(--gold);display:flex;align-items:center;gap:8px}
+.tag::before{content:"";width:18px;height:1px;background:var(--gold)}
+.card .body{padding:24px 24px 26px;display:flex;flex-direction:column;flex:1}
+.card h3{font-family:var(--serif);font-weight:400;font-size:22px;line-height:1.35;margin:0 0 6px}
+.card .s{color:var(--text2);font-size:14.5px;margin:0 0 22px}
+.card .foot{display:flex;justify-content:space-between;align-items:flex-end;border-top:1px solid var(--border);padding-top:18px;gap:12px;margin-top:auto}
+.card .whn{font-size:13.5px;color:var(--text2);line-height:1.55}
+.card .whn span{color:var(--text)}
+.price{text-align:right;font-size:12.5px;color:var(--text2);line-height:1.3}
+.price b{display:block;font-family:var(--serif);font-weight:500;font-size:20px;color:var(--text);margin-top:2px}
+
+/* EMPTY */
+.empty{display:none;border:1px solid var(--border);border-radius:2px;background:var(--surface);position:relative;overflow:hidden;padding:96px 32px;text-align:center}
+.empty::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:var(--gold)}
+.empty .ic{width:56px;height:56px;margin:0 auto 28px;stroke:var(--gold);fill:none;stroke-width:1.1;stroke-linecap:round;stroke-linejoin:round}
+.empty h3{font-family:var(--serif);font-weight:300;font-size:32px;margin:0 0 12px}
+.empty p{color:var(--text2);margin:0 0 36px}
+.state-empty .cards,.state-empty .pager,.state-empty .chips{display:none}
+.state-empty .empty{display:block}
+.state-empty .count{visibility:hidden}
+
+/* PAGER */
+.pager{display:flex;justify-content:center;align-items:center;gap:8px;margin-top:72px;padding-top:40px;border-top:1px solid var(--border)}
+.pager a{min-width:44px;height:44px;display:grid;place-items:center;padding:0 16px;font-size:14px;color:var(--text2);border:1px solid transparent;border-radius:2px;transition:color .2s,border-color .2s}
+.pager a:hover{color:var(--text);border-color:var(--border)}
+.pager a[aria-current]{color:var(--gold);border-color:var(--gold);font-family:var(--serif);font-size:16px}
+.pager a.off{color:#4b4b52;pointer-events:none}
+.pager .pn{font-family:var(--serif);font-size:16px}
+
+/* FOOTER */
+footer{background:var(--bg);border-top:1px solid var(--border);padding:72px 0 40px;margin-top:120px}
+.f-top{display:grid;grid-template-columns:1.4fr repeat(5,auto);gap:48px;align-items:start}
+.f-brand p{color:var(--text2);font-size:14px;margin:16px 0 0;max-width:20em}
+.f-top a.l{font-size:14px;color:var(--text2);padding:2px 0;display:block}
+.f-top a.l:hover{color:var(--text)}
+.f-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:64px;padding-top:28px;border-top:1px solid var(--border);color:#85837f;font-size:13px;gap:20px;flex-wrap:wrap}
+
+.soc{display:flex;gap:10px}
+.soc a{width:38px;height:38px;border:1px solid var(--border);border-radius:50%;display:grid;place-items:center;color:var(--text2);transition:border-color .2s,color .2s}
+.soc a:hover{border-color:var(--gold);color:var(--text)}
+.soc svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+
+/* state preview switch (referensi desain saja) */
+.sw{position:fixed;right:20px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:50;display:flex;border:1px solid var(--border);background:rgba(11,11,13,.92);border-radius:2px;font-size:12.5px}
+.sw span{padding:10px 12px;color:#85837f;border-right:1px solid var(--border)}
+.sw button{background:none;border:0;color:var(--text2);padding:10px 14px;cursor:pointer}
+.sw button[aria-pressed="true"]{color:var(--gold)}
+
+@media (max-width:1100px){
+  .filters{grid-template-columns:1fr 1fr}.f:nth-child(2){border-right:0}.div{display:none}.f{border-bottom:1px solid var(--border)}
+  .cards{grid-template-columns:1fr 1fr}.nav ul{display:none}.nav .wrap{justify-content:space-between}
+}
+@media (max-width:680px){
+  h1{font-size:42px}.cards{grid-template-columns:1fr}.search input{font-size:17px}.search button{padding:0 18px}
+  .f-top{grid-template-columns:1fr 1fr}.f-brand{grid-column:1/-1}.login{display:none}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="7" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+    <pattern id="kawung" width="36" height="36" patternUnits="userSpaceOnUse">
+      <g fill="none" stroke="#D6A85F" stroke-width=".8" opacity=".55">
+        <ellipse cx="18" cy="9" rx="8" ry="5"/><ellipse cx="18" cy="27" rx="8" ry="5"/>
+        <ellipse cx="9" cy="18" rx="5" ry="8"/><ellipse cx="27" cy="18" rx="5" ry="8"/>
+      </g>
+    </pattern>
+    <radialGradient id="g-red" cx=".5" cy=".4" r=".55"><stop offset="0" stop-color="#C62828" stop-opacity=".4"/><stop offset="1" stop-color="#C62828" stop-opacity="0"/></radialGradient>
+    <radialGradient id="g-gold" cx=".5" cy=".3" r=".6"><stop offset="0" stop-color="#D6A85F" stop-opacity=".55"/><stop offset="1" stop-color="#D6A85F" stop-opacity="0"/></radialGradient>
+    <linearGradient id="g-beam" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#E5484D" stop-opacity="0"/><stop offset=".5" stop-color="#E5484D" stop-opacity=".55"/><stop offset="1" stop-color="#E5484D" stop-opacity="0"/></linearGradient>
+    <filter id="blur"><feGaussianBlur stdDeviation="10"/></filter>
+  </defs>
+</svg>
+
+<!-- NAVBAR -->
+<header class="nav">
+  <div class="wrap">
+    <a class="logo" href="kagemaya-landing-page-visual-anchor.html" aria-label="Kagemaya beranda"><b>KAGEMAYA</b><i>影幻</i></a>
+    <nav aria-label="Utama"><ul>
+      <li><a href="kagemaya-event-discovery.html" aria-current="page">Event</a></li>
+      <li><a href="#">Kategori</a></li>
+      <li><a href="kagemaya-organizer-profile.html">Organizer</a></li>
+    </ul></nav>
+    <div class="nav-r">
+      <button class="icon-btn" aria-label="Cari"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg></button>
+      <a class="login" href="kagemaya-login.html">Login</a>
+      <a class="btn btn-red btn-sm" href="kagemaya-register.html">Daftar</a>
+    </div>
+  </div>
+</header>
+
+<!-- PAGE HEADER -->
+<section class="head" aria-labelledby="ttl">
+  <svg class="grain" viewBox="0 0 1440 520" preserveAspectRatio="none" aria-hidden="true"><rect width="1440" height="520" filter="url(#grain)"/></svg>
+  <div class="wrap">
+    <nav class="crumb" aria-label="Breadcrumb"><a href="#">Beranda</a><span aria-hidden="true">/</span><span>Event</span></nav>
+    <div class="eyebrow">Katalog Event</div>
+    <h1 id="ttl">Temukan Event</h1>
+    <p class="sub">Temukan pengalaman film, budaya, dan kreativitas yang menunggu untuk kamu rasakan.</p>
+
+    <form class="search" role="search" onsubmit="return false">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+      <input id="q" type="search" placeholder="Cari event, kota, atau kategori…" aria-label="Cari event, kota, atau kategori" autocomplete="off">
+      <button type="submit">Cari</button>
+    </form>
+
+    <div class="filters" role="group" aria-label="Filter event">
+      <div class="f"><label for="fc">Kategori</label>
+        <select id="fc"><option value="">Semua Kategori</option><option>Film 4D</option><option>Workshop Kreatif</option><option>Talkshow Budaya</option><option>Anime &amp; Manga</option></select></div>
+      <div class="f"><label for="fk">Kota</label>
+        <select id="fk"><option value="">Semua Kota</option><option>Jakarta</option><option>Bandung</option><option>Surabaya</option><option>Yogyakarta</option><option>Malang</option></select></div>
+      <div class="f"><label for="ft">Tanggal</label>
+        <select id="ft"><option>Kapan saja</option><option>Bulan ini</option><option>Bulan depan</option><option>Akhir pekan</option></select></div>
+      <div class="f"><label for="fh">Harga</label>
+        <select id="fh"><option>Semua harga</option><option>Gratis</option><option>Di bawah Rp100.000</option><option>Rp100.000 – Rp200.000</option><option>Di atas Rp200.000</option></select></div>
+      <div class="div"></div>
+      <div class="f sort"><label for="fs">Urutkan</label>
+        <select id="fs"><option>Terbaru</option><option>Terdekat</option><option>Harga Terendah</option><option>Paling Populer</option></select></div>
+    </div>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<main class="results" aria-labelledby="rs">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><h2 id="rs">Event Mendatang</h2><p class="count" id="count">6 event · Oktober – Desember 2026</p></div>
+      <a class="more" href="#" style="font-size:14px;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:4px;white-space:nowrap">Jelajahi berdasarkan kategori</a>
+    </div>
+
+    <div class="chips" id="chips" hidden></div>
+
+    <div class="cards" id="cards"></div>
+
+    <div class="empty" id="empty" role="status">
+      <svg class="ic" viewBox="0 0 48 48" aria-hidden="true"><rect x="8" y="12" width="32" height="24"/><path d="M8 18h32M8 30h32M14 12v6M14 30v6M22 12v6M22 30v6M30 12v6M30 30v6M36 12v6M36 30v6"/><path d="M4 44L44 4" stroke-opacity=".7"/></svg>
+      <h3>No event ditemukan.</h3>
+      <p>Coba ubah kata kunci atau filter pencarianmu.</p>
+      <button class="btn btn-line" id="reset" type="button">Reset Filter</button>
+    </div>
+
+    <nav class="pager" aria-label="Halaman">
+      <a class="off" href="#" aria-disabled="true">‹&nbsp; Previous</a>
+      <a href="#" aria-current="page" class="pn">1</a>
+      <a href="#" class="pn">2</a>
+      <a href="#" class="pn">3</a>
+      <a href="#">Next &nbsp;›</a>
+    </nav>
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="f-top">
+      <div class="f-brand"><a class="logo" href="#"><b>KAGEMAYA</b><i>影幻</i></a><p>Di balik bayangan, ilusi menjadi nyata.</p></div>
+      <a class="l" href="#">Event</a><a class="l" href="#">Kategori</a><a class="l" href="#">Organizer</a><a class="l" href="#">Tentang Kagemaya</a><a class="l" href="#">Bantuan</a>
+    </div>
+    <div class="f-bottom"><span>© 2026 Kagemaya. Semua hak dilindungi.</span><div class="soc">
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r=".6"/></svg></a>
+        <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="3.5"/><path d="M10 9.5v5l4.5-2.5z"/></svg></a>
+        <a href="#" aria-label="X"><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></a>
+        <a href="#" aria-label="TikTok"><svg viewBox="0 0 24 24"><path d="M14 4v10.5a3.5 3.5 0 11-3.5-3.5M14 4c.4 2.6 2 4 4.5 4.2"/></svg></a>
+      </div></div>
+  </div>
+</footer>
+
+<div class="sw" role="group" aria-label="Pratinjau state">
+  <span>State</span><button id="s1" aria-pressed="true">Hasil</button><button id="s2" aria-pressed="false">Kosong</button>
+</div>
+
+<script>
+// 1. Konfigurasi Base API URL
+const API_BASE_URL = 'http://localhost:5000/api';
+
+// SVG Icon Heart untuk wishlist
+const HEART = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 20s-7-4.4-7-10a4 4 0 017-2.6A4 4 0 0119 10c0 5.6-7 10-7 10z"/></svg>';
+
+// State Aplikasi
+let currentPage = 1;
+const limitPerPage = 6;
+let searchTimer = null;
+
+// Elemen DOM (Semua Filter Lengkap)
+const qInput = document.getElementById('q');   // Search Input
+const fcSelect = document.getElementById('fc'); // Kategori (Category)
+const fkSelect = document.getElementById('fk'); // Kota (City)
+const fdSelect = document.getElementById('fd'); // Tanggal (Date/Period)
+const fpSelect = document.getElementById('fp'); // Harga (Price)
+const fsSelect = document.getElementById('fs'); // Urutkan (Sort)
+
+const countEl = document.getElementById('count');
+const cardsEl = document.getElementById('cards');
+const chipsEl = document.getElementById('chips');
+const pagerEl = document.querySelector('.pager');
+const resetBtn = document.getElementById('reset');
+
+// Helper: Escaping String untuk Keamanan XSS
+function esc(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+// Helper: Format Tanggal Bahasa Indonesia
+function formatDate(dateString) {
+  if (!dateString) return '-';
+  const date = new Date(dateString);
+  return date.toLocaleDateString('id-ID', {
+    weekday: 'short',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric'
+  });
+}
+
+// Helper: Format Mata Uang Rupiah
+function formatCurrency(amount) {
+  if (amount === 0 || !amount) return 'Gratis';
+  return 'Rp' + Number(amount).toLocaleString('id-ID');
+}
+
+// 2. Auth State & Navbar Handler
+function checkAuthUI() {
+  const navAuth = document.querySelector('.nav-r');
+  if (!navAuth) return;
+
+  const token = localStorage.getItem('kagemaya_token');
+  const rawUser = localStorage.getItem('kagemaya_user');
+
+  let user = null;
+  if (rawUser) {
+    try {
+      user = JSON.parse(rawUser);
+    } catch (e) {
+      console.error('Error parsing user data:', e);
+    }
+  }
+
+  if (token && user) {
+    const displayName = user.name || user.fullName || user.username || user.email || 'User';
+
+    navAuth.innerHTML = `
+      <button class="icon-btn" aria-label="Cari">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+      </button>
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size: 14px; color: var(--text);">Halo, <b>${esc(displayName)}</b></span>
+        <button onclick="handleLogout()" class="btn btn-line btn-sm" style="padding: 6px 12px; font-size: 12px;">Logout</button>
+      </div>
+    `;
+  } else {
+    navAuth.innerHTML = `
+      <button class="icon-btn" aria-label="Cari">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+      </button>
+      <a class="login" href="kagemaya-login.html">Login</a>
+      <a class="btn btn-red btn-sm" href="kagemaya-register.html">Daftar</a>
+    `;
+  }
+}
+
+function handleLogout() {
+  localStorage.removeItem('kagemaya_token');
+  localStorage.removeItem('kagemaya_user');
+  window.location.reload();
+}
+
+// 3. Load Dynamic Options Kategori dari Backend
+// 3. Load Dynamic Options Kategori dari Backend
+async function loadCategories() {
+  if (!fcSelect) return;
+  try {
+    // Sesuaikan URL ke /api/events/categories
+    const res = await fetch(`${API_BASE_URL}/events/categories`);
+    
+    if (!res.ok) throw new Error(`HTTP Error! Status: ${res.status}`);
+
+    const result = await res.json();
+    const categories = result.data || result;
+
+    if (Array.isArray(categories)) {
+      fcSelect.innerHTML = '<option value="">Semua Kategori</option>';
+      categories.forEach(cat => {
+        const option = document.createElement('option');
+        option.value = cat.slug || cat.id;
+        option.textContent = cat.name;
+        fcSelect.appendChild(option);
+      });
+    }
+  } catch (err) {
+    console.error('Gagal memuat daftar kategori:', err.message);
+  }
+}
+
+// 4. Fetch Data Event dengan Filter & Pagination
+async function loadEvents(page = 1) {
+  currentPage = page;
+
+  // 1. Ambil Nilai dari Semua Filter
+  const searchVal   = qInput ? qInput.value.trim() : '';
+  const categoryVal = fcSelect ? fcSelect.value : '';
+  const cityVal     = fkSelect ? fkSelect.value : '';
+  const dateVal     = fdSelect ? fdSelect.value : '';
+  const priceVal    = fpSelect ? fpSelect.value : '';
+  const sortVal     = fsSelect ? fsSelect.value : '';
+
+  if (cardsEl) {
+    cardsEl.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text2); padding: 40px 0;">Memuat katalog event...</p>';
+  }
+
+  // 2. Susun Parameter Query ke Backend
+  const params = new URLSearchParams();
+  if (searchVal)   params.append('search', searchVal);
+  if (categoryVal && categoryVal !== 'all') params.append('category', categoryVal);
+  if (cityVal)     params.append('city', cityVal);
+  if (dateVal)     params.append('date', dateVal);     
+  if (priceVal)    params.append('price', priceVal);   
+  if (sortVal)     params.append('sort', sortVal);     
+  
+  params.append('page', currentPage);
+  params.append('limit', limitPerPage);
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/events?${params.toString()}`);
+    const result = await response.json();
+
+    if (!response.ok) throw new Error(result.message || 'Gagal mengambil data event');
+
+    const events = result.events || result.data || [];
+    const pagination = result.pagination || { page: 1, totalPages: Math.ceil(events.length / limitPerPage), total: events.length };
+
+    // Render Chips Filter Aktif
+    renderChips(searchVal, categoryVal, cityVal, dateVal, priceVal);
+
+    if (!events || events.length === 0) {
+      document.body.classList.add('state-empty');
+      if (countEl) countEl.textContent = '0 event ditemukan';
+      if (cardsEl) cardsEl.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text2); padding: 40px 0;">Tidak ada event yang sesuai dengan filter.</p>';
+      renderPagination({ page: 1, totalPages: 0 });
+      return;
+    }
+
+    document.body.classList.remove('state-empty');
+    if (countEl) countEl.textContent = `${pagination.total || events.length} event ditemukan`;
+
+    renderEventCards(events);
+    renderPagination(pagination);
+
+  } catch (error) {
+    console.error('Error fetching events:', error);
+    if (cardsEl) {
+      cardsEl.innerHTML = `<p style="grid-column: 1/-1; text-align: center; color: var(--red-hi); padding: 40px 0;">Gagal memuat event.</p>`;
+    }
+  }
+}
+
+// 5. Render UI Kartu Event
+function renderEventCards(events) {
+  if (!cardsEl) return;
+  cardsEl.innerHTML = events.map(e => `
+    <article class="card" onclick="window.location.href='kagemaya-event-detail.html?id=${e.id}'" style="cursor:pointer">
+      <div class="img">
+        <button class="wish" onclick="event.stopPropagation(); toggleWishlist(this)" aria-pressed="false" aria-label="Simpan ke wishlist">
+          ${HEART}
+        </button>
+        <img src="${e.banner_url || e.image || 'https://via.placeholder.com/480x360?text=Kagemaya+Event'}" alt="${esc(e.title)}" style="width:100%; height:100%; object-fit:cover;" />
+        <span class="tag">${esc(e.category?.name || e.category || 'Event')}</span>
+      </div>
+      <div class="body">
+        <h3>${esc(e.title)}</h3>
+        <p class="s">${esc(e.description || '')}</p>
+        <div class="foot">
+          <div class="whn">
+            <span>${esc(e.city || 'Online')}</span><br>${formatDate(e.start_date || e.date)}
+          </div>
+          <div class="price">
+            ${e.is_sold_out ? '<b style="color:var(--red-hi)">SOLD OUT</b>' : `Mulai dari <b>${formatCurrency(e.starting_price || e.price)}</b>`}
+          </div>
+        </div>
+      </div>
+    </article>
+  `).join('');
+}
+
+// 6. Render Active Chips
+function renderChips(search, category, city, date, price) {
+  if (!chipsEl) return;
+  const chips = [];
+
+  if (search) chips.push({ key: 'q', label: `“${search}”` });
+  if (category && fcSelect) {
+    const catName = fcSelect.options[fcSelect.selectedIndex]?.text || category;
+    chips.push({ key: 'fc', label: catName });
+  }
+  if (city) chips.push({ key: 'fk', label: city });
+  if (date && fdSelect) {
+    const dateText = fdSelect.options[fdSelect.selectedIndex]?.text || date;
+    chips.push({ key: 'fd', label: dateText });
+  }
+  if (price && fpSelect) {
+    const priceText = fpSelect.options[fpSelect.selectedIndex]?.text || price;
+    chips.push({ key: 'fp', label: priceText });
+  }
+
+  if (chips.length === 0) {
+    chipsEl.hidden = true;
+    chipsEl.innerHTML = '';
+    return;
+  }
+
+  chipsEl.hidden = false;
+  chipsEl.innerHTML = chips.map(c => `
+    <span class="chip">${esc(c.label)}<button data-k="${c.key}" aria-label="Hapus filter">×</button></span>
+  `).join('') + '<button class="chip clear" id="clr">Reset Filter</button>';
+}
+
+// 7. Render Navigation Pagination
+function renderPagination(pagination) {
+  if (!pagerEl) return;
+  const { page, totalPages } = pagination;
+  if (!totalPages || totalPages <= 1) {
+    pagerEl.style.display = 'none';
+    return;
+  }
+
+  pagerEl.style.display = 'flex';
+  let html = '';
+
+  if (page > 1) {
+    html += `<a href="#" onclick="changePage(${page - 1}); return false;">‹&nbsp; Previous</a>`;
+  } else {
+    html += `<a class="off" href="#" aria-disabled="true">‹&nbsp; Previous</a>`;
+  }
+
+  for (let i = 1; i <= totalPages; i++) {
+    if (i === page) {
+      html += `<a href="#" aria-current="page" class="pn">${i}</a>`;
+    } else {
+      html += `<a href="#" class="pn" onclick="changePage(${i}); return false;">${i}</a>`;
+    }
+  }
+
+  if (page < totalPages) {
+    html += `<a href="#" onclick="changePage(${page + 1}); return false;">Next &nbsp;›</a>`;
+  } else {
+    html += `<a class="off" href="#" aria-disabled="true">Next &nbsp;›</a>`;
+  }
+
+  pagerEl.innerHTML = html;
+}
+
+function changePage(newPage) {
+  loadEvents(newPage);
+  const resultsEl = document.querySelector('.results') || cardsEl;
+  if (resultsEl) {
+    window.scrollTo({ top: resultsEl.offsetTop - 80, behavior: 'smooth' });
+  }
+}
+
+// Reset Semua Filter
+function resetFilter() {
+  if (qInput)  qInput.value = '';
+  if (fcSelect) fcSelect.value = '';
+  if (fkSelect) fkSelect.value = '';
+  if (fdSelect) fdSelect.value = '';
+  if (fpSelect) fpSelect.value = '';
+  if (fsSelect) fsSelect.value = 'newest';
+  loadEvents(1);
+}
+
+function toggleWishlist(btn) {
+  const current = btn.getAttribute('aria-pressed') === 'true';
+  btn.setAttribute('aria-pressed', !current);
+}
+
+// 8. Event Listeners & Inisialisasi
+if (qInput) {
+  qInput.addEventListener('input', () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => loadEvents(1), 350);
+  });
+}
+
+// Tambahkan Listener ke Semua Select Dropdown
+if (fcSelect) fcSelect.addEventListener('change', () => loadEvents(1));
+if (fkSelect) fkSelect.addEventListener('change', () => loadEvents(1));
+if (fdSelect) fdSelect.addEventListener('change', () => loadEvents(1));
+if (fpSelect) fpSelect.addEventListener('change', () => loadEvents(1));
+if (fsSelect) fsSelect.addEventListener('change', () => loadEvents(1));
+
+if (resetBtn) resetBtn.onclick = resetFilter;
+
+// Event Listener Klik Chip Hapus Single Filter
+if (chipsEl) {
+  chipsEl.addEventListener('click', (e) => {
+    if (e.target.id === 'clr') return resetFilter();
+    const k = e.target.getAttribute('data-k');
+    if (k === 'q' && qInput)   qInput.value = '';
+    if (k === 'fc' && fcSelect) fcSelect.value = '';
+    if (k === 'fk' && fkSelect) fkSelect.value = '';
+    if (k === 'fd' && fdSelect) fdSelect.value = '';
+    if (k === 'fp' && fpSelect) fpSelect.value = '';
+    loadEvents(1);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  checkAuthUI();
+  await loadCategories();
+  loadEvents(1);
+});
+</script>
+</body>
+</html>

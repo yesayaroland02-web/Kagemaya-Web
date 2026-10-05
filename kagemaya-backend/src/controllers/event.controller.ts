@@ -4,14 +4,19 @@ import { getCategoriesService, getEventsService } from '../services/event.servic
 
 export const getEvents = async (req: Request, res: Response) => {
   try {
-    const { search, category, city, page, limit } = req.query;
+    // 1. Destructure semua parameter query dari frontend
+    const { search, category, city, date, price, sort, page, limit } = req.query;
 
+    // 2. Teruskan semua parameter ke Service
     const result = await getEventsService({
       search: search as string,
       category: category as string,
       city: city as string,
+      date: date as string,
+      price: price as string,
+      sort: sort as string,
       page: page ? Number(page) : 1,
-      limit: limit ? Number(limit) : 8,
+      limit: limit ? Number(limit) : 6,
     });
 
     return successResponse(
@@ -25,7 +30,6 @@ export const getEvents = async (req: Request, res: Response) => {
     return errorResponse(res, error.message || 'Gagal memuat event', 500, error);
   }
 };
-
 export const getCategories = async (_req: Request, res: Response) => {
   try {
     const categories = await getCategoriesService();

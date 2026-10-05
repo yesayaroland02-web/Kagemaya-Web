@@ -1,14 +1,20 @@
-import authRouter from './routes/auth.router';
-import cors from 'cors';
-import eventRouter from './routes/event.router'; // 1. Import eventRouter
 import express from 'express';
+import cors from 'cors';
+
+// Import Routers
+import authRouter from './routes/auth.router';
+import eventRouter from './routes/event.router';
+import categoryRouter from './routes/category.router'; // 1. Import categoryRouter
 
 const app = express();
 
-// Pasang CORS agar frontend bisa fetch tanpa terblokir
+// Middleware
 app.use(cors());
 app.use(express.json());
-// Routes
+
+// Routes Integration
 app.use('/api/auth', authRouter);
-app.use('/api/events', eventRouter); // 2. Mount route event
+app.use('/api/events', eventRouter);
+app.use('/api/categories', categoryRouter); // 2. Mount route categories
+
 export default app;
