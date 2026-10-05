@@ -1,0 +1,1551 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Daftar Akun — Kagemaya · Di Balik Bayangan, Ilusi Menjadi Nyata</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="kagemaya-tokens.css">
+<style>
+/* ─── INLINE FALLBACK TOKENS ─────────────────────────────────────── */
+:root {
+  color-scheme: dark;
+  --bg: #0B0B0D;
+  --surface: #121216;
+  --elev: #1C1C22;
+  --red: #C62828;
+  --red-hi: #E5484D;
+  --gold: #D6A85F;
+  --gold-dim: rgba(214, 168, 95, 0.16);
+  --text: #F4F0E8;
+  --text2: #B8B5B0;
+  --text3: #85837F;
+  --border: #292930;
+  --border-light: #3D3D47;
+  --success: #4CAF7D;
+  --error: #E05252;
+  --warning: #D6A84F;
+  --serif: 'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', Georgia, serif;
+  --sans: 'Inter', 'Noto Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --r: 2px;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+html {
+  background: var(--bg);
+  scroll-behavior: smooth;
+}
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+}
+button, input {
+  font-family: inherit;
+}
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+svg {
+  display: block;
+}
+
+/* ─── FILM GRAIN & NOIR EFFECTS ──────────────────────────────────── */
+.grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.18;
+  mix-blend-mode: overlay;
+  width: 100%;
+  height: 100%;
+}
+@keyframes pulseGlow {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 0.75; transform: scale(1.03); }
+}
+.beam-glow {
+  animation: pulseGlow 9s ease-in-out infinite;
+}
+
+/* ─── WRAPPER ────────────────────────────────────────────────────── */
+.wrap {
+  max-width: 1296px;
+  margin: 0 auto;
+  padding: 0 32px;
+  width: 100%;
+}
+
+/* ─── NAV (Exact canonical design) ───────────────────────────────── */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding-top: env(safe-area-inset-top, 0px);
+  background: rgba(11, 11, 13, 0.88);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+.nav .wrap {
+  display: flex;
+  align-items: center;
+  height: 84px;
+}
+.logo {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex: none;
+  margin-right: 40px;
+}
+.logo b {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 21px;
+  letter-spacing: 0.34em;
+  margin-right: -0.34em;
+}
+.logo i {
+  font-family: var(--serif);
+  font-style: normal;
+  color: var(--red-hi);
+  font-size: 17px;
+  font-weight: 400;
+}
+.nav nav {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+.nav ul {
+  display: flex;
+  gap: 36px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.nav ul a {
+  font-size: 14px;
+  color: var(--text2);
+  transition: color 0.2s;
+}
+.nav ul a:hover {
+  color: var(--text);
+}
+.nav-r {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+.nav-r .login-link {
+  font-size: 14px;
+  color: var(--text2);
+  transition: color 0.2s;
+}
+.nav-r .login-link:hover {
+  color: var(--text);
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: 500 14px/1 var(--sans);
+  padding: 13px 26px;
+  border-radius: var(--r);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.15s;
+  letter-spacing: 0.01em;
+  gap: 8px;
+}
+.btn-red {
+  background: var(--red);
+  color: var(--text);
+}
+.btn-red:hover {
+  background: var(--red-hi);
+}
+.btn-outline {
+  border-color: var(--border);
+  color: var(--text);
+  background: transparent;
+}
+.btn-outline:hover {
+  border-color: var(--text2);
+  background: var(--elev);
+}
+.btn-sm {
+  padding: 10px 20px;
+  font-size: 13px;
+}
+
+/* ─── REGISTER PAGE MAIN ─────────────────────────────────────────── */
+.register-page {
+  flex: 1;
+  padding-top: calc(84px + 36px);
+  padding-bottom: 96px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Atmospheric Background */
+.reg-bg-art {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+.reg-bg-art svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Center Column Form Container */
+.register-container {
+  position: relative;
+  z-index: 10;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+/* Page Header */
+.reg-header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+.reg-tagline {
+  font-family: var(--serif);
+  font-size: 12.5px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+.reg-tagline::before, .reg-tagline::after {
+  content: "";
+  width: 20px;
+  height: 1px;
+  background: var(--gold);
+  opacity: 0.7;
+}
+.reg-header h1 {
+  font-family: var(--serif);
+  font-weight: 400;
+  font-size: clamp(30px, 3.6vw, 42px);
+  line-height: 1.25;
+  margin: 0 0 12px;
+  letter-spacing: -0.01em;
+}
+.reg-header p {
+  color: var(--text2);
+  font-size: 15px;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+/* ─── ROLE SELECTOR COMPONENT (Customer vs Organizer) ───────────── */
+.role-section {
+  margin-bottom: 32px;
+}
+.role-section-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.role-selector-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.role-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 22px 20px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+.role-card:hover {
+  border-color: var(--border-light);
+  background: rgba(28, 28, 34, 0.6);
+}
+.role-card.active {
+  border-color: var(--gold);
+  background: var(--elev);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4), inset 0 0 0 1px var(--gold);
+}
+.role-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text3);
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+.role-card.active .role-badge {
+  color: var(--gold);
+}
+.role-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.role-title {
+  font-family: var(--serif);
+  font-size: 19px;
+  font-weight: 500;
+  color: var(--text);
+  margin: 0;
+}
+.role-radio-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  display: grid;
+  place-items: center;
+  flex: none;
+  background: var(--bg);
+  transition: border-color 0.2s;
+}
+.role-card.active .role-radio-dot {
+  border-color: var(--gold);
+}
+.role-card.active .role-radio-dot::after {
+  content: "";
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+.role-desc {
+  font-size: 12.5px;
+  color: var(--text2);
+  line-height: 1.55;
+  margin: 0;
+  flex: 1;
+}
+.role-perk-tag {
+  margin-top: 14px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 11.5px;
+  color: var(--text3);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.role-card.active .role-perk-tag {
+  color: var(--gold);
+}
+
+/* ─── FORM CONTAINER PANEL ───────────────────────────────────────── */
+.form-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 40px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.65);
+}
+
+/* Context Notice Banner */
+.role-banner-note {
+  border-radius: var(--r);
+  padding: 12px 16px;
+  margin-bottom: 28px;
+  font-size: 13px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  background: rgba(214, 168, 95, 0.08);
+  border: 1px solid rgba(214, 168, 95, 0.25);
+  color: #eed6b0;
+  line-height: 1.5;
+}
+.role-banner-note svg {
+  width: 17px;
+  height: 17px;
+  stroke: var(--gold);
+  fill: none;
+  stroke-width: 1.8;
+  flex: none;
+  margin-top: 2px;
+}
+
+/* FORM FIELDS */
+.form-row-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.form-group {
+  margin-bottom: 20px;
+}
+.form-label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.label-sub {
+  font-size: 11.5px;
+  font-weight: 400;
+  color: var(--text3);
+}
+
+.input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input-wrap:focus-within {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold-dim);
+}
+.input-wrap.has-error {
+  border-color: var(--error) !important;
+}
+.input-wrap.is-valid {
+  border-color: var(--success);
+}
+.input-icon {
+  position: absolute;
+  left: 14px;
+  color: var(--text3);
+  pointer-events: none;
+}
+.input-icon svg {
+  width: 16px;
+  height: 16px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.7;
+}
+
+.kage-input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font: 400 14.5px var(--sans);
+  padding: 13px 14px 13px 42px;
+  outline: none;
+}
+.kage-input::placeholder {
+  color: var(--text3);
+}
+
+/* Password Eye Toggle */
+.pwd-toggle {
+  background: none;
+  border: none;
+  color: var(--text3);
+  padding: 0 14px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  height: 100%;
+  transition: color 0.2s;
+}
+.pwd-toggle:hover {
+  color: var(--text);
+}
+.pwd-toggle svg {
+  width: 17px;
+  height: 17px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+}
+
+/* Password Strength Meter */
+.pass-strength-bar {
+  display: flex;
+  gap: 4px;
+  margin-top: 8px;
+}
+.pass-strength-seg {
+  height: 3px;
+  flex: 1;
+  background: var(--border);
+  border-radius: 1px;
+  transition: background 0.25s;
+}
+.pass-hint-text {
+  font-size: 11.5px;
+  color: var(--text3);
+  margin-top: 6px;
+  display: flex;
+  justify-content: space-between;
+}
+
+/* ─── REFERRAL CODE FIELD CONTAINER ──────────────────────────────── */
+.referral-container {
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+}
+.referral-container.hidden {
+  display: none;
+  opacity: 0;
+  max-height: 0;
+  margin: 0;
+}
+.referral-card-box {
+  background: rgba(18, 18, 22, 0.7);
+  border: 1px dashed rgba(214, 168, 95, 0.4);
+  border-radius: var(--r);
+  padding: 18px 20px;
+  margin-bottom: 24px;
+}
+.referral-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.referral-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+.referral-badge svg {
+  width: 14px;
+  height: 14px;
+  stroke: var(--gold);
+  fill: none;
+  stroke-width: 2;
+}
+.referral-optional {
+  font-size: 11.5px;
+  color: var(--text3);
+}
+.referral-reward-info {
+  font-size: 12.5px;
+  color: var(--text2);
+  line-height: 1.5;
+  margin-top: 10px;
+}
+.referral-feedback {
+  margin-top: 8px;
+  font-size: 12px;
+  display: none;
+  align-items: center;
+  gap: 6px;
+}
+.referral-feedback.valid {
+  display: flex;
+  color: var(--success);
+}
+
+/* Organizer Specific Notice when Referral is Excluded */
+.organizer-referral-excluded-note {
+  display: none;
+  background: rgba(28, 28, 34, 0.6);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 14px 18px;
+  margin-bottom: 24px;
+  font-size: 12.5px;
+  color: var(--text2);
+  line-height: 1.55;
+}
+.organizer-referral-excluded-note.active {
+  display: block;
+}
+.organizer-referral-excluded-note b {
+  color: var(--text);
+}
+
+/* Terms Checkbox */
+.terms-row {
+  margin-bottom: 28px;
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.5;
+}
+.checkbox-label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+.kage-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  cursor: pointer;
+  display: grid;
+  place-content: center;
+  transition: border-color 0.2s, background 0.2s;
+  margin: 2px 0 0;
+  flex: none;
+}
+.kage-checkbox:checked {
+  background: var(--red);
+  border-color: var(--red);
+}
+.kage-checkbox:checked::after {
+  content: "";
+  width: 4px;
+  height: 8px;
+  border: solid var(--text);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg) translate(-1px, -1px);
+}
+.terms-row a {
+  color: var(--gold);
+  text-decoration: underline;
+}
+
+/* Submit Button with Loading State */
+.btn-submit {
+  width: 100%;
+  padding: 16px;
+  font-size: 15px;
+  font-weight: 600;
+  position: relative;
+}
+.btn-submit .spinner {
+  display: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(244, 240, 232, 0.3);
+  border-top-color: var(--text);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+.btn-submit.loading .btn-text {
+  visibility: hidden;
+}
+.btn-submit.loading .spinner {
+  display: block;
+  position: absolute;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Card Foot */
+.panel-foot {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 13.5px;
+  color: var(--text2);
+}
+.panel-foot a {
+  color: var(--gold);
+  font-weight: 500;
+  margin-left: 6px;
+}
+.panel-foot a:hover {
+  text-decoration: underline;
+}
+
+/* ─── SUCCESS CELEBRATION MODAL ──────────────────────────────────── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(11, 11, 13, 0.9);
+  backdrop-filter: blur(8px);
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.modal-overlay.active {
+  display: flex;
+}
+.modal-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  width: 100%;
+  max-width: 520px;
+  padding: 36px;
+  position: relative;
+  text-align: center;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.8);
+}
+.success-icon-badge {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(76, 175, 125, 0.12);
+  border: 1px solid var(--success);
+  color: var(--success);
+  display: grid;
+  place-items: center;
+  margin: 0 auto 20px;
+}
+.modal-title {
+  font-family: var(--serif);
+  font-size: 26px;
+  margin: 0 0 10px;
+  font-weight: 400;
+}
+.modal-desc {
+  font-size: 14px;
+  color: var(--text2);
+  line-height: 1.6;
+  margin: 0 0 24px;
+}
+.reward-unlocked-card {
+  background: var(--elev);
+  border: 1px solid var(--gold);
+  border-radius: var(--r);
+  padding: 16px 20px;
+  text-align: left;
+  margin-bottom: 24px;
+}
+.reward-unlocked-title {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--gold);
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+.referral-code-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--bg);
+  padding: 10px 14px;
+  border-radius: var(--r);
+  margin-top: 10px;
+  font-family: monospace;
+  font-size: 16px;
+  color: var(--text);
+  letter-spacing: 0.1em;
+}
+
+/* ─── FOOTER ─────────────────────────────────────────────────────── */
+footer {
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  padding: 64px 0 36px;
+  margin-top: auto;
+}
+.f-top {
+  display: grid;
+  grid-template-columns: 1.4fr repeat(4, auto);
+  gap: 48px;
+  align-items: start;
+}
+.f-brand p {
+  color: var(--text2);
+  font-size: 14px;
+  margin: 16px 0 0;
+  max-width: 22em;
+}
+.f-col h4 {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin: 0 0 18px;
+}
+.f-col a {
+  font-size: 13.5px;
+  color: var(--text2);
+  padding: 4px 0;
+  display: block;
+  transition: color 0.2s;
+}
+.f-col a:hover {
+  color: var(--text);
+}
+.f-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 54px;
+  padding-top: 26px;
+  border-top: 1px solid var(--border);
+  color: #85837f;
+  font-size: 13px;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* ─── RESPONSIVE BEHAVIOR ────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .role-selector-grid {
+    grid-template-columns: 1fr;
+  }
+  .form-row-2 {
+    grid-template-columns: 1fr;
+  }
+  .form-panel {
+    padding: 28px 20px;
+  }
+  .f-top {
+    grid-template-columns: 1fr 1fr;
+    gap: 36px;
+  }
+}
+@media (max-width: 600px) {
+  .nav ul {
+    display: none;
+  }
+  .f-top {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- CANONICAL NAVBAR -->
+<header class="nav">
+  <div class="wrap">
+    <a href="kagemaya-landing-page-visual-anchor.html" class="logo">
+      <b>KAGEMAYA</b><i>影</i>
+    </a>
+    <nav>
+      <ul>
+        <li><a href="kagemaya-event-discovery.html">Jelajahi</a></li>
+        <li><a href="kagemaya-event-discovery.html#categories">Kategori</a></li>
+        <li><a href="kagemaya-organizer-profile.html">Organizer</a></li>
+        <li><a href="kagemaya-landing-page-visual-anchor.html#about">Tentang</a></li>
+      </ul>
+    </nav>
+    <div class="nav-r">
+      <a href="kagemaya-login.html" class="login-link">Masuk</a>
+      <a href="kagemaya-register.html" class="btn btn-red btn-sm">Daftar</a>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN REGISTER SECTION -->
+<main class="register-page">
+  <!-- Atmospheric Noir Artwork Canvas -->
+  <div class="reg-bg-art" aria-hidden="true">
+    <svg viewBox="0 0 1440 1000" preserveAspectRatio="xMidYMid slice" fill="none">
+      <defs>
+        <radialGradient id="centerGlow" cx="50%" cy="20%" r="50%">
+          <stop offset="0%" stop-color="#C62828" stop-opacity="0.12" />
+          <stop offset="60%" stop-color="#D6A85F" stop-opacity="0.04" />
+          <stop offset="100%" stop-color="#0B0B0D" stop-opacity="0" />
+        </radialGradient>
+        <pattern id="kumikoGrid" width="48" height="48" patternUnits="userSpaceOnUse">
+          <path d="M 0 24 L 24 0 L 48 24 L 24 48 Z" stroke="#292930" stroke-width="0.75" fill="none" opacity="0.32" />
+          <path d="M 24 24 L 24 0 M 24 24 L 48 24 M 24 24 L 24 48 M 24 24 L 0 24" stroke="#292930" stroke-width="0.4" fill="none" opacity="0.2" />
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#kumikoGrid)" />
+      <circle class="beam-glow" cx="720" cy="240" r="540" fill="url(#centerGlow)" />
+    </svg>
+    <svg class="grain" xmlns="http://www.w3.org/2000/svg">
+      <filter id="grain">
+        <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch" />
+        <feColorMatrix type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.22 0" />
+      </filter>
+      <rect width="100%" height="100%" filter="url(#grain)" />
+    </svg>
+  </div>
+
+  <div class="wrap">
+    <div class="register-container">
+
+      <!-- Page Header -->
+      <header class="reg-header">
+        <div class="reg-tagline">Registrasi Akun Baru</div>
+        <h1>Mulai Perjalanan Sinematik</h1>
+        <p>Pilih peran Anda untuk menjelajahi kurasi film 4D, membeli tiket, atau menyelenggarakan panggung perhelatan budaya.</p>
+      </header>
+
+      <!-- ROLE SELECTOR SECTION (Customer vs Organizer) -->
+      <section class="role-section" aria-labelledby="roleSelectionLabel">
+        <span class="role-section-label" id="roleSelectionLabel">1. Pilih Peran Akun</span>
+        <div class="role-selector-grid" role="radiogroup" aria-label="Pilihan Peran Pengguna">
+
+          <!-- OPTION 1: CUSTOMER -->
+          <div 
+            class="role-card active" 
+            id="roleCardCustomer" 
+            role="radio" 
+            aria-checked="true" 
+            tabindex="0" 
+            onclick="selectRole('customer')" 
+            onkeydown="handleRoleKey(event, 'customer')">
+            <div class="role-badge">Penikmat Sinema</div>
+            <div class="role-head">
+              <h2 class="role-title">Customer</h2>
+              <div class="role-radio-dot"></div>
+            </div>
+            <p class="role-desc">
+              Jelajahi pemutaran film 4D, beli tiket, kumpulkan poin referral, simpan wishlist, dan kirim ulasan pasca-acara.
+            </p>
+            <div class="role-perk-tag">
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Mendukung Poin &amp; Kupon Referral</span>
+            </div>
+          </div>
+
+          <!-- OPTION 2: ORGANIZER -->
+          <div 
+            class="role-card" 
+            id="roleCardOrganizer" 
+            role="radio" 
+            aria-checked="false" 
+            tabindex="0" 
+            onclick="selectRole('organizer')" 
+            onkeydown="handleRoleKey(event, 'organizer')">
+            <div class="role-badge">Penyelenggara Acara</div>
+            <div class="role-head">
+              <h2 class="role-title">Organizer</h2>
+              <div class="role-radio-dot"></div>
+            </div>
+            <p class="role-desc">
+              Buat panggung acara, kelola kuota tier tiket, rilis voucher promosi, dan verifikasi bukti pembayaran peserta.
+            </p>
+            <div class="role-perk-tag">
+              <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+              <span>Akses Khusus Dashboard Pengelola</span>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- REGISTRATION FORM PANEL -->
+      <section class="form-panel" aria-labelledby="formSectionLabel">
+        <span class="role-section-label" id="formSectionLabel">2. Informasi &amp; Kredensial</span>
+
+        <!-- Dynamic Context Info Note -->
+        <div class="role-banner-note" id="roleBannerNote">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <span id="roleBannerText">
+            Mendaftar sebagai <b>Customer</b>: Anda akan memiliki akses penuh ke pemesanan tiket, fitur sosial Q&amp;A, dan reward poin referral.
+          </span>
+        </div>
+
+        <form id="registerForm" onsubmit="handleRegisterSubmit(event)" novalidate>
+
+          <!-- FIELD: NAMA LENGKAP / ORGANISASI -->
+          <div class="form-group">
+            <label for="nameInput" class="form-label">
+              <span id="labelName">Nama Lengkap</span>
+            </label>
+            <div class="input-wrap" id="nameWrap">
+              <div class="input-icon">
+                <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              </div>
+              <input 
+                type="text" 
+                id="nameInput" 
+                class="kage-input" 
+                placeholder="mis. Rina Putri" 
+                required 
+                autocomplete="name">
+            </div>
+          </div>
+
+          <!-- FIELD KHUSUS ORGANIZER: PIC NAME (Hidden on Customer) -->
+          <div class="form-group" id="picGroup" style="display: none;">
+            <label for="picInput" class="form-label">
+              <span>Nama Penanggung Jawab (PIC)</span>
+            </label>
+            <div class="input-wrap">
+              <div class="input-icon">
+                <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+              <input 
+                type="text" 
+                id="picInput" 
+                class="kage-input" 
+                placeholder="Nama lengkap perwakilan resmi">
+            </div>
+          </div>
+
+          <!-- FIELD: EMAIL -->
+          <div class="form-group">
+            <label for="emailInput" class="form-label">
+              <span id="labelEmail">Alamat Email</span>
+            </label>
+            <div class="input-wrap" id="emailWrap">
+              <div class="input-icon">
+                <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              </div>
+              <input 
+                type="email" 
+                id="emailInput" 
+                class="kage-input" 
+                placeholder="nama@email.com" 
+                required 
+                autocomplete="email">
+            </div>
+          </div>
+
+          <!-- FIELD: PASSWORD & CONFIRM PASSWORD (2 Column) -->
+          <div class="form-row-2">
+            <!-- Kata Sandi -->
+            <div class="form-group">
+              <label for="passwordInput" class="form-label">
+                <span>Kata Sandi</span>
+              </label>
+              <div class="input-wrap" id="passWrap">
+                <div class="input-icon">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
+                <input 
+                  type="password" 
+                  id="passwordInput" 
+                  class="kage-input" 
+                  placeholder="Min. 8 karakter" 
+                  required 
+                  oninput="checkPasswordStrength(this.value)"
+                  autocomplete="new-password">
+                <button type="button" class="pwd-toggle" onclick="togglePass('passwordInput', this)" aria-label="Lihat kata sandi">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <!-- SVG Awal: Mata Dicoret / Hide (karena status awal password tersembunyi) -->
+                  <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                  <line x1="1" y1="1" x2="23" y2="23"/>
+                </button>
+                </svg>
+              </div>
+              <!-- Strength Indicator -->
+              <div class="pass-strength-bar">
+                <div class="pass-strength-seg" id="seg1"></div>
+                <div class="pass-strength-seg" id="seg2"></div>
+                <div class="pass-strength-seg" id="seg3"></div>
+              </div>
+              <div class="pass-hint-text">
+                <span>Kekuatan sandi</span>
+                <span id="strengthLabel" style="color:var(--text3)">Belum diisi</span>
+              </div>
+            </div>
+
+            <!-- Konfirmasi Kata Sandi -->
+            <div class="form-group">
+              <label for="confirmPassInput" class="form-label">
+                <span>Konfirmasi Kata Sandi</span>
+              </label>
+              <div class="input-wrap" id="confirmPassWrap">
+                <div class="input-icon">
+                  <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                </div>
+                <input 
+                  type="password" 
+                  id="confirmPassInput" 
+                  class="kage-input" 
+                  placeholder="Ulangi kata sandi" 
+                  required 
+                  oninput="checkPasswordMatch()"
+                  autocomplete="new-password">
+                <button type="button" class="pwd-toggle" onclick="togglePass('confirmPassInput', this)" aria-label="Lihat kata sandi">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <!-- SVG Awal: Mata Dicoret / Hide (karena status awal password tersembunyi) -->
+                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+                    <line x1="1" y1="1" x2="23" y2="23"/>
+                  </svg>
+                </button>
+              </div>
+              <div class="pass-hint-text">
+                <span id="matchStatusText" style="color:var(--text3)">Pastikan kedua sandi identik</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ─── CRUCIAL PRD FEATURE: KODE REFERRAL (Customer Only) ─────── -->
+          <div class="referral-container" id="referralContainer">
+            <div class="referral-card-box">
+              <div class="referral-header">
+                <div class="referral-badge">
+                  <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  <span>Kode Referral Teman</span>
+                </div>
+                <span class="referral-optional">[ Opsional ]</span>
+              </div>
+              <div class="input-wrap" id="referralWrap">
+                <div class="input-icon">
+                  <svg viewBox="0 0 24 24"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>
+                </div>
+                <input 
+                  type="text" 
+                  id="referralInput" 
+                  class="kage-input" 
+                  placeholder="mis. YUDHA-4819" 
+                  style="text-transform: uppercase; letter-spacing: 0.08em;"
+                  oninput="handleReferralInput(this.value)">
+              </div>
+              <!-- Reward Notice -->
+              <div class="referral-reward-info">
+                💡 Masukkan kode referral teman Anda untuk mendapatkan <b>Kupon Diskon 3 Bulan</b> secara otomatis. Teman yang membagikan kode akan menerima <b>+10.000 Poin Kagemaya</b>.
+              </div>
+              <!-- Live Validation Feedback -->
+              <div class="referral-feedback" id="referralFeedback">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                <span id="referralFeedbackText">Kode referral valid! Kupon diskon 15% akan langsung ditambahkan ke akun Anda.</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Organizer Referral Excluded Notice (When role = organizer) -->
+          <div class="organizer-referral-excluded-note" id="organizerExcludedNote">
+            <b>🛡️ Aturan Otorisasi Peran Penyelenggara:</b>
+            Sesuai regulasi sistem Kagemaya, akun ber-role <b>Organizer</b> tidak menggunakan sistem referral dan tidak memperoleh hak klaim kupon diskon pembeli. Anda akan langsung diarahkan ke verifikasi identitas penyelenggara.
+          </div>
+
+          <!-- Checkbox Ketentuan Layanan -->
+          <div class="terms-row">
+            <label class="checkbox-label">
+              <input type="checkbox" class="kage-checkbox" id="termsCheck" required>
+              <span>Saya menyetujui <a href="#">Ketentuan Layanan</a> dan <a href="#">Kebijakan Privasi</a> Kagemaya, serta memahami aturan hak akses peran yang dipilih.</span>
+            </label>
+          </div>
+
+          <!-- Primary Submit Button -->
+          <button type="submit" class="btn btn-red btn-submit" id="regSubmitBtn">
+            <span class="btn-text" id="submitBtnText">Daftar sebagai Customer</span>
+            <div class="spinner"></div>
+          </button>
+
+        </form>
+
+        <!-- Switch to Login -->
+        <div class="panel-foot">
+          Sudah memiliki akun?
+          <a href="kagemaya-login.html">Masuk ke Akun Anda</a>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</main>
+
+<!-- SUCCESS CELEBRATION MODAL -->
+<div class="modal-overlay" id="successModal">
+  <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="succTitle">
+    <div class="success-icon-badge">
+      <svg viewBox="0 0 24 24" width="32" height="32" stroke="currentColor" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
+    <div style="font-size: 11.5px; color: var(--gold); letter-spacing: 0.16em; text-transform: uppercase; margin-bottom: 6px;">Pendaftaran Berhasil</div>
+    <h3 class="modal-title" id="succTitle">Selamat Datang di Panggung Kagemaya</h3>
+    <p class="modal-desc" id="succDesc">
+      Akun Customer Anda telah berhasil dibuat. Seluruh panggung ilusi sinematik kini terbuka untuk Anda nikmati.
+    </p>
+
+    <!-- Customer Reward Box -->
+    <div class="reward-unlocked-card" id="succCustomerCard">
+      <div class="reward-unlocked-title">Kode Referral Pribadi Anda</div>
+      <div style="font-size: 13px; color: var(--text2);">Bagikan kode ini ke teman Anda. Dapatkan +10.000 Poin untuk setiap teman yang bergabung!</div>
+      <div class="referral-code-display">
+        <b id="myNewReferralCode">KAGE-7782</b>
+        <button type="button" class="btn btn-outline btn-sm" onclick="copyReferralCode(this)" style="padding:4px 10px;font-size:11px">Salin</button>
+      </div>
+    </div>
+
+    <!-- Organizer Box -->
+    <div class="reward-unlocked-card" id="succOrganizerCard" style="display: none;">
+      <div class="reward-unlocked-title">Panggung Acara Siap Dikelola</div>
+      <div style="font-size: 13px; color: var(--text2);">Akun Organizer Anda telah aktif. Buka dashboard untuk mulai mempublikasikan event film 4D atau mengelola kuota tiket.</div>
+    </div>
+
+    <button type="button" class="btn btn-red" id="succNextBtn" onclick="redirectAfterRegister()" style="width:100%;padding:14px">
+      Mulai Eksplorasi Event
+    </button>
+  </div>
+</div>
+
+<!-- CANONICAL MINIMAL DARK FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="f-top">
+      <div class="f-brand">
+        <div class="logo">
+          <b>KAGEMAYA</b><i>影</i>
+        </div>
+        <p>Panggung digital bagi ilusi sinematik dua bangsa. Menghubungkan sineas, kreator, dan penikmat budaya Indo-Jepang dalam satu etalase interaktif.</p>
+      </div>
+      <div class="f-col">
+        <h4>Eksplorasi</h4>
+        <a href="kagemaya-event-discovery.html">Semua Event</a>
+        <a href="kagemaya-event-discovery.html?cat=film4d">Film 4D</a>
+        <a href="kagemaya-event-discovery.html?cat=workshop">Workshop Kreatif</a>
+        <a href="kagemaya-event-discovery.html?cat=talkshow">Talkshow Budaya</a>
+      </div>
+      <div class="f-col">
+        <h4>Komunitas</h4>
+        <a href="kagemaya-organizer-profile.html">Profil Organizer</a>
+        <a href="kagemaya-qa-wall.html">Dinding Tanya Jawab</a>
+        <a href="kagemaya-wishlist.html">Wishlist Tersimpan</a>
+      </div>
+      <div class="f-col">
+        <h4>Peran &amp; Akses</h4>
+        <a href="kagemaya-register.html?role=customer">Daftar Customer</a>
+        <a href="kagemaya-register.html?role=organizer">Daftar Organizer</a>
+        <a href="kagemaya-organizer-dashboard.html">Dashboard Penyelenggara</a>
+      </div>
+      <div class="f-col">
+        <h4>Bantuan</h4>
+        <a href="#">Panduan Tiket</a>
+        <a href="#">Verifikasi Pembayaran</a>
+        <a href="#">Ketentuan Privasi</a>
+      </div>
+    </div>
+
+    <div class="f-bottom">
+      <div>&copy; 2026 Kagemaya.id — Hak Cipta Dilindungi. Platform Sinema &amp; Budaya Indo-Jepang.</div>
+      <div style="font-family: var(--serif); color: var(--gold); letter-spacing: 0.15em;">影と幻 · KAGE TO MAYA</div>
+    </div>
+  </div>
+</footer>
+
+<!-- INTERACTIVE SCRIPTS -->
+<script>
+// Konfigurasi URL Base Backend Anda
+const API_BASE_URL = 'http://localhost:5000/api';
+let currentRole = 'customer';
+
+// Handle Role Selection
+function selectRole(role) {
+  currentRole = role;
+  const cardCust = document.getElementById('roleCardCustomer');
+  const cardOrg = document.getElementById('roleCardOrganizer');
+  const refContainer = document.getElementById('referralContainer');
+  const orgExcludedNote = document.getElementById('organizerExcludedNote');
+  const picGroup = document.getElementById('picGroup');
+  const labelName = document.getElementById('labelName');
+  const nameInput = document.getElementById('nameInput');
+  const labelEmail = document.getElementById('labelEmail');
+  const emailInput = document.getElementById('emailInput');
+  const bannerText = document.getElementById('roleBannerText');
+  const submitBtnText = document.getElementById('submitBtnText');
+
+  if (role === 'customer') {
+    cardCust.classList.add('active');
+    cardCust.setAttribute('aria-checked', 'true');
+    cardOrg.classList.remove('active');
+    cardOrg.setAttribute('aria-checked', 'false');
+
+    // Show Referral Code Field
+    if (refContainer) refContainer.classList.remove('hidden');
+    if (orgExcludedNote) orgExcludedNote.classList.remove('active');
+    if (picGroup) picGroup.style.display = 'none';
+
+    // Label updates
+    if (labelName) labelName.textContent = 'Nama Lengkap';
+    if (nameInput) nameInput.placeholder = 'mis. Rina Putri';
+    if (labelEmail) labelEmail.textContent = 'Alamat Email';
+    if (emailInput) emailInput.placeholder = 'nama@email.com';
+
+    if (bannerText) {
+      bannerText.innerHTML = 'Mendaftar sebagai <b>Customer</b>: Anda akan memiliki akses penuh ke pemesanan tiket, fitur sosial Q&amp;A, dan reward poin referral.';
+    }
+    if (submitBtnText) submitBtnText.textContent = 'Daftar sebagai Customer';
+  } else {
+    cardOrg.classList.add('active');
+    cardOrg.setAttribute('aria-checked', 'true');
+    cardCust.classList.remove('active');
+    cardCust.setAttribute('aria-checked', 'false');
+
+    // CRUCIAL PRD RULE: Referral code MUST NOT appear for Organizer!
+    if (refContainer) refContainer.classList.add('hidden');
+    if (orgExcludedNote) orgExcludedNote.classList.add('active');
+    if (picGroup) picGroup.style.display = 'block';
+
+    // Label updates
+    if (labelName) labelName.textContent = 'Nama Organisasi / Komunitas / Studio';
+    if (nameInput) nameInput.placeholder = 'mis. Aozora Collective / Tokyo Screening';
+    if (labelEmail) labelEmail.textContent = 'Alamat Email Resmi Organizer';
+    if (emailInput) emailInput.placeholder = 'official@kolektif.com';
+
+    if (bannerText) {
+      bannerText.innerHTML = 'Mendaftar sebagai <b>Organizer</b>: Anda akan mendapatkan akses ke manajemen event, verifikasi pembayaran manual, dan statistik penjualan.';
+    }
+    if (submitBtnText) submitBtnText.textContent = 'Daftar sebagai Organizer';
+  }
+}
+
+function handleRoleKey(e, role) {
+  if (e.key === ' ' || e.key === 'Enter') {
+    e.preventDefault();
+    selectRole(role);
+  }
+}
+
+// Password Visibility Toggle
+function togglePass(inputId, btn) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+
+  const svg = btn.querySelector('svg');
+  const isPassword = input.type === 'password';
+
+  if (isPassword) {
+    // 1. Ubah tipe input jadi 'text' agar password KELIHATAN
+    input.type = 'text';
+    btn.setAttribute('aria-label', 'Sembunyikan kata sandi');
+
+    // 2. Ganti ikon menjadi MATA TERBUKA (Show State)
+    if (svg) {
+      svg.innerHTML = `
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+        <circle cx="12" cy="12" r="3"/>
+      `;
+    }
+  } else {
+    // 1. Ubah tipe input jadi 'password' agar password TERSEMBUNYI (Hide)
+    input.type = 'password';
+    btn.setAttribute('aria-label', 'Lihat kata sandi');
+
+    // 2. Ganti ikon menjadi MATA DICORET / GARIS (Hide State)
+    if (svg) {
+      svg.innerHTML = `
+        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/>
+        <line x1="1" y1="1" x2="23" y2="23"/>
+      `;
+    }
+  }
+}
+
+// Password Strength Meter
+function checkPasswordStrength(val) {
+  const s1 = document.getElementById('seg1');
+  const s2 = document.getElementById('seg2');
+  const s3 = document.getElementById('seg3');
+  const label = document.getElementById('strengthLabel');
+
+  if (!s1 || !s2 || !s3 || !label) return;
+
+  s1.style.background = 'var(--border)';
+  s2.style.background = 'var(--border)';
+  s3.style.background = 'var(--border)';
+
+  if (!val) {
+    label.textContent = 'Belum diisi';
+    label.style.color = 'var(--text3)';
+    return;
+  }
+
+  if (val.length < 6) {
+    s1.style.background = 'var(--error)';
+    label.textContent = 'Terlalu Pendek';
+    label.style.color = 'var(--error)';
+  } else if (val.length < 10) {
+    s1.style.background = 'var(--warning)';
+    s2.style.background = 'var(--warning)';
+    label.textContent = 'Sedang (Cukup Baik)';
+    label.style.color = 'var(--warning)';
+  } else {
+    s1.style.background = 'var(--success)';
+    s2.style.background = 'var(--success)';
+    s3.style.background = 'var(--success)';
+    label.textContent = 'Kuat (Aman)';
+    label.style.color = 'var(--success)';
+  }
+  checkPasswordMatch();
+}
+
+// Check Password Confirmation Match
+function checkPasswordMatch() {
+  const p1 = document.getElementById('passwordInput').value;
+  const p2 = document.getElementById('confirmPassInput').value;
+  const wrap = document.getElementById('confirmPassWrap');
+  const status = document.getElementById('matchStatusText');
+
+  if (!wrap || !status) return;
+
+  if (!p2) {
+    wrap.classList.remove('has-error', 'is-valid');
+    status.textContent = 'Pastikan kedua sandi identik';
+    status.style.color = 'var(--text3)';
+    return;
+  }
+
+  if (p1 === p2) {
+    wrap.classList.remove('has-error');
+    wrap.classList.add('is-valid');
+    status.textContent = '✓ Kata sandi cocok';
+    status.style.color = 'var(--success)';
+  } else {
+    wrap.classList.remove('is-valid');
+    wrap.classList.add('has-error');
+    status.textContent = '✕ Kata sandi belum cocok';
+    status.style.color = 'var(--error)';
+  }
+}
+
+// Live Referral Input Validator Simulator
+function handleReferralInput(code) {
+  const feedback = document.getElementById('referralFeedback');
+  const text = document.getElementById('referralFeedbackText');
+  const wrap = document.getElementById('referralWrap');
+  if (!feedback || !text || !wrap) return;
+
+  const cleaned = code.trim().toUpperCase();
+
+  if (cleaned.length >= 4) {
+    feedback.classList.add('valid');
+    wrap.classList.add('is-valid');
+    text.textContent = `Kode referral "${cleaned}" terverifikasi! Kupon Diskon 15% (aktif 3 bulan) siap diklaim.`;
+  } else {
+    feedback.classList.remove('valid');
+    wrap.classList.remove('is-valid');
+  }
+}
+
+// Real Integration Register Submit Handler with REST API
+async function handleRegisterSubmit(e) {
+  e.preventDefault();
+
+  const nameInput = document.getElementById('nameInput');
+  const emailInput = document.getElementById('emailInput');
+  const passInput = document.getElementById('passwordInput');
+  const roleInput = document.getElementById('roleInput'); // atau ambil dari pilihan role/toggle
+  const btn = document.getElementById('registerSubmitBtn');
+
+  // Ambil nilai role dan konversi ke UPPERCASE ("CUSTOMER" atau "ORGANIZER")
+  const rawRole = roleInput ? roleInput.value : 'CUSTOMER';
+  const role = rawRole.toUpperCase(); 
+
+  const payload = {
+    name: nameInput ? nameInput.value.trim() : '',
+    email: emailInput ? emailInput.value.trim() : '',
+    password: passInput ? passInput.value : '',
+    role: role // Nilai terkonversi: "CUSTOMER" / "ORGANIZER"
+  };
+
+  if (btn) {
+    btn.disabled = true;
+    btn.innerText = 'Mendaftarkan...';
+  }
+
+  try {
+    const response = await fetch('http://localhost:5000/api/auth/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      // Menangani jika backend mengembalikan array pesan error dari Zod
+      if (Array.isArray(data)) {
+        throw new Error(data[0]?.message || 'Gagal mendaftar. Periksa kembali input Anda.');
+      }
+      throw new Error(data.message || 'Gagal melakukan pendaftaran.');
+    }
+
+    // Ambil token & user setelah pendaftaran berhasil
+    const token = data.token || data.accessToken || data.data?.token;
+    const user = data.user || data.data?.user || data.data;
+
+    if (token && user) {
+      localStorage.setItem('kagemaya_token', token);
+      localStorage.setItem('kagemaya_user', JSON.stringify(user));
+
+      // Redirect otomatis ke landing page atau dashboard
+      const targetUrl = (user.role === 'ORGANIZER' || user.role === 'organizer')
+        ? 'kagemaya-organizer-dashboard.html'
+        : 'kagemaya-landing-page-visual-anchor.html';
+
+      window.location.href = targetUrl;
+    } else {
+      alert('Pendaftaran berhasil! Silakan masuk dengan akun Anda.');
+      window.location.href = 'kagemaya-login.html';
+    }
+
+  } catch (err) {
+    alert(err.message || 'Terjadi kesalahan pada sistem.');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerText = 'Daftar Akun Baru';
+    }
+  }
+}
+
+function copyReferralCode(btn) {
+  const code = document.getElementById('myNewReferralCode').textContent;
+  navigator.clipboard.writeText(code).then(() => {
+    btn.textContent = 'Tersalin!';
+    setTimeout(() => { btn.textContent = 'Salin'; }, 2000);
+  });
+}
+
+function redirectAfterRegister() {
+  if (currentRole === 'organizer') {
+    window.location.href = 'kagemaya-organizer-dashboard.html';
+  } else {
+    window.location.href = 'kagemaya-event-discovery.html';
+  }
+}
+
+// Check URL Params for pre-selected role
+window.addEventListener('DOMContentLoaded', () => {
+  const params = new URLSearchParams(window.location.search);
+  const role = params.get('role');
+  if (role === 'organizer') {
+    selectRole('organizer');
+  } else {
+    selectRole('customer');
+  }
+});
+</script>
+</body>
+</html>

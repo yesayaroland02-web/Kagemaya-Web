@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="refresh" content="0; url=kagemaya-landing-page-visual-anchor.html">
+  <title>Redirecting...</title>
+  <script>
+    window.location.href = "kagemaya-landing-page-visual-anchor.html";
+  </script>
+</head>
+<body>
+  <p>Jika Anda tidak dialihkan secara otomatis, <a href="kagemaya-landing-page-visual-anchor.html">klik di sini</a>.</p>
+</body>
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  // Ambil token dan data user dari localStorage
+  const token = localStorage.getItem('kagemaya_token');
+  const userJson = localStorage.getItem('kagemaya_user');
+
+  if (token && userJson) {
+    try {
+      const user = JSON.parse(userJson);
+      renderLoggedInNavbar(user);
+    } catch (err) {
+      console.error('Gagal parsing data user:', err);
+    }
+  }
+});
+
+function renderLoggedInNavbar(user) {
+  // Cari container tombol Login/Daftar di kanan Navbar
+  const navRight = document.querySelector('.nav-actions') || 
+                   document.querySelector('.nav-r') || 
+                   document.querySelector('.nav-right');
+                   
+  if (!navRight) return;
+
+  // Format Nama (Contoh: "Hana Melani" -> "Hana M.")
+  let displayName = user.name || user.fullName || user.email || 'User';
+  const nameParts = displayName.trim().split(' ');
+  if (nameParts.length > 1) {
+    displayName = `${nameParts[0]} ${nameParts[1].charAt(0).toUpperCase()}.`;
+  } else {
+    displayName = nameParts[0];
+  }
+
+  // Tentukan link tombol
+  const orderLink = user.role === 'organizer' 
+    ? 'kagemaya-organizer-dashboard.html' 
+    : 'kagemaya-event-discovery.html';
+
+  // Render ulang isi Navbar kanan
+  navRight.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 16px; position: relative;">
+      <!-- Search Icon -->
+      <button type="button" aria-label="Cari" style="background: none; border: none; color: inherit; cursor: pointer; display: flex; align-items: center;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/>
+        </svg>
+      </button>
+
+      <!-- Nama User -->
+      <span id="userNameBtn" style="color: #E2B857; font-weight: 500; font-size: 14px; cursor: pointer;">
+        ${displayName}
+      </span>
+
+      <!-- Tombol Pesananku / Dashboard -->
+      <a href="${orderLink}" style="
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: transparent;
+        color: #FFFFFF;
+        padding: 6px 16px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 13px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+      ">
+        ${user.role === 'organizer' ? 'Dashboard' : 'Pesananku'}
+      </a>
+
+      <!-- Dropdown Logout (Hidden) -->
+      <div id="userMenuDropdown" style="
+        display: none; 
+        position: absolute; 
+        right: 0; 
+        top: 36px; 
+        background: #181818; 
+        border: 1px solid #333; 
+        border-radius: 4px; 
+        padding: 6px 0; 
+        min-width: 120px; 
+        z-index: 100;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+      ">
+        <button id="logoutBtn" style="
+          width: 100%; 
+          text-align: left; 
+          background: none; 
+          border: 0; 
+          color: #ff4d4d; 
+          padding: 8px 14px; 
+          font-size: 13px; 
+          cursor: pointer;
+        ">
+          Keluar (Logout)
+        </button>
+      </div>
+    </div>
+  `;
+
+  // Toggle Dropdown Logout
+  const nameBtn = document.getElementById('userNameBtn');
+  const dropdown = document.getElementById('userMenuDropdown');
+  const logoutBtn = document.getElementById('logoutBtn');
+
+  if (nameBtn && dropdown) {
+    nameBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    });
+
+    document.addEventListener('click', () => {
+      dropdown.style.display = 'none';
+    });
+  }
+
+  // Fitur Logout
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('kagemaya_token');
+      localStorage.removeItem('kagemaya_user');
+      window.location.reload();
+    });
+  }
+}
+</script>
+</html>
