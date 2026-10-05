@@ -1,21 +1,14 @@
-import express from 'express';
-import cors from 'cors'; // 1. Import cors
 import authRouter from './routes/auth.router';
+import cors from 'cors';
+import eventRouter from './routes/event.router'; // 1. Import eventRouter
+import express from 'express';
 
 const app = express();
 
-// 2. Pasang CORS Middleware (Wajib di paling atas sebelum route)
-app.use(
-  cors({
-    origin: ['http://localhost:3000', 'http://127.0.0.1:3000', 'http://127.0.0.1:5500'],
-    credentials: true,
-  })
-);
-
-// Middleware parsing body JSON (WAJIB ADA)
+// Pasang CORS agar frontend bisa fetch tanpa terblokir
+app.use(cors());
 app.use(express.json());
-
-// Main Route Mounting
+// Routes
 app.use('/api/auth', authRouter);
-
+app.use('/api/events', eventRouter); // 2. Mount route event
 export default app;
