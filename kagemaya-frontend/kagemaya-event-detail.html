@@ -314,10 +314,9 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:72px 0 40
       <li><a href="#">Kategori</a></li>
       <li><a href="#">Organizer</a></li>
     </ul></nav>
-    <div class="nav-r">
-      <button class="icon-btn" aria-label="Cari"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg></button>
-      <a class="login" href="#">Login</a>
-      <a class="btn btn-red btn-sm" href="#">Daftar</a>
+    <div class="nav-r" id="nav-actions-container">
+      <a class="login" href="kagemaya-login.html">Login</a>
+      <a class="btn btn-red btn-sm" href="kagemaya-register.html">Daftar</a>
     </div>
   </div>
 </header>
@@ -671,57 +670,341 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:72px 0 40
 </div>
 
 <script>
-(function(){
-  var fmt=function(n){return 'Rp'+n.toString().replace(/\B(?=(\d{3})+(?!\d))/g,'.')};
-  var rows=[].slice.call(document.querySelectorAll('.tk'));
-  var MAX=5;
-  function update(){
-    var q=0,t=0;
-    rows.forEach(function(r){var n=+r.querySelector('output').textContent;q+=n;t+=n*(+r.dataset.price);r.classList.toggle('on',n>0)});
-    rows.forEach(function(r){
-      var o=r.querySelector('output'),n=+o.textContent,quota=+r.dataset.quota,b=r.querySelectorAll('button');
-      b[0].disabled=n<=0; b[1].disabled=q>=MAX||n>=quota;
-    });
-    document.getElementById('cnt').textContent=q?q+' tiket dipilih':'Belum ada tiket dipilih';
-    document.getElementById('tot').textContent=fmt(t);
-    document.getElementById('buy').disabled=!q;
-    document.getElementById('mcnt').textContent=q?q+' tiket dipilih':'Mulai dari';
-    document.getElementById('mtot').textContent=q?fmt(t):'Rp150.000';
+const API_BASE = 'http://localhost:5000/api';
+let eventData = null;
+const selectedTickets = {}; // { [tierId]: qty }
+const MAX_TOTAL_TICKETS = 5;
+
+// Format Rupiah
+function fmt(n) {
+  return 'Rp' + Number(n).toLocaleString('id-ID');
+}
+
+// 1. Ambil Event ID dari URL Query
+function getEventId() {
+  return new URLSearchParams(window.location.search).get('id');
+}
+
+// 2. Fetch Detail Event dari Backend
+async function initEventDetail() {
+  const eventId = getEventId();
+  if (!eventId) {
+    console.log('ID event tidak ditentukan, menggunakan data demo visual.');
+    setupStaticInteractions();
+    return;
   }
-  rows.forEach(function(r){
-    r.addEventListener('click',function(e){
-      var b=e.target.closest('button[data-d]'); if(!b||b.disabled)return;
-      var o=r.querySelector('output'); o.textContent=Math.max(0,+o.textContent+(+b.dataset.d)); update();
+
+  try {
+    const res = await fetch(`${API_BASE}/events/${eventId}`);
+    const json = await res.json();
+    if (!res.ok || !json.data) throw new Error(json.message || 'Event tidak ditemukan.');
+
+    eventData = json.data;
+    populateEventData(eventData);
+  } catch (err) {
+    console.error('Gagal mengambil data event dari backend:', err);
+    setupStaticInteractions();
+  }
+}
+
+// 3. Masukkan Data ke DOM Asli
+function populateEventData(ev) {
+  document.title = `${ev.title} — Kagemaya`;
+
+  // Judul
+  const h1 = document.querySelector('h1');
+  if (h1) h1.textContent = ev.title;
+
+  // Tanggal & Jam
+  const d = new Date(ev.start_date);
+  const dateStr = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+  const dayStr = d.toLocaleDateString('id-ID', { weekday: 'long' });
+  const timeStr = d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB';
+
+  // Meta bar di Hero
+  const metaItems = document.querySelectorAll('.meta li');
+  if (metaItems[0]) metaItems[0].innerHTML = `<svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1.5"/><path d="M3 10h18M3 14h18M8 5v14M16 5v14"/></svg>${ev.category?.name || 'Budaya'}`;
+  if (metaItems[1]) metaItems[1].innerHTML = `<svg viewBox="0 0 24 24"><path d="M12 21s-7-5.5-7-11a7 7 0 0114 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>${ev.city}`;
+  if (metaItems[2]) metaItems[2].innerHTML = `<svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="1.5"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>${dateStr}`;
+  if (metaItems[3]) metaItems[3].innerHTML = `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/></svg>${timeStr}`;
+
+  // Jadwal Detail
+  const schedDate = document.querySelector('.date-big');
+  if (schedDate) {
+    schedDate.querySelector('.d').textContent = d.getDate();
+    schedDate.querySelector('.m').textContent = d.toLocaleDateString('id-ID', { month: 'long' });
+    schedDate.querySelector('.y').textContent = `${d.getFullYear()} · ${dayStr}`;
+  }
+
+  // Waktu & Tempat di Aside
+  const asideWhen = document.querySelector('.th .when');
+  if (asideWhen) asideWhen.innerHTML = `${dayStr}, ${dateStr} · ${timeStr}<br>${ev.location}, ${ev.city}`;
+
+  // Deskripsi
+  const lead = document.querySelector('.lead');
+  if (lead) lead.textContent = ev.description;
+
+  // Lokasi & Venue
+  const locTitle = document.querySelector('.loc .info h3');
+  if (locTitle) locTitle.textContent = ev.location;
+  const locAddr = document.querySelector('.loc .addr');
+  if (locAddr) locAddr.textContent = `${ev.location}, ${ev.city}`;
+
+  // Organizer
+  const orgName = ev.organizer?.organizer_profile?.organization_name || ev.organizer?.name || 'Organizer';
+  const orgH3 = document.querySelector('.orgc h3');
+  if (orgH3) orgH3.textContent = orgName;
+  const byName = document.querySelector('.by b');
+  if (byName) byName.textContent = orgName;
+
+  // Render Tier Tiket ke <ul class="tix">
+  renderTickets(ev.ticket_types);
+}
+
+// 4. Render Tiket Dinamis ke <ul class="tix">
+function renderTickets(tickets) {
+  const list = document.querySelector('.tix');
+  if (!list || !tickets || tickets.length === 0) return;
+
+  list.innerHTML = tickets.map(t => {
+    const isSoldOut = t.available_quota <= 0;
+    const isLow = t.available_quota > 0 && t.available_quota <= 10;
+    const qty = selectedTickets[t.id] || 0;
+
+    let quotaBadge = `Tersisa ${t.available_quota} tiket`;
+    if (isSoldOut) quotaBadge = `<span style="color:#ff8b8b;font-weight:600">Habis Terjual</span>`;
+    else if (isLow) quotaBadge = `<span style="color:var(--gold);font-weight:600">Tersisa ${t.available_quota} tiket!</span>`;
+
+    return `
+      <li class="tk ${qty > 0 ? 'on' : ''} ${isSoldOut ? 'disabled' : ''}" 
+          data-id="${t.id}" data-price="${t.price}" data-quota="${t.available_quota}"
+          style="${isSoldOut ? 'opacity:0.55;cursor:not-allowed;' : ''}">
+        <div>
+          <div class="nm">${t.name}</div>
+          <div class="pr">${fmt(t.price)}</div>
+          <div class="qt ${isLow ? 'low' : ''}">${quotaBadge}</div>
+        </div>
+        <div class="step">
+          <button type="button" aria-label="Kurangi ${t.name}" data-d="-1" ${qty <= 0 ? 'disabled' : ''}>−</button>
+          <output>${qty}</output>
+          <button type="button" aria-label="Tambah ${t.name}" data-d="1" ${isSoldOut ? 'disabled' : ''}>+</button>
+        </div>
+      </li>
+    `;
+  }).join('');
+
+  attachTicketEvents();
+  updateSummary();
+}
+
+// 5. Hitung Total & Status Tombol
+function updateSummary() {
+  const rows = [].slice.call(document.querySelectorAll('.tk'));
+  let totalQty = 0;
+  let totalPrice = 0;
+
+  rows.forEach(r => {
+    const count = +(r.querySelector('output')?.textContent || 0);
+    const price = +(r.dataset.price || 0);
+    const quota = +(r.dataset.quota || 0);
+    totalQty += count;
+    totalPrice += count * price;
+
+    const btns = r.querySelectorAll('.step button');
+    if (btns[0]) btns[0].disabled = count <= 0;
+    if (btns[1]) btns[1].disabled = totalQty >= MAX_TOTAL_TICKETS || count >= quota;
+    r.classList.toggle('on', count > 0);
+  });
+
+  // Update Summary Deskstop & Mobile
+  const cnt = document.getElementById('cnt');
+  const tot = document.getElementById('tot');
+  const buy = document.getElementById('buy');
+  const mcnt = document.getElementById('mcnt');
+  const mtot = document.getElementById('mtot');
+  const mbuy = document.getElementById('mbuy');
+
+  if (cnt) cnt.textContent = totalQty ? `${totalQty} tiket dipilih` : 'Belum ada tiket dipilih';
+  if (tot) tot.textContent = fmt(totalPrice);
+  if (buy) buy.disabled = totalQty === 0;
+
+  if (mcnt) mcnt.textContent = totalQty ? `${totalQty} tiket dipilih` : 'Mulai dari';
+  if (mtot) mtot.textContent = totalQty ? fmt(totalPrice) : (eventData ? fmt(eventData.starting_price) : 'Rp150.000');
+  if (mbuy) mbuy.disabled = totalQty === 0;
+}
+
+function attachTicketEvents() {
+  document.querySelectorAll('.tk').forEach(row => {
+    row.addEventListener('click', e => {
+      const btn = e.target.closest('button[data-d]');
+      if (!btn || btn.disabled) return;
+
+      const id = row.dataset.id;
+      const delta = +btn.dataset.d;
+      const output = row.querySelector('output');
+      const current = +(output.textContent || 0);
+      const next = Math.max(0, current + delta);
+
+      output.textContent = next;
+      if (id) selectedTickets[id] = next;
+      updateSummary();
     });
   });
-  document.getElementById('mbuy').addEventListener('click',function(){
-    if(!document.querySelector('.tk.on')){document.querySelector('aside').scrollIntoView({behavior:'smooth'})}
-  });
-  var save=document.getElementById('save');
-  save.addEventListener('click',function(){
-    var p=save.getAttribute('aria-pressed')==='true';
-    save.setAttribute('aria-pressed',!p); save.querySelector('span').textContent=p?'Simpan Event':'Tersimpan';
-  });
-  var fo=document.getElementById('follow'),fc=document.getElementById('fcount');
-  fo.addEventListener('click',function(){
-    var p=fo.getAttribute('aria-pressed')==='true';
-    fo.setAttribute('aria-pressed',!p); fo.textContent=p?'Follow':'Mengikuti'; fc.textContent=p?'124':'125';
-  });
-  var qin=document.getElementById('qin');
-  function send(){
-    var v=qin.value.trim(); if(!v)return;
-    var d=document.createElement('div'); d.className='q open';
-    var a=document.createElement('div'); a.className='ask';
-    var s=document.createElement('span'); s.textContent=v; a.appendChild(s);
-    var w=document.createElement('div'); w.className='who'; w.textContent='Kamu · baru saja';
-    var x=document.createElement('div'); x.className='wait'; x.textContent='Menunggu jawaban dari organizer.';
-    d.appendChild(a); d.appendChild(w); d.appendChild(x);
-    document.querySelector('.qa').appendChild(d); qin.value='';
+}
+
+function setupStaticInteractions() {
+  attachTicketEvents();
+  updateSummary();
+}
+
+// 6. Tombol Checkout
+async function handleCheckout() {
+  const ticketEntries = Object.entries(selectedTickets).filter(([_, qty]) => qty > 0);
+  if (ticketEntries.length === 0) {
+    alert('Silakan pilih tiket terlebih dahulu.');
+    return;
   }
-  document.getElementById('qsend').addEventListener('click',send);
-  qin.addEventListener('keydown',function(e){if(e.key==='Enter')send()});
-  update();
-})();
+
+  const [tierId, qty] = ticketEntries[0];
+
+  // Validasi Kuota Tiket Real-time ke API Backend Day 5
+  if (eventData) {
+    try {
+      const res = await fetch(`${API_BASE}/events/tickets/${tierId}/availability?qty=${qty}`);
+      const valData = await res.json();
+      if (!res.ok) {
+        alert(valData.message || 'Ketersediaan kuota tiket tidak mencukupi.');
+        return;
+      }
+    } catch (e) {
+      console.warn('Validasi tiket offline fallback:', e);
+    }
+  }
+
+  const eventId = eventData ? eventData.id : 'demo-event';
+  const url = `kagemaya-checkout.html?event_id=${eventId}&tier_id=${tierId}&qty=${qty}`;
+  window.location.href = url;
+}
+
+// 7. Render Logged In Navbar
+function renderLoggedInNavbar(user) {
+  const navRight = document.getElementById('nav-actions-container');
+  if (!navRight) return;
+
+  let displayName = user.name || user.email || 'User';
+  const nameParts = displayName.trim().split(' ');
+  if (nameParts.length > 1) {
+    displayName = `${nameParts[0]} ${nameParts[1].charAt(0).toUpperCase()}.`;
+  } else {
+    displayName = nameParts[0];
+  }
+
+  const orderLink = (user.role === 'ORGANIZER' || user.role === 'organizer')
+    ? 'kagemaya-organizer-dashboard.html'
+    : 'kagemaya-order-history.html';
+
+  navRight.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 16px; position: relative;">
+      <span id="userNameBtn" style="color: #E2B857; font-weight: 500; font-size: 14px; cursor: pointer;">
+        ${displayName}
+      </span>
+      <a href="${orderLink}" style="
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        background: transparent;
+        color: #FFFFFF;
+        padding: 6px 16px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+      ">
+        ${(user.role === 'ORGANIZER' || user.role === 'organizer') ? 'Dashboard' : 'Pesananku'}
+      </a>
+      <button id="logoutBtn" style="
+        background: none;
+        border: none;
+        color: #ff4d4d;
+        font-size: 13px;
+        cursor: pointer;
+        padding: 4px 8px;
+      ">
+        Keluar
+      </button>
+    </div>
+  `;
+
+  document.getElementById('logoutBtn')?.addEventListener('click', () => {
+    localStorage.removeItem('kagemaya_token');
+    localStorage.removeItem('kagemaya_user');
+    window.location.reload();
+  });
+}
+
+// Inisialisasi Halaman
+document.addEventListener('DOMContentLoaded', () => {
+  // Setup Navbar Auth
+  const token = localStorage.getItem('kagemaya_token');
+  const userJson = localStorage.getItem('kagemaya_user');
+  if (token && userJson) {
+    try {
+      const user = JSON.parse(userJson);
+      renderLoggedInNavbar(user);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  // Tombol Checkout
+  document.getElementById('buy')?.addEventListener('click', handleCheckout);
+  document.getElementById('mbuy')?.addEventListener('click', () => {
+    if (!document.querySelector('.tk.on')) {
+      document.querySelector('aside')?.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      handleCheckout();
+    }
+  });
+
+  // Interaksi Wishlist
+  const saveBtn = document.getElementById('save');
+  saveBtn?.addEventListener('click', () => {
+    const p = saveBtn.getAttribute('aria-pressed') === 'true';
+    saveBtn.setAttribute('aria-pressed', !p);
+    saveBtn.querySelector('span').textContent = p ? 'Simpan Event' : 'Tersimpan';
+  });
+
+  // Interaksi Follow Organizer
+  const followBtn = document.getElementById('follow');
+  const fcount = document.getElementById('fcount');
+  followBtn?.addEventListener('click', () => {
+    const p = followBtn.getAttribute('aria-pressed') === 'true';
+    followBtn.setAttribute('aria-pressed', !p);
+    followBtn.textContent = p ? 'Follow' : 'Mengikuti';
+    if (fcount) fcount.textContent = p ? '124' : '125';
+  });
+
+  // Interaksi Tanya Jawab (Q&A)
+  const qin = document.getElementById('qin');
+  const qsend = document.getElementById('qsend');
+  function sendQA() {
+    const v = qin?.value.trim();
+    if (!v) return;
+    const d = document.createElement('div');
+    d.className = 'q open';
+    d.innerHTML = `
+      <div class="ask"><span>${v}</span></div>
+      <div class="who">Kamu · baru saja</div>
+      <div class="wait">Menunggu jawaban dari organizer.</div>
+    `;
+    document.querySelector('.qa')?.appendChild(d);
+    if (qin) qin.value = '';
+  }
+  qsend?.addEventListener('click', sendQA);
+  qin?.addEventListener('keydown', e => { if (e.key === 'Enter') sendQA(); });
+
+  // Load Event Detail
+  initEventDetail();
+});
 </script>
 </body>
 </html>

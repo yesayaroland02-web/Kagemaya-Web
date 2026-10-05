@@ -206,3 +206,58 @@ export const getEventByIdService = async (id: string) => {
     },
   };
 };
+
+// Fungsi untuk mengecek kuota tiket secara presisi sebelum checkout
+export const validateTicketStockService = async (ticketTypeId: string, requestedQty: number) => {
+  const ticket = await prisma.ticketType.findUnique({
+    where: { id: ticketTypeId },
+    select: {
+      id: true,
+      name: true,
+      price: true,
+      quota: true,
+      available_quota: true,
+      event: {
+        select: {
+          id: true,
+          title: true,
+          start_date: true,
+        },
+      },
+    },
+  });
+
+  if (!ticket) {
+    throw new Error('Jenis tiket tidak ditemukan');
+  }
+
+  // 1. Cek apakah tiket sudah habis (Sold Out)
+  if (ticket.available_quota <= 0) {
+    return {
+      is_available: false,
+      reason: 'SOLD_OUT',
+      message: `Tiket "${ticket.name}" telah habis terjual.`,
+      ticket,
+    };
+  }
+
+  // 2. Cek apakah jumlah tiket yang diminta melebihi sisa kuota
+  if (requestedQty > ticket.available_quota) {
+    return {
+      is_available: false,
+      reason: 'INSUFFICIENT_QUOTA',
+      message: `Hanya tersisa ${ticket.available_quota} tiket untuk jenis "${ticket.name}".`,
+      remaining_quota: ticket.available_quota,
+      ticket,
+    };
+  }
+
+  // 3. Tiket tersedia secara valid
+  return {
+    is_available: true,
+    reason: 'AVAILABLE',
+    message: 'Ketersediaan kuota tiket valid.',
+    remaining_quota: ticket.available_quota,
+    ticket,
+  };
+};

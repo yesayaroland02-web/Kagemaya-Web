@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
 import { errorResponse, successResponse } from '../utils/response';
-import { getCategoriesService, getEventsService, getEventByIdService } from '../services/event.service';
+import { getCategoriesService, getEventByIdService, getEventsService } from '../services/event.service';
+
+import { validateTicketStockService } from '../services/event.service';
 
 export const getEvents = async (req: Request, res: Response) => {
   try {
@@ -43,5 +45,19 @@ export const getEventById = async (req: Request, res: Response) => {
   } catch (error: any) {
     const statusCode = error.message === 'Event tidak ditemukan' ? 404 : 500;
     return errorResponse(res, error.message || 'Gagal memuat detail event', statusCode, error);
+  }
+};
+
+export const checkTicketStock = async (req: Request, res: Response) => {
+  try {
+    const { ticketTypeId } = req.params;
+    const qty = req.query.qty ? Number(req.query.qty) : 1;
+    const result = await validateTicketStockService(ticketTypeId, qty);
+    if (!result.is_available) {
+      return errorResponse(res, result.message, 400, result);
+    }
+    return successResponse(res, result.message, result, 200);
+  } catch (error: any) {
+    return errorResponse(res, error.message || 'Gagal memvalidasi kuota tiket', 500, error);
   }
 };
