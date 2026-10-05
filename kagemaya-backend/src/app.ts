@@ -1,20 +1,12 @@
-import express, { Application, Request, Response } from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import morgan from 'morgan';
+import express from 'express';
+import authRouter from './routes/auth.router'; // Sesuaikan path jika berbeda
 
-const app: Application = express();
+const app = express();
 
-app.use(cors());
-app.use(helmet());
-app.use(morgan('dev'));
+// Middleware parsing body JSON (WAJIB ADA)
 app.use(express.json());
 
-app.get('/', (req: Request, res: Response) => {
-  res.json({
-    message: 'Welcome to kagemaya.id API',
-    status: 'OK',
-  });
-});
+// Main Route Mounting
+app.use('/api/auth', authRouter);
 
 export default app;
