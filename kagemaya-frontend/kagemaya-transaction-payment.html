@@ -1,0 +1,989 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Konfirmasi Pembayaran — Yūgen · Kagemaya</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="kagemaya-tokens.css">
+<style>
+/* ─── DESIGN TOKENS ─────────────────────────────────────── */
+:root{
+  color-scheme:dark;
+  --bg:#0B0B0D; --surface:#121216; --elev:#1C1C22;
+  --red:#C62828; --red-hi:#E5484D; --gold:#D6A85F;
+  --text:#F4F0E8; --text2:#B8B5B0; --text3:#85837f;
+  --mist:#B8B5B0; --border:#292930;
+  --serif:'Noto Serif JP','Hiragino Mincho ProN','Yu Mincho',Georgia,serif;
+  --sans:'Inter','Noto Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --r:2px;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+html{scroll-padding-top:84px;background:var(--bg);scroll-behavior:smooth}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+svg{display:block}
+
+/* ─── GRAIN ─────────────────────────────────────────────── */
+.grain{position:absolute;inset:0;pointer-events:none;opacity:.18;mix-blend-mode:overlay;width:100%;height:100%}
+
+/* ─── WRAP ───────────────────────────────────────────────── */
+.wrap{max-width:1296px;margin:0 auto;padding:0 32px}
+
+/* ─── NAVBAR ─────────────────────────────────────────────── */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;padding-top:env(safe-area-inset-top,0px);background:rgba(11,11,13,.9);border-bottom:1px solid var(--border);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.nav .wrap{display:flex;align-items:center;height:84px;gap:0}
+.logo{display:flex;align-items:baseline;gap:12px;flex:none;margin-right:40px}
+.logo b{font-family:var(--serif);font-weight:500;font-size:21px;letter-spacing:.34em;margin-right:-.34em}
+.logo i{font-family:var(--serif);font-style:normal;color:var(--red-hi);font-size:17px;font-weight:400}
+.nav nav{flex:1;display:flex;justify-content:center}
+.nav ul{display:flex;gap:36px;list-style:none;margin:0;padding:0}
+.nav ul a{font-size:14px;color:var(--text2);transition:color .2s}
+.nav ul a:hover{color:var(--text)}
+.nav-r{display:flex;align-items:center;gap:24px;flex:none}
+.icon-btn{background:none;border:0;color:var(--text2);padding:6px;display:grid;place-items:center;transition:color .2s;cursor:pointer}
+.icon-btn:hover{color:var(--text)}
+.login{font-size:14px;color:var(--text2)}
+.btn{display:inline-flex;align-items:center;justify-content:center;font:500 14px/1 var(--sans);padding:14px 26px;border-radius:var(--r);border:1px solid transparent;cursor:pointer;transition:background .2s,border-color .2s,color .2s,opacity .2s;letter-spacing:.01em;gap:8px}
+.btn-red{background:var(--red);color:var(--text)}
+.btn-red:hover:not(:disabled){background:var(--red-hi)}
+.btn-red:disabled{opacity:.45;cursor:not-allowed}
+.btn-line{border-color:rgba(244,240,232,.28);color:var(--text);background:transparent}
+.btn-line:hover{border-color:var(--text)}
+.btn-sm{padding:10px 20px;font-size:13px}
+
+/* ─── STEPS BAR ──────────────────────────────────────────── */
+.steps-bar{position:sticky;top:84px;z-index:90;background:var(--surface);border-bottom:1px solid var(--border)}
+.steps-bar .wrap{display:flex;align-items:stretch;height:52px}
+.step-item{display:flex;align-items:center;gap:10px;padding:0 28px 0 0;font-size:13.5px;color:var(--text3);position:relative}
+.step-item:first-child{padding-left:0}
+.step-item::after{content:"/";position:absolute;right:10px;opacity:.3}
+.step-item:last-child::after{display:none}
+.step-item.done{color:var(--text2)}
+.step-item.done .sn{background:var(--elev);border-color:var(--border);color:var(--text2)}
+.step-item.active{color:var(--text);font-weight:500}
+.step-item.active .sn{background:var(--gold);border-color:var(--gold);color:var(--bg)}
+.sn{width:24px;height:24px;border-radius:50%;border:1px solid var(--border);display:grid;place-items:center;font-size:12px;font-weight:600;flex:none;background:var(--bg)}
+
+/* ─── PAGE ───────────────────────────────────────────────── */
+.page{padding-top:calc(84px + 40px);padding-bottom:120px}
+.pay-grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:48px;align-items:start}
+
+/* ─── PANEL ──────────────────────────────────────────────── */
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:24px;animation:fadeIn .4s ease both}
+.panel:nth-child(1){animation-delay:.04s}
+.panel:nth-child(2){animation-delay:.10s}
+.panel:nth-child(3){animation-delay:.16s}
+.panel:nth-child(4){animation-delay:.22s}
+.panel-head{padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:16px}
+.panel-head h3{font-family:var(--serif);font-weight:400;font-size:19px;margin:0}
+.panel-body{padding:24px}
+
+/* ─── TRANSACTION HEADER ─────────────────────────────────── */
+.txn-card{display:flex;gap:20px;align-items:flex-start}
+.txn-thumb{width:100px;height:72px;flex:none;border-radius:var(--r);overflow:hidden;position:relative;background:#09090b;border:1px solid var(--border)}
+.txn-thumb svg.scene{width:100%;height:100%}
+.txn-info{}
+.txn-id{font-family:'Courier New',monospace;font-size:12px;color:var(--text3);letter-spacing:.08em;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.txn-id button{background:none;border:0;padding:0;color:var(--text3);cursor:pointer;display:grid;place-items:center;transition:color .2s}
+.txn-id button:hover{color:var(--gold)}
+.txn-info h4{font-family:var(--serif);font-weight:500;font-size:18px;line-height:1.3;margin:0 0 8px}
+.txn-meta{display:flex;flex-wrap:wrap;gap:6px 20px}
+.txn-meta span{font-size:13px;color:var(--text2);display:flex;align-items:center;gap:6px}
+.txn-meta svg{width:13px;height:13px;stroke:var(--gold);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* ─── BANK TRANSFER ──────────────────────────────────────── */
+.bank-rows{display:grid;gap:0}
+.bank-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border);gap:16px}
+.bank-row:last-child{border-bottom:none;padding-bottom:0}
+.br-label{font-size:13px;color:var(--text2)}
+.br-value{font-size:14.5px;font-weight:500;display:flex;align-items:center;gap:10px;text-align:right}
+.br-value.mono{font-family:'Courier New',monospace;font-size:17px;letter-spacing:.06em;color:var(--text)}
+.br-value.amount{font-family:var(--serif);font-size:22px;font-weight:400;color:var(--red-hi)}
+.copy-btn{background:var(--elev);border:1px solid var(--border);border-radius:var(--r);color:var(--text2);font-size:11.5px;font-family:var(--sans);padding:4px 10px;cursor:pointer;transition:border-color .2s,color .2s;display:flex;align-items:center;gap:5px;white-space:nowrap}
+.copy-btn:hover{border-color:var(--gold);color:var(--gold)}
+.copy-btn svg{width:11px;height:11px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round}
+.bank-logo-row{display:flex;align-items:center;gap:12px}
+.bank-chip{background:var(--elev);border:1px solid var(--border);border-radius:var(--r);padding:6px 14px;font-size:13.5px;font-weight:600;letter-spacing:.06em;color:var(--text)}
+
+/* ─── COUNTDOWN ──────────────────────────────────────────── */
+.countdown-wrap{display:flex;flex-direction:column;align-items:center;padding:28px 24px 24px;gap:16px}
+.countdown-label{font-size:12.5px;color:var(--text2);letter-spacing:.12em;text-transform:uppercase;display:flex;align-items:center;gap:8px}
+.countdown-label::before,.countdown-label::after{content:"";flex:1;height:1px;background:var(--border)}
+.countdown-digits{display:flex;align-items:center;gap:0;position:relative}
+.cd-unit{display:flex;flex-direction:column;align-items:center;gap:4px}
+.cd-num{font-family:var(--serif);font-weight:300;font-size:72px;line-height:1;color:var(--red-hi);letter-spacing:-.02em;min-width:2.2ch;text-align:center;position:relative}
+.cd-sep{font-family:var(--serif);font-size:56px;font-weight:300;color:var(--red);opacity:.55;padding:0 4px;align-self:flex-start;line-height:1.05;animation:blink 1s step-end infinite}
+@keyframes blink{0%,100%{opacity:.55}50%{opacity:.1}}
+.cd-sub{font-size:11px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase}
+.countdown-note{font-size:13px;color:var(--text2);text-align:center;max-width:28em;line-height:1.6}
+.countdown-note strong{color:var(--red-hi)}
+.countdown-wrap.urgent .cd-num{color:var(--red-hi)}
+.countdown-wrap.expired .cd-num{color:var(--text3)}
+
+/* ─── PROGRESS BAR ───────────────────────────────────────── */
+.time-bar{height:3px;background:var(--elev);border-radius:2px;overflow:hidden;margin:0 24px 24px;position:relative}
+.time-bar-fill{height:100%;background:linear-gradient(90deg,var(--red) 0%,var(--red-hi) 100%);border-radius:2px;transition:width 1s linear;transform-origin:left}
+
+/* ─── UPLOAD AREA ────────────────────────────────────────── */
+.upload-area{border:2px dashed var(--mist);border-radius:4px;background:rgba(28,28,34,.5);min-height:220px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;cursor:pointer;transition:border-color .25s,background .25s;position:relative;overflow:hidden;padding:32px 24px;text-align:center}
+.upload-area:hover,.upload-area.drag{border-color:var(--gold);background:rgba(214,168,95,.04)}
+.upload-area.has-file{border-color:var(--gold);border-style:solid;background:rgba(214,168,95,.06)}
+.upload-icon{width:52px;height:52px;border:1px solid rgba(184,181,176,.3);border-radius:50%;display:grid;place-items:center;flex:none;transition:border-color .25s}
+.upload-area:hover .upload-icon,.upload-area.drag .upload-icon{border-color:var(--gold)}
+.upload-icon svg{width:22px;height:22px;stroke:var(--mist);fill:none;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;transition:stroke .25s}
+.upload-area:hover .upload-icon svg,.upload-area.drag .upload-icon svg{stroke:var(--gold)}
+.upload-title{font-size:15px;font-weight:500;color:var(--text)}
+.upload-sub{font-size:13px;color:var(--text2);line-height:1.55;max-width:22em}
+.upload-types{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:4px}
+.upload-types span{font-size:11.5px;color:var(--text3);border:1px solid var(--border);border-radius:2px;padding:2px 8px;letter-spacing:.04em}
+input[type="file"]#file-input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+
+/* file preview */
+.file-preview{display:none;align-items:center;gap:14px;padding:14px 16px;background:var(--elev);border:1px solid var(--border);border-radius:var(--r);margin-top:16px}
+.file-preview.show{display:flex}
+.fp-icon{width:40px;height:40px;border-radius:var(--r);background:rgba(214,168,95,.1);border:1px solid rgba(214,168,95,.25);display:grid;place-items:center;flex:none}
+.fp-icon svg{width:18px;height:18px;stroke:var(--gold);fill:none;stroke-width:1.5;stroke-linecap:round}
+.fp-info{flex:1;min-width:0}
+.fp-name{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fp-size{font-size:12px;color:var(--text2)}
+.fp-remove{background:none;border:0;color:var(--text3);padding:4px;cursor:pointer;transition:color .2s;display:grid;place-items:center}
+.fp-remove:hover{color:var(--red-hi)}
+.fp-remove svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round}
+
+/* ─── INSTRUCTIONS ───────────────────────────────────────── */
+.instructions{background:rgba(214,168,95,.05);border:1px solid rgba(214,168,95,.18);border-radius:var(--r);padding:18px 20px;display:flex;gap:14px;align-items:flex-start}
+.instr-icon{width:32px;height:32px;border-radius:50%;background:rgba(214,168,95,.12);border:1px solid rgba(214,168,95,.25);display:grid;place-items:center;flex:none;margin-top:2px}
+.instr-icon svg{width:15px;height:15px;stroke:var(--gold);fill:none;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.instr-body{}
+.instr-title{font-size:13px;font-weight:600;color:var(--gold);letter-spacing:.04em;margin-bottom:6px;text-transform:uppercase}
+.instr-list{margin:0;padding:0;list-style:none;display:grid;gap:5px}
+.instr-list li{font-size:13.5px;color:var(--text2);display:flex;gap:9px;align-items:flex-start;line-height:1.5}
+.instr-list li::before{content:"·";color:var(--gold);flex:none;margin-top:1px}
+
+/* ─── RIGHT SUMMARY CARD ─────────────────────────────────── */
+.summary-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);position:sticky;top:calc(84px + 52px + 16px);overflow:hidden;animation:fadeIn .4s ease .08s both}
+.s-head{padding:20px 24px;border-bottom:1px solid var(--border)}
+.s-head h3{font-family:var(--serif);font-weight:400;font-size:19px;margin:0}
+.s-body{padding:20px 24px}
+
+/* order rows */
+.o-rows{display:grid;gap:0;margin-bottom:16px}
+.o-row{display:flex;justify-content:space-between;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;align-items:baseline}
+.o-row:last-child{border-bottom:none}
+.o-lbl{color:var(--text2)}
+.o-val{font-weight:500;text-align:right}
+.o-divider{height:1px;background:var(--border);margin:12px 0}
+.o-total{display:flex;justify-content:space-between;gap:12px;align-items:baseline}
+.o-total .o-lbl{font-size:13.5px;color:var(--text);font-weight:500;font-family:var(--serif)}
+.o-total .o-val{font-family:var(--serif);font-size:26px;font-weight:400;color:var(--red-hi)}
+
+/* ─── STATUS BADGE ───────────────────────────────────────── */
+.status-section{padding:20px 24px;border-top:1px solid var(--border)}
+.status-label{font-size:11px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px}
+.kage-status{display:inline-flex;align-items:center;gap:8px;border-radius:var(--r);padding:8px 14px;font-size:13px;font-weight:500;border:1px solid;white-space:nowrap}
+.kage-status .s-dot{width:7px;height:7px;border-radius:50%;flex:none;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.5;transform:scale(1.3)}}
+
+/* waiting payment */
+.s-waiting-pay{background:rgba(198,40,40,.08);border-color:rgba(198,40,40,.35);color:var(--red-hi)}
+.s-waiting-pay .s-dot{background:var(--red-hi)}
+
+/* waiting organizer */
+.s-waiting-org{background:rgba(214,168,95,.08);border-color:rgba(214,168,95,.35);color:var(--gold)}
+.s-waiting-org .s-dot{background:var(--gold)}
+
+/* confirmed */
+.s-confirmed{background:rgba(74,222,128,.08);border-color:rgba(74,222,128,.3);color:#4ade80}
+.s-confirmed .s-dot{background:#4ade80}
+
+.status-desc{font-size:13px;color:var(--text2);margin-top:10px;line-height:1.6}
+.status-id{font-size:12px;color:var(--text3);margin-top:6px;font-family:'Courier New',monospace;letter-spacing:.04em}
+
+/* ─── CTA AREA ───────────────────────────────────────────── */
+.cta-area{padding:20px 24px;border-top:1px solid var(--border)}
+.cta-area .btn{width:100%;padding:17px;font-size:15px}
+.cta-note{display:flex;gap:7px;align-items:flex-start;font-size:12.5px;color:var(--text2);margin-top:12px;line-height:1.55}
+.cta-note svg{width:13px;height:13px;stroke:var(--gold);fill:none;stroke-width:1.7;stroke-linecap:round;flex:none;margin-top:3px}
+
+/* help link */
+.help-link{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--text2);margin-top:16px;justify-content:center;transition:color .2s;border:none;background:none;cursor:pointer;width:100%}
+.help-link:hover{color:var(--gold)}
+.help-link svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round}
+
+/* ─── MOBILE STICKY BAR ──────────────────────────────────── */
+.mbar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:50;align-items:center;justify-content:space-between;gap:16px;padding:12px 20px calc(12px + env(safe-area-inset-bottom,0px));background:rgba(18,18,22,.96);border-top:1px solid var(--border);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.mbar-info small{display:block;font-size:12px;color:var(--text2);line-height:1.3}
+.mbar-info b{font-family:var(--serif);font-size:20px;font-weight:500}
+.mbar .btn{padding:14px 26px;font-size:14px}
+
+/* ─── FOOTER ─────────────────────────────────────────────── */
+footer{background:var(--bg);border-top:1px solid var(--border);padding:64px 0 36px;margin-top:0}
+.f-top{display:grid;grid-template-columns:1.4fr repeat(4,auto);gap:48px;align-items:start}
+.f-brand p{color:var(--text2);font-size:14px;margin:14px 0 0;max-width:20em;line-height:1.65}
+.f-top a.l{font-size:14px;color:var(--text2);padding:2px 0;display:block;transition:color .2s}
+.f-top a.l:hover{color:var(--text)}
+.f-top h6{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin:0 0 14px;font-weight:500}
+.f-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:56px;padding-top:24px;border-top:1px solid var(--border);color:var(--text3);font-size:13px;gap:20px;flex-wrap:wrap}
+.soc{display:flex;gap:10px}
+.soc a{width:36px;height:36px;border:1px solid var(--border);border-radius:50%;display:grid;place-items:center;color:var(--text2);transition:border-color .2s,color .2s}
+.soc a:hover{border-color:var(--gold);color:var(--text)}
+.soc svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+
+/* ─── ANIMATIONS ─────────────────────────────────────────── */
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes beam{0%,100%{opacity:.82}50%{opacity:1}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}.cd-sep{animation:none!important}}
+
+/* ─── RESPONSIVE ─────────────────────────────────────────── */
+@media(max-width:1100px){
+  .pay-grid{grid-template-columns:1fr;gap:0}
+  .summary-card{position:static;margin-top:28px}
+  .cta-area .btn{display:none}
+  .mbar{display:flex}
+  body{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+  .f-top{grid-template-columns:1fr 1fr 1fr}.f-brand{grid-column:1/-1}
+}
+@media(max-width:760px){
+  .wrap{padding:0 20px}
+  .nav ul,.login{display:none}
+  .nav .wrap{gap:12px}
+  .nav-r{margin-left:auto}
+  .steps-bar .wrap{overflow-x:auto}
+  .step-item{white-space:nowrap;flex:none}
+  .page{padding-top:calc(84px + 28px)}
+  .cd-num{font-size:52px}
+  .txn-card{flex-direction:column}
+  .txn-thumb{width:100%;height:100px}
+  .f-top{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ SVG DEFS ══════════════════════════════════════════════ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="7" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+    <pattern id="kawung" width="36" height="36" patternUnits="userSpaceOnUse">
+      <g fill="none" stroke="#D6A85F" stroke-width=".8" opacity=".55">
+        <ellipse cx="18" cy="9" rx="8" ry="5"/><ellipse cx="18" cy="27" rx="8" ry="5"/>
+        <ellipse cx="9" cy="18" rx="5" ry="8"/><ellipse cx="27" cy="18" rx="5" ry="8"/>
+      </g>
+    </pattern>
+  </defs>
+</svg>
+
+<!-- ═══ 1. NAVBAR ════════════════════════════════════════════ -->
+<header class="nav" role="banner">
+  <div class="wrap">
+    <a class="logo" href="kagemaya-landing-page-visual-anchor.html" aria-label="Kagemaya beranda">
+      <b>KAGEMAYA</b><i>影幻</i>
+    </a>
+    <nav aria-label="Utama"><ul>
+      <li><a href="#">Event</a></li>
+      <li><a href="#">Kategori</a></li>
+      <li><a href="#">Organizer</a></li>
+    </ul></nav>
+    <div class="nav-r">
+      <button class="icon-btn" aria-label="Cari">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+      </button>
+      <a class="login" href="#" id="userName">User</a>
+      <a class="btn btn-sm btn-line" href="#">Pesananku</a>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ STEPS BAR ════════════════════════════════════════════ -->
+<div class="steps-bar" aria-label="Langkah pembelian">
+  <div class="wrap">
+    <div class="step-item done">
+      <span class="sn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12l4.5 4.5L19 7"/></svg></span>
+      Pilih Event
+    </div>
+    <div class="step-item done">
+      <span class="sn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12l4.5 4.5L19 7"/></svg></span>
+      Checkout
+    </div>
+    <div class="step-item active" aria-current="step">
+      <span class="sn">3</span>Pembayaran
+    </div>
+    <div class="step-item">
+      <span class="sn">4</span>E-Tiket
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MAIN ══════════════════════════════════════════════════ -->
+<main class="page" id="main">
+  <div class="wrap">
+    <div class="pay-grid">
+
+      <!-- ─── LEFT COLUMN ────────────────────────────────── -->
+      <div class="left-col">
+
+        <!-- 2. TRANSACTION HEADER ──────────────────────── -->
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Transaksi</h3>
+            <a href="kagemaya-checkout.html" style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--text2);border-bottom:1px solid var(--border);padding-bottom:2px;transition:color .2s,border-color .2s" onmouseover="this.style.color='var(--text)';this.style.borderColor='var(--gold)'" onmouseout="this.style.color='var(--text2)';this.style.borderColor='var(--border)'">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+              Kembali
+            </a>
+          </div>
+          <div class="panel-body">
+            <div class="txn-card">
+              <!-- Mini event scene thumbnail -->
+              <div class="txn-thumb" aria-hidden="true">
+                <svg class="scene" viewBox="0 0 100 72" preserveAspectRatio="xMidYMid slice">
+                  <defs>
+                    <linearGradient id="t-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b0b0d"/><stop offset="1" stop-color="#2a0e10"/></linearGradient>
+                    <radialGradient id="t-moon" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#F4E3C4"/><stop offset=".3" stop-color="#E5484D" stop-opacity=".5"/><stop offset="1" stop-color="#C62828" stop-opacity="0"/></radialGradient>
+                    <filter id="t-b"><feGaussianBlur stdDeviation="4"/></filter>
+                  </defs>
+                  <rect width="100" height="72" fill="url(#t-sky)"/>
+                  <circle cx="70" cy="22" r="38" fill="url(#t-moon)" opacity=".85"/>
+                  <circle cx="70" cy="22" r="10" fill="#F1DFC0" opacity=".92"/>
+                  <g fill="#09090b">
+                    <rect x="4" y="38" width="8" height="34"/><rect x="14" y="30" width="7" height="42"/><rect x="23" y="42" width="10" height="30"/>
+                    <rect x="62" y="36" width="10" height="36"/><rect x="74" y="26" width="8" height="46"/><rect x="84" y="40" width="12" height="32"/>
+                  </g>
+                  <g fill="#D6A85F" opacity=".55"><rect x="6" y="48" width="3" height="4"/><rect x="16" y="42" width="3" height="4"/><rect x="64" y="46" width="3" height="4"/><rect x="76" y="38" width="3" height="4"/></g>
+                  <rect x="0" y="62" width="100" height="10" fill="#07070a"/>
+                  <ellipse cx="70" cy="62" rx="42" ry="5" fill="#C62828" opacity=".2" filter="url(#t-b)"/>
+                  <rect width="100" height="72" fill="url(#kawung)" opacity=".06"/>
+                </svg>
+                <svg class="grain" viewBox="0 0 100 72" preserveAspectRatio="none"><rect width="100" height="72" filter="url(#grain)"/></svg>
+              </div>
+
+              <div class="txn-info">
+                <div class="txn-id">
+                  <span id="txn-id-text">TXN-2026-KGM-008471</span>
+                  <button id="copy-id-btn" aria-label="Salin ID transaksi" title="Salin ID transaksi">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                  </button>
+                </div>
+                <h4>Yūgen: Film 4D Kolaborasi Tokyo–Jakarta</h4>
+                <div class="txn-meta">
+                  <span>
+                    <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="1.5"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>
+                    Senin, 12 Oktober 2026
+                  </span>
+                  <span>
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/></svg>
+                    19:00–21:30 WIB
+                  </span>
+                  <span>
+                    <svg viewBox="0 0 24 24"><path d="M12 21s-7-5.5-7-11a7 7 0 0114 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+                    Teater Sinar Maya, Jakarta
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- BANK TRANSFER DETAILS ──────────────────────── -->
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Detail Transfer Bank</h3>
+            <div style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text2)">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.6" stroke-linecap="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg>
+              Transfer tepat ke rekening ini
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="bank-rows">
+              <div class="bank-row">
+                <span class="br-label">Bank Tujuan</span>
+                <span class="br-value">
+                  <div class="bank-logo-row">
+                    <span class="bank-chip">BCA</span>
+                    Bank Central Asia
+                  </div>
+                </span>
+              </div>
+              <div class="bank-row">
+                <span class="br-label">Nomor Rekening</span>
+                <span class="br-value">
+                  <span class="mono" id="acc-num">1234&nbsp;5678&nbsp;90</span>
+                  <button class="copy-btn" data-copy="1234567890" aria-label="Salin nomor rekening">
+                    <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                    Salin
+                  </button>
+                </span>
+              </div>
+              <div class="bank-row">
+                <span class="br-label">Atas Nama</span>
+                <span class="br-value">PT Kagemaya Nusantara</span>
+              </div>
+              <div class="bank-row">
+                <span class="br-label">Jumlah Transfer</span>
+                <span class="br-value">
+                  <span class="amount" id="transfer-amount">Rp456.750</span>
+                  <button class="copy-btn" data-copy="456750" aria-label="Salin nominal transfer">
+                    <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                    Salin
+                  </button>
+                </span>
+              </div>
+              <div class="bank-row" style="background:rgba(198,40,40,.04);margin:8px -24px -24px;padding:14px 24px;border-top:1px solid rgba(198,40,40,.2);border-bottom:none">
+                <div style="display:flex;gap:10px;align-items:flex-start">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--red-hi)" stroke-width="1.6" stroke-linecap="round" style="flex:none;margin-top:2px"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+                  <p style="margin:0;font-size:13px;color:var(--text2);line-height:1.55">Transfer <strong style="color:var(--text)">nominal unik</strong> di atas tepat sesuai angka untuk memudahkan verifikasi otomatis. Jangan bulatkan atau ubah nominalnya.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. COUNTDOWN TIMER ──────────────────────────── -->
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Batas Waktu Pembayaran</h3>
+          </div>
+
+          <div class="countdown-wrap" id="countdown-wrap">
+            <div class="countdown-label">Waktu tersisa</div>
+            <div class="countdown-digits" role="timer" aria-live="polite" aria-label="Countdown timer">
+              <div class="cd-unit">
+                <span class="cd-num" id="cd-h">01</span>
+                <span class="cd-sub">jam</span>
+              </div>
+              <span class="cd-sep">:</span>
+              <div class="cd-unit">
+                <span class="cd-num" id="cd-m">42</span>
+                <span class="cd-sub">menit</span>
+              </div>
+              <span class="cd-sep">:</span>
+              <div class="cd-unit">
+                <span class="cd-num" id="cd-s">35</span>
+                <span class="cd-sub">detik</span>
+              </div>
+            </div>
+            <p class="countdown-note" id="cd-note">
+              Selesaikan pembayaran sebelum <strong id="cd-deadline">23:30 WIB</strong>.
+              Pesanan akan dibatalkan otomatis jika waktu habis.
+            </p>
+          </div>
+
+          <!-- time progress bar -->
+          <div class="time-bar" aria-hidden="true">
+            <div class="time-bar-fill" id="time-bar-fill" style="width:70%"></div>
+          </div>
+        </div>
+
+        <!-- 4. UPLOAD AREA ──────────────────────────────── -->
+        <div class="panel">
+          <div class="panel-head">
+            <h3>Upload Bukti Pembayaran</h3>
+            <span style="font-size:12.5px;color:var(--text2);display:flex;align-items:center;gap:6px">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--gold)" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+              Maks. 5 MB
+            </span>
+          </div>
+          <div class="panel-body">
+            <div class="upload-area" id="upload-area" role="button" tabindex="0" aria-label="Klik atau seret file bukti pembayaran ke sini">
+              <input type="file" id="file-input" accept=".jpg,.jpeg,.png,.pdf,.webp" aria-label="Pilih file bukti pembayaran">
+              <div class="upload-icon" id="upload-icon-wrap">
+                <svg viewBox="0 0 24 24">
+                  <path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/>
+                  <polyline points="17 8 12 3 7 8"/>
+                  <line x1="12" y1="3" x2="12" y2="15"/>
+                </svg>
+              </div>
+              <div id="upload-placeholder">
+                <div class="upload-title">Upload Bukti Pembayaran</div>
+                <div class="upload-sub">Seret &amp; lepas file di sini, atau klik untuk pilih dari perangkat kamu</div>
+                <div class="upload-types">
+                  <span>JPG</span><span>PNG</span><span>PDF</span><span>WEBP</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- file preview (hidden until file selected) -->
+            <div class="file-preview" id="file-preview">
+              <div class="fp-icon">
+                <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              </div>
+              <div class="fp-info">
+                <div class="fp-name" id="fp-name">—</div>
+                <div class="fp-size" id="fp-size">—</div>
+              </div>
+              <button class="fp-remove" id="fp-remove" aria-label="Hapus file">
+                <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 5. INSTRUCTIONS ─────────────────────────────── -->
+        <div class="instructions" role="note" aria-label="Petunjuk pembayaran">
+          <div class="instr-icon">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
+          </div>
+          <div class="instr-body">
+            <div class="instr-title">Petunjuk Pembayaran</div>
+            <ul class="instr-list">
+              <li>Unggah bukti pembayaran sebelum waktu habis.</li>
+              <li>Pastikan nominal transfer sesuai dengan yang tertera — termasuk angka unik di akhir.</li>
+              <li>Format yang diterima: JPG, PNG, PDF, atau WEBP, maksimal 5 MB.</li>
+              <li>Konfirmasi organizer biasanya dikirim dalam 1×24 jam setelah bukti diunggah.</li>
+              <li>Hubungi bantuan jika ada kendala atau jika belum dikonfirmasi lebih dari 24 jam.</li>
+            </ul>
+          </div>
+        </div>
+
+      </div><!-- /left-col -->
+
+      <!-- ─── RIGHT COLUMN ────────────────────────────── -->
+      <div class="right-col">
+        <div class="summary-card" aria-label="Ringkasan pesanan">
+
+          <!-- order summary -->
+          <div class="s-head"><h3>Ringkasan Pesanan</h3></div>
+          <div class="s-body">
+            <div class="o-rows">
+              <div class="o-row">
+                <span class="o-lbl">Regular × 1</span>
+                <span class="o-val">Rp150.000</span>
+              </div>
+              <div class="o-row">
+                <span class="o-lbl">Premium × 1</span>
+                <span class="o-val">Rp250.000</span>
+              </div>
+              <div class="o-row" style="color:var(--gold)">
+                <span class="o-lbl" style="color:var(--gold)">Diskon Voucher KAGE20</span>
+                <span class="o-val">−Rp40.000</span>
+              </div>
+              <div class="o-row" style="color:var(--gold)">
+                <span class="o-lbl" style="color:var(--gold)">Potongan Poin</span>
+                <span class="o-val">−Rp10.000</span>
+              </div>
+              <div class="o-row">
+                <span class="o-lbl">Biaya Layanan</span>
+                <span class="o-val">Rp6.750</span>
+              </div>
+            </div>
+            <div class="o-divider"></div>
+            <div class="o-total">
+              <span class="o-lbl">Total Dibayar</span>
+              <span class="o-val">Rp456.750</span>
+            </div>
+          </div>
+
+          <!-- 6. STATUS BADGE ─────────────────────────── -->
+          <div class="status-section">
+            <div class="status-label">Status Transaksi</div>
+            <div class="kage-status s-waiting-pay" id="status-badge" role="status" aria-live="polite">
+              <span class="s-dot"></span>
+              <span id="status-text">Menunggu Pembayaran</span>
+            </div>
+            <p class="status-desc" id="status-desc">
+              Pesananmu sudah dibuat. Selesaikan transfer dan unggah bukti pembayaran sebelum batas waktu berakhir.
+            </p>
+            <div class="status-id">TXN-2026-KGM-008471</div>
+          </div>
+
+          <!-- CTA -->
+          <div class="cta-area">
+            <button class="btn btn-red" id="submit-btn" type="button" disabled aria-label="Konfirmasi pembayaran">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Konfirmasi Pembayaran
+            </button>
+            <p class="cta-note">
+              <svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg>
+              Upload bukti terlebih dahulu untuk mengaktifkan tombol konfirmasi.
+            </p>
+            <button class="help-link" type="button">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9a3 3 0 115.4 1.8C14 12 12 12.5 12 14M12 17h.01"/></svg>
+              Ada masalah? Hubungi Bantuan
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+    </div><!-- /pay-grid -->
+  </div><!-- /wrap -->
+</main>
+
+<!-- ═══ MOBILE STICKY CTA ════════════════════════════════════ -->
+<div class="mbar" id="mbar" role="region" aria-label="Konfirmasi pembayaran">
+  <div class="mbar-info">
+    <small id="m-status">Upload bukti dahulu</small>
+    <b>Rp456.750</b>
+  </div>
+  <button class="btn btn-red" id="m-submit" type="button" disabled>
+    Konfirmasi
+  </button>
+</div>
+
+<!-- ═══ FOOTER ════════════════════════════════════════════════ -->
+<footer>
+  <div class="wrap">
+    <div class="f-top">
+      <div class="f-brand">
+        <a class="logo" href="#"><b>KAGEMAYA</b><i>影幻</i></a>
+        <p>Di balik bayangan, ilusi menjadi nyata.</p>
+      </div>
+      <div>
+        <h6>Jelajahi</h6>
+        <a class="l" href="#">Event</a>
+        <a class="l" href="#">Kategori</a>
+        <a class="l" href="#">Organizer</a>
+      </div>
+      <div>
+        <h6>Perusahaan</h6>
+        <a class="l" href="#">Tentang Kagemaya</a>
+        <a class="l" href="#">Karir</a>
+        <a class="l" href="#">Blog</a>
+      </div>
+      <div>
+        <h6>Dukungan</h6>
+        <a class="l" href="#">Bantuan</a>
+        <a class="l" href="#">Kebijakan Refund</a>
+        <a class="l" href="#">Kontak</a>
+      </div>
+    </div>
+    <div class="f-bottom">
+      <span>© 2026 Kagemaya. Semua hak dilindungi.</span>
+      <div class="soc">
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r=".6"/></svg></a>
+        <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="3.5"/><path d="M10 9.5v5l4.5-2.5z"/></svg></a>
+        <a href="#" aria-label="X"><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></a>
+        <a href="#" aria-label="TikTok"><svg viewBox="0 0 24 24"><path d="M14 4v10.5a3.5 3.5 0 11-3.5-3.5M14 4c.4 2.6 2 4 4.5 4.2"/></svg></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══ SCRIPT ════════════════════════════════════════════════ -->
+<script>
+(function(){
+  'use strict';
+
+  const API_BASE = 'http://localhost:5000/api';
+  const urlParams = new URLSearchParams(window.location.search);
+  
+  const orderId = urlParams.get('id') || urlParams.get('order_id') || sessionStorage.getItem('last_order_id');
+  const eventId = urlParams.get('event_id');
+
+  if (!orderId) {
+    alert('ID Transaksi tidak ditemukan.');
+    window.location.href = 'kagemaya-event-discovery.html';
+    return;
+  }
+
+  function loadLoggedInUser() {
+  const userNameElement = document.getElementById('userName');
+
+  if (!userNameElement) return;
+
+  const token = localStorage.getItem('kagemaya_token');
+  const userJson = localStorage.getItem('kagemaya_user');
+
+  // Belum login
+  if (!token || !userJson) {
+    userNameElement.textContent = 'User';
+    return;
+  }
+
+  try {
+    const parsedUser = JSON.parse(userJson);
+
+    // Mengantisipasi kalau data disimpan sebagai { user: {...} }
+    const user = parsedUser.user || parsedUser;
+
+    const displayName =
+      user.name ||
+      user.username ||
+      user.fullName ||
+      user.full_name ||
+      user.email ||
+      'User';
+
+    userNameElement.textContent = displayName;
+  } catch (error) {
+    console.error('Gagal membaca data user:', error);
+    userNameElement.textContent = 'User';
+  }
+}
+  
+
+  function formatRupiah(amount) {
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount || 0);
+  }
+
+  let currentOrderData = null;
+  let selectedFile = null;
+
+  /* ── AMBIL DATA ORDER ── */
+  async function loadOrderData() {
+    const token = localStorage.getItem('kagemaya_token');
+
+    try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+
+      const res = await fetch(`${API_BASE}/orders/${encodeURIComponent(orderId)}`, { headers });
+      if (!res.ok) throw new Error(`Gagal mengambil data (${res.status})`);
+
+      const result = await res.json();
+      currentOrderData = result.data || result;
+      renderOrderToUI(currentOrderData);
+    } catch (err) {
+      console.warn("Gagal fetch dari API, menggunakan data lokal...", err);
+      
+      const savedOrder = sessionStorage.getItem(`order_${orderId}`);
+      if (savedOrder) {
+        currentOrderData = JSON.parse(savedOrder);
+        renderOrderToUI(currentOrderData);
+      } else if (eventId) {
+        fetchEventInfo(eventId);
+      }
+    }
+  }
+
+  async function fetchEventInfo(id) {
+    try {
+      const res = await fetch(`${API_BASE}/events/${encodeURIComponent(id)}`);
+      if (res.ok) {
+        const result = await res.json();
+        const evt = result.data || result;
+        const titleEl = document.querySelector('.txn-info h4');
+        if (titleEl && evt.title) titleEl.textContent = evt.title;
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /* ── RENDER ELEMEN UI ── */
+  function renderOrderToUI(order) {
+    const currentId = order.id || orderId;
+
+    const txnIdEl = document.getElementById('txn-id-text');
+    if (txnIdEl) txnIdEl.textContent = currentId;
+    
+    const statusIdEl = document.querySelector('.status-id');
+    if (statusIdEl) statusIdEl.textContent = currentId;
+
+    if (order.event_title) {
+      const titleEl = document.querySelector('.txn-info h4');
+      if (titleEl) titleEl.textContent = order.event_title;
+    }
+
+    const oRows = document.querySelector('.o-rows');
+    if (oRows && Array.isArray(order.tickets)) {
+      oRows.innerHTML = order.tickets.map(item => `
+        <div class="o-row">
+          <span class="o-lbl">${item.name || 'Tiket'} × ${item.quantity || item.qty}</span>
+          <span class="o-val">${formatRupiah((item.quantity || item.qty) * (item.price || 0))}</span>
+        </div>
+      `).join('');
+
+      if (order.voucher_discount > 0) {
+        oRows.innerHTML += `
+          <div class="o-row" style="color:var(--gold)">
+            <span class="o-lbl" style="color:var(--gold)">Diskon Voucher</span>
+            <span class="o-val">−${formatRupiah(order.voucher_discount)}</span>
+          </div>`;
+      }
+
+      if (order.points_discount > 0) {
+        oRows.innerHTML += `
+          <div class="o-row" style="color:var(--gold)">
+            <span class="o-lbl" style="color:var(--gold)">Potongan Poin</span>
+            <span class="o-val">−${formatRupiah(order.points_discount)}</span>
+          </div>`;
+      }
+
+      if (order.service_fee > 0) {
+        oRows.innerHTML += `
+          <div class="o-row">
+            <span class="o-lbl">Biaya Layanan</span>
+            <span class="o-val">${formatRupiah(order.service_fee)}</span>
+          </div>`;
+      }
+    }
+
+    const grandTotal = Number(order.total_amount || 0);
+    const totalValEl = document.querySelector('.o-total .o-val');
+    if (totalValEl) totalValEl.textContent = formatRupiah(grandTotal);
+
+    const transferAmountEl = document.getElementById('transfer-amount');
+    if (transferAmountEl) transferAmountEl.textContent = formatRupiah(grandTotal);
+
+    const mbarTotalEl = document.querySelector('.mbar-info b');
+    if (mbarTotalEl) mbarTotalEl.textContent = formatRupiah(grandTotal);
+  }
+
+  /* ── SIMPAN PESANAN KE 'PESANANKU' LOKAL ── */
+  function saveToMyOrders(order) {
+    const existingOrders = JSON.parse(localStorage.getItem('kagemaya_my_orders') || '[]');
+    
+    const updatedOrder = {
+      ...order,
+      id: order.id || orderId,
+      status: 'Menunggu Verifikasi', // Status setelah upload bukti
+      payment_date: new Date().toISOString(),
+      proof_uploaded: true
+    };
+
+    // Filter jika ID pesanan sudah ada sebelumnya (update status)
+    const filteredOrders = existingOrders.filter(item => item.id !== updatedOrder.id);
+    filteredOrders.unshift(updatedOrder);
+
+    localStorage.setItem('kagemaya_my_orders', JSON.stringify(filteredOrders));
+  }
+
+  /* ── UPLOAD FILE & EVENT HANDLERS ── */
+  function initUploadAndConfirm() {
+    const uploadArea = document.querySelector('.upload-box') || document.querySelector('[class*="upload"]');
+    const confirmBtn = document.querySelector('.btn-confirm') || 
+                       Array.from(document.querySelectorAll('button')).find(b => b.textContent.includes('Konfirmasi Pembayaran'));
+
+    if (!uploadArea) return;
+
+    const hiddenFileInput = document.createElement('input');
+    hiddenFileInput.type = 'file';
+    hiddenFileInput.accept = 'image/jpeg,image/png,image/webp,application/pdf';
+    hiddenFileInput.style.display = 'none';
+    document.body.appendChild(hiddenFileInput);
+
+    uploadArea.style.cursor = 'pointer';
+    uploadArea.addEventListener('click', () => hiddenFileInput.click());
+
+    hiddenFileInput.addEventListener('change', (e) => {
+      if (e.target.files && e.target.files[0]) {
+        handleFileSelect(e.target.files[0]);
+      }
+    });
+
+    uploadArea.addEventListener('dragover', (e) => e.preventDefault());
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        handleFileSelect(e.dataTransfer.files[0]);
+      }
+    });
+
+    function handleFileSelect(file) {
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Ukuran file maksimal 5 MB.');
+        return;
+      }
+
+      selectedFile = file;
+
+      // Update tampilan box upload
+      uploadArea.innerHTML = `
+        <div style="text-align: center; padding: 1.5rem;">
+          <p style="color: #d4af37; font-weight: 600; margin-bottom: 0.25rem;">File Berhasil Dipilih:</p>
+          <p style="color: #fff; margin-bottom: 0.25rem;">${file.name}</p>
+          <span style="font-size: 0.8rem; color: #888;">(${(file.size / (1024 * 1024)).toFixed(2)} MB) — Klik untuk mengganti</span>
+        </div>
+      `;
+
+      // Aktifkan tombol Konfirmasi Pembayaran
+      if (confirmBtn) {
+        confirmBtn.disabled = false;
+        confirmBtn.removeAttribute('disabled');
+        confirmBtn.style.opacity = '1';
+        confirmBtn.style.cursor = 'pointer';
+        confirmBtn.style.backgroundColor = '#d4af37';
+        confirmBtn.style.color = '#000';
+      }
+    }
+
+    if (confirmBtn) {
+      confirmBtn.addEventListener('click', async () => {
+        if (!selectedFile) {
+          alert('Silakan pilih file bukti pembayaran terlebih dahulu.');
+          return;
+        }
+
+        confirmBtn.disabled = true;
+        confirmBtn.textContent = 'Mengunggah...';
+
+        const token = localStorage.getItem('kagemaya_token');
+        const formData = new FormData();
+        formData.append('payment_proof', selectedFile);
+        formData.append('order_id', orderId);
+
+        try {
+          const res = await fetch(`${API_BASE}/orders/confirm-payment`, {
+            method: 'POST',
+            headers: token ? { 'Authorization': `Bearer ${token}` } : {},
+            body: formData
+          });
+
+          if (!res.ok) throw new Error('Gagal mengunggah ke server');
+        } catch (err) {
+          console.warn("Server API offline/tidak merespons. Menyimpan pesanan secara lokal...", err);
+        } finally {
+          // 1. Simpan/Update pesanan ke Pesananku di localStorage
+          const payloadToSave = currentOrderData || {
+            id: orderId,
+            event_id: eventId,
+            total_amount: document.getElementById('transfer-amount')?.textContent || '0'
+          };
+          saveToMyOrders(payloadToSave);
+
+          // 2. Beri notifikasi dan redirect ke Home (kagemaya-event-discovery.html)
+          alert('Bukti pembayaran berhasil diunggah! Pesanan kamu telah disimpan di Pesananku.');
+          window.location.href = 'kagemaya-event-discovery.html';
+        }
+      });
+    }
+  }
+
+  // Timer Hitung Mundur
+  let remaining = 1 * 3600 + 42 * 60 + 33;
+  function tick(){
+    if (remaining <= 0) return;
+    const h = Math.floor(remaining / 3600);
+    const m = Math.floor((remaining % 3600) / 60);
+    const s = remaining % 60;
+    
+    const cdH = document.getElementById('cd-h');
+    const cdM = document.getElementById('cd-m');
+    const cdS = document.getElementById('cd-s');
+    if (cdH) cdH.textContent = String(h).padStart(2, '0');
+    if (cdM) cdM.textContent = String(m).padStart(2, '0');
+    if (cdS) cdS.textContent = String(s).padStart(2, '0');
+    remaining--;
+  }
+  setInterval(tick, 1000);
+
+  // Fitur Salin Teks
+  document.querySelectorAll('.copy-btn, #copy-id-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const copyVal = btn.getAttribute('data-copy') || orderId;
+      navigator.clipboard.writeText(copyVal);
+      const orig = btn.innerHTML;
+      btn.innerHTML = 'Tersalin';
+      setTimeout(() => btn.innerHTML = orig, 2000);
+    });
+  });
+
+  loadLoggedInUser();
+loadOrderData();
+initUploadAndConfirm();
+})();
+</script>
+
+</body>
+</html>

@@ -25,93 +25,128 @@ export const getEventsService = async (params: GetEventsParams) => {
     ];
   }
 
-  // 2. Filter Kategori
+  // 2. Filter Kategori (Mendukung ID, Slug, maupun Nama Kategori)
   if (category && category !== 'all' && category !== 'Semua Kategori') {
-    where.category = { slug: category };
+    where.category = {
+      OR: [
+        { slug: { equals: category, mode: 'insensitive' } },
+        { name: { equals: category, mode: 'insensitive' } },
+        { id: category },
+      ],
+    };
   }
 
   // 3. Filter Kota
-  if (city && city !== 'Semua Kota') {
+  if (city && city !== 'all' && city !== 'Semua Kota') {
     where.city = { equals: city, mode: 'insensitive' };
   }
 
-  // 4. Filter Tanggal (Menangani "Akhir pekan" / "weekend", "Hari ini", "Minggu ini", dll)
+  // 4. Filter Tanggal
   const now = new Date();
-  if (date === 'today' || date === 'Hari ini') {
-    const endOfDay = new Date();
-    endOfDay.setHours(23, 59, 59, 999);
-    where.start_date = { gte: now, lte: endOfDay };
-  } else if (date === 'weekend' || date === 'Akhir pekan') {
-    // Menghitung hari Sabtu & Minggu terdekat
-    const dayOfWeek = now.getDay();
-    const distanceToSaturday = (6 - dayOfWeek + 7) % 7;
-    const saturday = new Date(now);
-    saturday.setDate(now.getDate() + distanceToSaturday);
-    saturday.setHours(0, 0, 0, 0);
+  if (date && date !== 'all' && date !== 'Kapan saja') {
+    if (date === 'today' || date === 'Hari ini') {
+      const endOfDay = new Date();
+      endOfDay.setHours(23, 59, 59, 999);
+      where.start_date = { gte: now, lte: endOfDay };
+    } else if (date === 'weekend' || date === 'Akhir pekan') {
+      const dayOfWeek = now.getDay();
+      const distanceToSaturday = (6 - dayOfWeek + 7) % 7;
+      const saturday = new Date(now);
+      saturday.setDate(now.getDate() + distanceToSaturday);
+      saturday.setHours(0, 0, 0, 0);
 
-    const sunday = new Date(saturday);
-    sunday.setDate(saturday.getDate() + 1);
-    sunday.setHours(23, 59, 59, 999);
+      const sunday = new Date(saturday);
+      sunday.setDate(saturday.getDate() + 1);
+      sunday.setHours(23, 59, 59, 999);
 
-    where.start_date = { gte: saturday, lte: sunday };
-  } else if (date === 'this_week' || date === 'Minggu ini') {
-    const nextWeek = new Date();
-    nextWeek.setDate(now.getDate() + 7);
-    where.start_date = { gte: now, lte: nextWeek };
-  } else if (date === 'this_month' || date === 'Bulan ini') {
-    const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
-    where.start_date = { gte: now, lte: endOfMonth };
-  } else if (date === 'next_month' || date === 'Bulan depan') {
-    const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1, 0, 0, 0);
-    const endOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 2, 0, 23, 59, 59);
-    where.start_date = { gte: startOfNextMonth, lte: endOfNextMonth };
+      where.start_date = { gte: saturday, lte: sunday };
+    } else if (date === 'this_week' || date === 'Minggu ini') {
+      const nextWeek = new Date();
+      nextWeek.setDate(now.getDate() + 7);
+      where.start_date = { gte: now, lte: nextWeek };
+    } else if (date === 'this_month' || date === 'Bulan ini') {
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59);
+      where.start_date = { gte: now, lte: endOfMonth };
+    } else if (date === 'next_month' || date === 'Bulan depan') {
+      const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1, 0, 0, 0);
+      const endOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 2, 0, 23, 59, 59);
+      where.start_date = { gte: startOfNextMonth, lte: endOfNextMonth };
+    }
   }
 
-  // 5. Filter Harga (Menangani "Gratis" / "free")
-  if (price === 'free' || price === 'Gratis') {
-    where.starting_price = 0;
-  } else if (price === 'under_100k' || price === '< Rp100.000') {
-    where.starting_price = { lt: 100000 };
-  } else if (price === '100k_500k' || price === 'Rp100.000 - Rp500.000') {
-    where.starting_price = { gte: 100000, lte: 500000 };
-  } else if (price === 'over_500k' || price === '> Rp500.000') {
-    where.starting_price = { gt: 500000 };
+  // 5. Filter Harga (Disesuaikan dengan Label UI Frontend)
+  if (price && price !== 'all' && price !== 'Semua harga') {
+    if (price === 'free' || price === 'Gratis') {
+      where.starting_price = 0;
+    } else if (price === 'under_100k' || price === '< Rp100.000') {
+      where.starting_price = { lt: 100000 };
+    } else if (price === '100k_200k' || price === 'Rp100.000 - Rp200.000') {
+      where.starting_price = { gte: 100000, lte: 200000 };
+    } else if (price === '100k_500k' || price === 'Rp100.000 - Rp500.000') {
+      where.starting_price = { gte: 100000, lte: 500000 };
+    } else if (price === 'over_500k' || price === '> Rp500.000') {
+      where.starting_price = { gt: 500000 };
+    }
   }
 
-  // 6. Pengurutan (Menangani "Paling Populer" / "popular", "Terbaru", dll)
+  // 6. Pengurutan (Ordering)
   let orderBy: any = { created_at: 'desc' };
 
   if (sort === 'popular' || sort === 'Paling Populer') {
-    // Urutkan berdasarkan ketersediaan kursi / transaksi atau fallback ke created_at
     orderBy = { available_seats: 'asc' };
   } else if (sort === 'oldest' || sort === 'Terlama') {
     orderBy = { created_at: 'asc' };
-  } else if (sort === 'price_asc' || sort === 'Harga Termurah') {
+  } else if (sort === 'price_asc' || sort === 'Harga Terendah' || sort === 'Harga Termurah') {
     orderBy = { starting_price: 'asc' };
   } else if (sort === 'price_desc' || sort === 'Harga Tertinggi') {
     orderBy = { starting_price: 'desc' };
+  } else if (sort === 'newest' || sort === 'Terbaru') {
+    orderBy = { created_at: 'desc' };
   }
 
   const [events, total] = await Promise.all([
-    prisma.event.findMany({
-      where,
-      skip,
-      take: limit,
-      orderBy,
-      include: { category: true },
-    }),
-    prisma.event.count({ where }),
-  ]);
+  prisma.event.findMany({
+    where,
+    skip,
+    take: limit,
+    orderBy,
+    include: {
+      category: true,
+      ticket_types: {
+        orderBy: {
+          price: 'asc',
+        },
+        select: {
+          price: true,
+        },
+      },
+    },
+  }),
+  prisma.event.count({ where }),
+]);
+
+const eventsWithStartingPrice = events.map((event) => {
+  const prices = event.ticket_types.map((ticket) => Number(ticket.price));
+
+  const startingPrice =
+    prices.length > 0 ? Math.min(...prices) : null;
 
   return {
-    events,
-    pagination: {
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit),
-    },
+    ...event,
+    starting_price: startingPrice,
+    ticket_types: undefined,
   };
+});
+
+return {
+  events: eventsWithStartingPrice,
+  pagination: {
+    total,
+    page,
+    limit,
+    totalPages: Math.ceil(total / limit),
+  },
+};
 };
 
 export const getCategoriesService = async () => {

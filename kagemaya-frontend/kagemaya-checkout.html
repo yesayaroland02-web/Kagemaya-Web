@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Checkout — Yūgen: Film 4D Tokyo–Jakarta · Kagemaya</title>
+<title>Checkout</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -36,7 +36,7 @@ svg{display:block}
 /* ─── LAYOUT WRAPPERS ───────────────────────────────────────────── */
 .wrap{max-width:1296px;margin:0 auto;padding:0 32px}
 
-/* ─── NAV (exact copy from landing) ────────────────────────────── */
+/* ─── NAV ───────────────────────────────────────────────────────── */
 .nav{position:fixed;top:0;left:0;right:0;z-index:100;padding-top:env(safe-area-inset-top,0px);background:rgba(11,11,13,.88);border-bottom:1px solid var(--border);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .nav .wrap{display:flex;align-items:center;height:84px;gap:0}
 .logo{display:flex;align-items:baseline;gap:12px;flex:none;margin-right:40px}
@@ -75,12 +75,6 @@ svg{display:block}
 .page{padding-top:calc(84px + 40px);padding-bottom:120px}
 .checkout-grid{display:grid;grid-template-columns:minmax(0,1fr) 380px;gap:48px;align-items:start}
 
-/* ─── SECTION HEADINGS ───────────────────────────────────────────── */
-.sec-label{font-family:var(--serif);font-weight:400;font-size:13px;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin:0 0 20px;display:flex;align-items:center;gap:16px}
-.sec-label::before{content:"";height:1px;width:24px;background:var(--gold);opacity:.5;flex:none}
-.sec-label::after{content:"";flex:1;height:1px;background:var(--border);margin-left:4px}
-h2.s-title{font-family:var(--serif);font-weight:400;font-size:26px;margin:0 0 24px;letter-spacing:-.01em}
-
 /* ─── PANEL CARD ─────────────────────────────────────────────────── */
 .panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:28px}
 .panel-head{padding:22px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:16px}
@@ -90,29 +84,22 @@ h2.s-title{font-family:var(--serif);font-weight:400;font-size:26px;margin:0 0 24
 /* ─── EVENT SUMMARY CARD ─────────────────────────────────────────── */
 .evt-card{display:flex;gap:20px;align-items:flex-start}
 .evt-thumb{width:96px;height:72px;flex:none;border-radius:var(--r);overflow:hidden;position:relative;background:#09090b;border:1px solid var(--border)}
-.evt-thumb svg{width:100%;height:100%}
-.evt-thumb .grain{opacity:.2}
+.evt-thumb img{width:100%;height:100%;object-fit:cover}
 .evt-info{flex:1;min-width:0}
 .evt-info .ev-cat{font-size:12px;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;margin-bottom:4px}
 .evt-info h4{font-family:var(--serif);font-weight:500;font-size:18px;line-height:1.3;margin:0 0 8px}
 .evt-meta-row{display:flex;flex-wrap:wrap;gap:8px 20px}
 .evt-meta-row span{font-size:13px;color:var(--text2);display:flex;align-items:center;gap:6px}
-.evt-meta-row svg{width:14px;height:14px;stroke:var(--gold);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;flex:none}
 .evt-badge{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--gold);color:var(--gold);font-size:11.5px;padding:2px 8px;border-radius:var(--r);margin-left:auto;align-self:flex-start;flex:none;white-space:nowrap}
-.evt-badge svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:1.8}
 
 /* ─── TICKET CARDS ───────────────────────────────────────────────── */
-.tix-list{display:grid;gap:0;border:1px solid var(--border);border-radius:var(--r);overflow:hidden}
+.tix-list{display:grid;gap:0;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;list-style:none;margin:0;padding:0}
 .kage-ticket-card{display:grid;grid-template-columns:1fr auto;gap:6px 20px;align-items:center;padding:22px 24px;background:var(--surface);border-bottom:1px solid var(--border);transition:background .2s,border-left-color .2s;border-left:3px solid transparent;position:relative}
 .kage-ticket-card:last-child{border-bottom:none}
 .kage-ticket-card.active{background:var(--elev);border-left-color:var(--gold)}
-.kage-ticket-card.active .tk-price{color:var(--text)}
 .tk-tier{font-family:var(--serif);font-weight:500;font-size:18px;line-height:1.2}
 .tk-price{font-size:15px;color:var(--text);margin-top:3px;font-weight:500}
 .tk-quota{font-size:12.5px;color:var(--text2);margin-top:2px}
-.tk-quota.low{color:var(--gold)}
-.tk-perks{font-size:12.5px;color:var(--text2);grid-column:1/-1;margin-top:2px;line-height:1.5}
-.tk-perks svg{width:12px;height:12px;stroke:var(--gold);fill:none;stroke-width:1.6;display:inline;vertical-align:middle;margin-right:4px}
 
 /* stepper */
 .kage-stepper{display:flex;align-items:center;border:1px solid var(--border);border-radius:var(--r);background:var(--bg);gap:0}
@@ -122,52 +109,33 @@ h2.s-title{font-family:var(--serif);font-weight:400;font-size:26px;margin:0 0 24
 .kage-stepper output{min-width:32px;text-align:center;font-size:15px;font-weight:500;line-height:38px;display:block}
 .kage-stepper .sep{width:1px;height:38px;background:var(--border)}
 
-/* ticket type tags */
-.tk-tag{position:absolute;top:14px;right:14px}
 .kage-badge{display:inline-flex;align-items:center;gap:5px;border:1px solid;font-size:11px;padding:2px 7px;border-radius:var(--r);font-weight:500;letter-spacing:.04em}
 .kage-badge-gold{border-color:var(--gold);color:var(--gold)}
-.kage-badge-red{border-color:var(--red-hi);color:var(--red-hi)}
 .kage-badge-dim{border-color:var(--border);color:var(--text2)}
 
 /* ─── VOUCHER FIELD ──────────────────────────────────────────────── */
 .voucher-wrap{display:flex;border:1px solid var(--border);border-radius:var(--r);background:var(--surface);overflow:hidden;transition:border-color .2s}
 .voucher-wrap:focus-within{border-color:var(--gold)}
-.voucher-wrap.applied{border-color:var(--gold);background:rgba(214,168,95,.06)}
 .voucher-input{flex:1;background:none;border:0;color:var(--text);font:400 15px var(--sans);padding:14px 18px;min-width:0}
-.voucher-input::placeholder{color:#6d6b68}
 .voucher-input:focus-visible{outline:none}
-.voucher-input:disabled{opacity:.5;cursor:not-allowed}
-.voucher-apply{background:none;border:0;border-left:1px solid var(--border);color:var(--text2);font:500 13.5px var(--sans);padding:0 22px;cursor:pointer;transition:color .2s,background .2s;white-space:nowrap}
-.voucher-apply:hover:not([disabled]){color:var(--gold)}
-.voucher-apply.applied{color:var(--gold)}
-.voucher-apply:disabled{cursor:not-allowed;opacity:.45}
-.voucher-note{font-size:12.5px;margin-top:10px;display:flex;align-items:center;gap:7px;min-height:18px}
-.voucher-note.ok{color:var(--gold)}
-.voucher-note.err{color:var(--red-hi)}
-.voucher-note svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;flex:none}
+.voucher-apply{background:none;border:0;border-left:1px solid var(--border);color:var(--text2);font:500 13.5px var(--sans);padding:0 22px;cursor:pointer}
+.voucher-apply:hover{color:var(--gold)}
 
 /* ─── POINTS BALANCE ─────────────────────────────────────────────── */
 .points-row{display:flex;align-items:center;justify-content:space-between;gap:16px}
 .points-info{display:flex;align-items:center;gap:14px}
 .points-icon{width:44px;height:44px;border-radius:50%;background:rgba(214,168,95,.12);border:1px solid rgba(214,168,95,.3);display:grid;place-items:center;flex:none}
-.points-icon svg{width:20px;height:20px;stroke:var(--gold);fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-.points-label{font-size:12.5px;color:var(--text2);line-height:1.4}
-.points-balance{font-family:var(--serif);font-size:22px;font-weight:400;color:var(--text);line-height:1.2}
-.points-balance small{font-family:var(--sans);font-size:11.5px;color:var(--gold);margin-left:4px;letter-spacing:.06em}
-.points-divider{height:1px;background:var(--border);margin:18px 0}
-.points-value-note{font-size:12.5px;color:var(--text2);margin-top:8px;display:flex;align-items:center;gap:6px}
-.points-value-note svg{width:14px;height:14px;stroke:var(--gold);fill:none;stroke-width:1.6;stroke-linecap:round;flex:none}
+.points-label{font-size:12.5px;color:var(--text2)}
+.points-balance{font-family:var(--serif);font-size:22px;font-weight:400;color:var(--text)}
 
 /* toggle switch */
 .toggle-wrap{display:flex;align-items:center;gap:10px;cursor:pointer}
-.toggle-wrap label{font-size:14px;cursor:pointer;color:var(--text)}
 .toggle{position:relative;width:42px;height:24px;flex:none}
 .toggle input{opacity:0;position:absolute;width:0;height:0}
-.track{display:block;width:42px;height:24px;background:var(--elev);border:1px solid var(--border);border-radius:12px;transition:background .2s,border-color .2s;position:relative}
+.track{display:block;width:42px;height:24px;background:var(--elev);border:1px solid var(--border);border-radius:12px;position:relative}
 .thumb{position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:var(--text2);transition:transform .2s,background .2s}
 .toggle input:checked + .track{background:rgba(214,168,95,.18);border-color:var(--gold)}
 .toggle input:checked + .track .thumb{transform:translateX(18px);background:var(--gold)}
-.toggle input:focus-visible + .track{outline:2px solid var(--gold);outline-offset:2px}
 
 /* ─── PRICE BREAKDOWN (RIGHT COLUMN) ────────────────────────────── */
 .summary-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;position:sticky;top:calc(84px + 52px + 16px)}
@@ -176,9 +144,7 @@ h2.s-title{font-family:var(--serif);font-weight:400;font-size:26px;margin:0 0 24
 .summary-body{padding:22px 24px}
 .summary-lines{display:grid;gap:0}
 .line-item{display:flex;justify-content:space-between;align-items:baseline;padding:9px 0;border-bottom:1px solid var(--border);font-size:14.5px;gap:12px}
-.line-item:last-child{border-bottom:0}
 .line-item .li-label{color:var(--text2);display:flex;align-items:center;gap:7px;flex:1}
-.line-item .li-label svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;flex:none;opacity:.7}
 .line-item .li-val{font-weight:500;text-align:right;white-space:nowrap}
 .line-item.discount .li-val{color:var(--gold)}
 .line-item.total-line{padding:14px 0 0;margin-top:4px;border-bottom:0}
@@ -186,389 +152,179 @@ h2.s-title{font-family:var(--serif);font-weight:400;font-size:26px;margin:0 0 24
 .line-item.total-line .li-val{font-family:var(--serif);font-size:26px;font-weight:500;color:var(--red-hi)}
 .summary-divider{height:1px;background:var(--border);margin:14px 0}
 
-/* ticket pill list in summary */
 .tix-pills{display:flex;flex-direction:column;gap:6px;margin-bottom:16px}
 .tix-pill{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:13px;padding:8px 10px;background:var(--elev);border-radius:var(--r);border:1px solid var(--border)}
 .tix-pill .tp-name{color:var(--text2)}
 .tix-pill .tp-qty{font-weight:500}
 
-/* CTA area inside summary card */
 .summary-cta{padding:20px 24px;border-top:1px solid var(--border)}
-.summary-cta .btn{width:100%;padding:17px;font-size:15px;letter-spacing:.02em}
-.summary-cta .btn svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round}
-.cta-note{display:flex;gap:7px;align-items:flex-start;font-size:12.5px;color:var(--text2);margin-top:12px;line-height:1.5}
-.cta-note svg{width:14px;height:14px;stroke:var(--gold);fill:none;stroke-width:1.6;stroke-linecap:round;flex:none;margin-top:2px}
+.summary-cta .btn{width:100%;padding:17px;font-size:15px}
 
 /* ─── MOBILE STICKY BAR ──────────────────────────────────────────── */
-.mbar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:50;align-items:center;justify-content:space-between;gap:16px;padding:12px 20px calc(12px + env(safe-area-inset-bottom,0px));background:rgba(18,18,22,.96);border-top:1px solid var(--border);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
-.mbar .mbar-info small{display:block;font-size:12px;color:var(--text2);line-height:1.3}
+.mbar{display:none;position:fixed;left:0;right:0;bottom:0;z-index:50;align-items:center;justify-content:space-between;gap:16px;padding:12px 20px calc(12px + env(safe-area-inset-bottom,0px));background:rgba(18,18,22,.96);border-top:1px solid var(--border)}
+.mbar .mbar-info small{display:block;font-size:12px;color:var(--text2)}
 .mbar .mbar-info b{font-family:var(--serif);font-size:20px;font-weight:500}
-.mbar .btn{padding:14px 28px;font-size:14px}
 
-/* ─── FOOTER ─────────────────────────────────────────────────────── */
-footer{background:var(--bg);border-top:1px solid var(--border);padding:64px 0 36px}
-.f-top{display:grid;grid-template-columns:1.4fr repeat(5,auto);gap:48px;align-items:start}
-.f-brand p{color:var(--text2);font-size:14px;margin:14px 0 0;max-width:20em;line-height:1.65}
-.f-top a.l{font-size:14px;color:var(--text2);padding:2px 0;display:block;transition:color .2s}
-.f-top a.l:hover{color:var(--text)}
-.f-top h6{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--text3);margin:0 0 14px;font-weight:500}
-.f-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:56px;padding-top:24px;border-top:1px solid var(--border);color:var(--text3);font-size:13px;gap:20px;flex-wrap:wrap}
-.soc{display:flex;gap:10px}
-.soc a{width:36px;height:36px;border:1px solid var(--border);border-radius:50%;display:grid;place-items:center;color:var(--text2);transition:border-color .2s,color .2s}
-.soc a:hover{border-color:var(--gold);color:var(--text)}
-.soc svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
-
-/* ─── ANIMATIONS ─────────────────────────────────────────────────── */
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-.panel{animation:fadeIn .35s ease both}
-.panel:nth-child(1){animation-delay:.05s}
-.panel:nth-child(2){animation-delay:.10s}
-.panel:nth-child(3){animation-delay:.15s}
-.panel:nth-child(4){animation-delay:.20s}
-@keyframes beam{0%,100%{opacity:.82}50%{opacity:1}}
-@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
-
-/* ─── RESPONSIVE ─────────────────────────────────────────────────── */
 @media(max-width:1100px){
   .checkout-grid{grid-template-columns:1fr;gap:0}
-  .summary-card{position:static;margin-top:36px;margin-bottom:0}
+  .summary-card{position:static;margin-top:36px}
   .summary-cta .btn{display:none}
   .mbar{display:flex}
-  body{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
-  .f-top{grid-template-columns:1fr 1fr 1fr}.f-brand{grid-column:1/-1}
-}
-@media(max-width:760px){
-  .wrap{padding:0 20px}
-  .nav ul,.login{display:none}
-  .nav .wrap{gap:12px}
-  .nav-r{margin-left:auto;gap:10px}
-  .steps-bar .wrap{overflow-x:auto;gap:0}
-  .step-item{white-space:nowrap;flex:none}
-  .page{padding-top:calc(84px + 52px + 28px);padding-bottom:100px}
-  .f-top{grid-template-columns:1fr 1fr}
-  .evt-card{flex-direction:column;gap:14px}
-  .evt-thumb{width:100%;height:120px}
-  .points-row{flex-direction:column;align-items:flex-start;gap:14px}
 }
 </style>
 </head>
 <body>
 
-<!-- ═══ SVG DEFS (grain + kawung) ════════════════════════════════ -->
-<svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <defs>
-    <filter id="grain" x="0" y="0" width="100%" height="100%">
-      <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="7" stitchTiles="stitch"/>
-      <feColorMatrix type="saturate" values="0"/>
-    </filter>
-    <pattern id="kawung" width="36" height="36" patternUnits="userSpaceOnUse">
-      <g fill="none" stroke="#D6A85F" stroke-width=".8" opacity=".55">
-        <ellipse cx="18" cy="9" rx="8" ry="5"/><ellipse cx="18" cy="27" rx="8" ry="5"/>
-        <ellipse cx="9" cy="18" rx="5" ry="8"/><ellipse cx="27" cy="18" rx="5" ry="8"/>
-      </g>
-    </pattern>
-  </defs>
-</svg>
-
-<!-- ═══ 1. NAVBAR ══════════════════════════════════════════════════ -->
+<!-- NAVBAR -->
 <header class="nav" role="banner">
   <div class="wrap">
-    <a class="logo" href="kagemaya-landing-page-visual-anchor.html" aria-label="Kagemaya beranda">
+    <a class="logo" href="kagemaya-landing-page-visual-anchor.html">
       <b>KAGEMAYA</b><i>影幻</i>
     </a>
-    <nav aria-label="Utama"><ul>
-      <li><a href="#">Event</a></li>
-      <li><a href="#">Kategori</a></li>
-      <li><a href="#">Organizer</a></li>
-    </ul></nav>
-    <div class="nav-r">
-      <button class="icon-btn" aria-label="Cari">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
-      </button>
-      <a class="login" href="#">Hana M.</a>
-      <a class="btn btn-red btn-sm" href="#">Akun</a>
+    <nav>
+      <ul style="list-style:none;display:flex;gap:20px">
+        <li><a href="#">Event</a></li>
+        <li><a href="#">Kategori</a></li>
+        <li><a href="#">Organizer</a></li>
+      </ul>
+    </nav>
+    <div class="nav-r" id="authNav">
+      <span id="userName">User</span>
+      <a href="kagemaya-pesananku.html" class="btn btn-red btn-sm">Akun</a>
     </div>
   </div>
 </header>
 
-<!-- ═══ STEPS BAR ═════════════════════════════════════════════════ -->
-<div class="steps-bar" aria-label="Langkah pembelian">
+<!-- STEPS BAR -->
+<div class="steps-bar">
   <div class="wrap">
-    <div class="step-item done">
-      <span class="sn" aria-hidden="true">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12l4.5 4.5L19 7"/></svg>
-      </span>Pilih Event
-    </div>
-    <div class="step-item active" aria-current="step">
-      <span class="sn" aria-hidden="true">2</span>Checkout
-    </div>
-    <div class="step-item">
-      <span class="sn" aria-hidden="true">3</span>Pembayaran
-    </div>
-    <div class="step-item">
-      <span class="sn" aria-hidden="true">4</span>E-Tiket
-    </div>
+    <div class="step-item done"><span class="sn">✓</span>Pilih Event</div>
+    <div class="step-item active"><span class="sn">2</span>Checkout</div>
+    <div class="step-item"><span class="sn">3</span>Pembayaran</div>
+    <div class="step-item"><span class="sn">4</span>E-Tiket</div>
   </div>
 </div>
 
-<!-- ═══ PAGE BODY ═════════════════════════════════════════════════ -->
-<main class="page" id="main">
+<!-- PAGE BODY -->
+<main class="page">
   <div class="wrap">
     <div class="checkout-grid">
 
-      <!-- ─── LEFT COLUMN ──────────────────────────────────────── -->
+      <!-- LEFT COLUMN -->
       <div class="left-col">
 
-        <!-- 2. EVENT SUMMARY ──────────────────────────────────── -->
+        <!-- EVENT SUMMARY -->
         <div class="panel">
           <div class="panel-head">
             <h3>Detail Event</h3>
-            <a class="kage-badge kage-badge-dim" href="kagemaya-event-detail.html">
-              <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5l3 3L12 15l-4 1 1-4z"/></svg>
-              Ubah
-            </a>
+            <a class="kage-badge kage-badge-dim" id="change-event-link" href="kagemaya-event-discovery.html">Ubah</a>
           </div>
           <div class="panel-body">
             <div class="evt-card">
-              <div class="evt-thumb" aria-hidden="true">
-                <!-- mini artscene: moon city -->
-                <svg viewBox="0 0 96 72" preserveAspectRatio="xMidYMid slice">
-                  <defs>
-                    <linearGradient id="es-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b0b0d"/><stop offset="1" stop-color="#2a0e10"/></linearGradient>
-                    <radialGradient id="es-moon" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#F4E3C4"/><stop offset=".3" stop-color="#E5484D" stop-opacity=".5"/><stop offset="1" stop-color="#C62828" stop-opacity="0"/></radialGradient>
-                    <filter id="es-b"><feGaussianBlur stdDeviation="4"/></filter>
-                  </defs>
-                  <rect width="96" height="72" fill="url(#es-sky)"/>
-                  <circle cx="68" cy="24" r="36" fill="url(#es-moon)" opacity=".85"/>
-                  <circle cx="68" cy="24" r="10" fill="#F1DFC0" opacity=".9"/>
-                  <g fill="#09090b">
-                    <rect x="4" y="40" width="8" height="32"/><rect x="14" y="32" width="7" height="40"/><rect x="23" y="44" width="10" height="28"/>
-                    <rect x="60" y="38" width="10" height="34"/><rect x="72" y="28" width="8" height="44"/><rect x="82" y="42" width="10" height="30"/>
-                  </g>
-                  <g fill="#D6A85F" opacity=".55"><rect x="6" y="50" width="3" height="4"/><rect x="16" y="44" width="3" height="4"/><rect x="62" y="48" width="3" height="4"/><rect x="74" y="40" width="3" height="4"/></g>
-                  <rect x="0" y="62" width="96" height="10" fill="#07070a"/>
-                  <ellipse cx="68" cy="62" rx="40" ry="5" fill="#C62828" opacity=".2" filter="url(#es-b)"/>
-                </svg>
-                <svg class="grain" viewBox="0 0 96 72" preserveAspectRatio="none" aria-hidden="true"><rect width="96" height="72" filter="url(#grain)"/></svg>
+              <div class="evt-thumb">
+                <img id="checkout-event-image" src="" alt="Event">
               </div>
-
               <div class="evt-info">
-                <div class="ev-cat">Film 4D</div>
-                <h4>Yūgen: Film 4D Kolaborasi Tokyo–Jakarta</h4>
+                <div class="ev-cat" id="checkout-event-category">Event</div>
+                <h4 id="checkout-event-title">Memuat event...</h4>
                 <div class="evt-meta-row">
-                  <span>
-                    <svg viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="1.5"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>
-                    Senin, 12 Oktober 2026
-                  </span>
-                  <span>
-                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3.5 2"/></svg>
-                    19:00–21:30 WIB
-                  </span>
-                  <span>
-                    <svg viewBox="0 0 24 24"><path d="M12 21s-7-5.5-7-11a7 7 0 0114 0c0 5.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
-                    Teater Sinar Maya, Jakarta
-                  </span>
+                  <span>📅 <span id="checkout-event-date">Memuat tanggal...</span></span>
+                  <span>⏰ <span id="checkout-event-time">-</span></span>
+                  <span>📍 <span id="checkout-event-location">Memuat lokasi...</span></span>
                 </div>
               </div>
-
-              <span class="evt-badge">
-                <svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg>
-                Terjamin
-              </span>
+              <span class="evt-badge">Terjamin</span>
             </div>
           </div>
         </div>
 
-        <!-- 3. TICKET SELECTION ────────────────────────────────── -->
+        <!-- TICKET SELECTION -->
         <div class="panel">
           <div class="panel-head">
             <h3>Pilih Tiket</h3>
             <span class="kage-badge kage-badge-dim">Maks. 5 tiket / transaksi</span>
           </div>
           <div class="panel-body" style="padding:0">
-            <ul class="tix-list" role="list" aria-label="Jenis tiket">
-
-              <!-- Regular -->
-              <li class="kage-ticket-card" id="tk-regular" data-price="150000" data-quota="84" data-max="5">
-                <div>
-                  <div class="tk-tier">Regular</div>
-                  <div class="tk-price" id="pr-regular">Rp150.000</div>
-                  <div class="tk-quota" id="qt-regular">Tersisa 84 tiket</div>
-                  <div class="tk-perks" style="margin-top:6px">
-                    <svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg>Akses penonton umum
-                    &ensp;<svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg>E-tiket via email
-                  </div>
-                </div>
-                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px">
-                  <div class="kage-stepper" aria-label="Jumlah tiket Regular">
-                    <button type="button" class="tk-minus" aria-label="Kurangi tiket Regular" disabled>−</button>
-                    <span class="sep"></span>
-                    <output class="tk-count">0</output>
-                    <span class="sep"></span>
-                    <button type="button" class="tk-plus" aria-label="Tambah tiket Regular">+</button>
-                  </div>
-                </div>
-              </li>
-
-              <!-- Premium -->
-              <li class="kage-ticket-card" id="tk-premium" data-price="250000" data-quota="32" data-max="5">
-                <div>
-                  <div class="tk-tier">Premium
-                    <span class="kage-badge kage-badge-gold" style="margin-left:8px;vertical-align:middle;font-size:10px">Populer</span>
-                  </div>
-                  <div class="tk-price" id="pr-premium">Rp250.000</div>
-                  <div class="tk-quota" id="qt-premium">Tersisa 32 tiket</div>
-                  <div class="tk-perks" style="margin-top:6px">
-                    <svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg>Kursi tengah pilihan
-                    &ensp;<svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg>Suguhan lobi (teh &amp; jajanan)
-                    &ensp;<svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg>E-tiket via email
-                  </div>
-                </div>
-                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px">
-                  <div class="kage-stepper" aria-label="Jumlah tiket Premium">
-                    <button type="button" class="tk-minus" aria-label="Kurangi tiket Premium" disabled>−</button>
-                    <span class="sep"></span>
-                    <output class="tk-count">0</output>
-                    <span class="sep"></span>
-                    <button type="button" class="tk-plus" aria-label="Tambah tiket Premium">+</button>
-                  </div>
-                </div>
-              </li>
-
-              <!-- VIP -->
-              <li class="kage-ticket-card" id="tk-vip" data-price="400000" data-quota="9" data-max="4">
-                <div>
-                  <div class="tk-tier">VIP
-                    <span class="kage-badge kage-badge-red" style="margin-left:8px;vertical-align:middle;font-size:10px">Hampir Habis</span>
-                  </div>
-                  <div class="tk-price" id="pr-vip">Rp400.000</div>
-                  <div class="tk-quota low" id="qt-vip">Tersisa 9 tiket</div>
-                  <div class="tk-perks" style="margin-top:6px">
-                    <svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg>Baris depan eksklusif
-                    &ensp;<svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg>Meet &amp; greet sutradara
-                    &ensp;<svg viewBox="0 0 24 24"><path d="M5 12l4.5 4.5L19 7"/></svg>Sertifikat kehadiran
-                  </div>
-                </div>
-                <div style="display:flex;flex-direction:column;align-items:flex-end;gap:10px">
-                  <div class="kage-stepper" aria-label="Jumlah tiket VIP">
-                    <button type="button" class="tk-minus" aria-label="Kurangi tiket VIP" disabled>−</button>
-                    <span class="sep"></span>
-                    <output class="tk-count">0</output>
-                    <span class="sep"></span>
-                    <button type="button" class="tk-plus" aria-label="Tambah tiket VIP">+</button>
-                  </div>
-                </div>
-              </li>
-
+            <ul class="tix-list" id="ticket-list-container">
+              <li style="padding:24px;color:#85837f;text-align:center">Memuat daftar tiket...</li>
             </ul>
           </div>
         </div>
 
-        <!-- 4. VOUCHER INPUT ────────────────────────────────────── -->
+        <!-- VOUCHER -->
         <div class="panel">
-          <div class="panel-head">
-            <h3>Kode Voucher</h3>
-          </div>
+          <div class="panel-head"><h3>Kode Voucher</h3></div>
           <div class="panel-body">
-            <div class="voucher-wrap" id="voucher-wrap">
-              <input class="voucher-input" id="voucher-input" type="text" placeholder="Masukkan kode voucher…" aria-label="Kode voucher" autocomplete="off" spellcheck="false" maxlength="20">
-              <button class="voucher-apply" id="voucher-btn" type="button" aria-label="Terapkan voucher">Terapkan</button>
+            <div class="voucher-wrap">
+              <input class="voucher-input" id="voucher-input" type="text" placeholder="Masukkan kode voucher…">
+              <button class="voucher-apply" id="voucher-btn" type="button">Terapkan</button>
             </div>
-            <div class="voucher-note" id="voucher-note" aria-live="polite"></div>
-            <!-- example chips -->
-            <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:14px">
-              <button type="button" class="kage-badge kage-badge-gold" style="cursor:pointer;background:transparent;border-style:dashed" onclick="document.getElementById('voucher-input').value='KAGE20';document.getElementById('voucher-input').dispatchEvent(new Event('input'))">KAGE20</button>
-              <button type="button" class="kage-badge kage-badge-dim" style="cursor:pointer;background:transparent;border-style:dashed" onclick="document.getElementById('voucher-input').value='MAYA10';document.getElementById('voucher-input').dispatchEvent(new Event('input'))">MAYA10</button>
+            <div style="display:flex;gap:8px;margin-top:14px">
+              <button type="button" class="kage-badge kage-badge-gold" style="cursor:pointer;background:transparent" onclick="applyQuickVoucher('KAGE20')">KAGE20 (20%)</button>
+              <button type="button" class="kage-badge kage-badge-dim" style="cursor:pointer;background:transparent" onclick="applyQuickVoucher('MAYA10')">MAYA10 (10%)</button>
             </div>
           </div>
         </div>
 
-        <!-- 5. POINTS BALANCE ──────────────────────────────────── -->
+        <!-- POINTS -->
         <div class="panel">
-          <div class="panel-head">
-            <h3>Poin Kagemaya</h3>
-          </div>
+          <div class="panel-head"><h3>Poin Kagemaya</h3></div>
           <div class="panel-body">
             <div class="points-row">
               <div class="points-info">
-                <div class="points-icon" aria-hidden="true">
-                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>
-                </div>
+                <div class="points-icon">🪙</div>
                 <div>
                   <div class="points-label">Saldo Poin kamu saat ini</div>
-                  <div class="points-balance" id="points-display">3.250 <small>poin · Washi</small></div>
+                  <div class="points-balance" id="points-display">3.250 <small>poin</small></div>
                 </div>
               </div>
-              <div>
-                <label class="toggle-wrap" aria-label="Gunakan poin">
-                  <div class="toggle">
-                    <input type="checkbox" id="use-points" aria-checked="false">
-                    <span class="track"><span class="thumb"></span></span>
-                  </div>
-                  <span class="label" id="toggle-label">Gunakan poin</span>
-                </label>
-              </div>
-            </div>
-            <div class="points-divider"></div>
-            <div class="points-value-note" id="points-note">
-              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>
-              1 poin = Rp1. Poin dapat menutup hingga 50% dari total transaksi.
+              <label class="toggle-wrap">
+                <div class="toggle">
+                  <input type="checkbox" id="use-points">
+                  <span class="track"><span class="thumb"></span></span>
+                </div>
+                <span>Gunakan poin</span>
+              </label>
             </div>
           </div>
         </div>
 
-      </div><!-- /left-col -->
+      </div>
 
-      <!-- ─── RIGHT COLUMN: PRICE SUMMARY ──────────────────────── -->
+      <!-- RIGHT COLUMN: PRICE SUMMARY -->
       <div class="right-col">
-        <div class="summary-card" role="complementary" aria-label="Ringkasan pesanan">
+        <div class="summary-card">
           <div class="summary-head">
             <h3>Ringkasan Pesanan</h3>
           </div>
           <div class="summary-body">
-
-            <!-- selected ticket pills -->
-            <div class="tix-pills" id="tix-pills" aria-live="polite">
-              <div class="tix-pill" id="pill-placeholder" style="justify-content:center;color:var(--text2);font-style:italic">
+            <div class="tix-pills" id="tix-pills">
+              <div class="tix-pill" style="justify-content:center;color:var(--text2);font-style:italic">
                 Belum ada tiket dipilih
               </div>
             </div>
 
             <div class="summary-divider"></div>
 
-            <!-- line items -->
-            <div class="summary-lines" role="list">
-              <div class="line-item" role="listitem">
-                <span class="li-label">
-                  <svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><path d="M3 10h18"/></svg>
-                  Subtotal
-                </span>
+            <div class="summary-lines">
+              <div class="line-item">
+                <span class="li-label">Subtotal</span>
                 <span class="li-val" id="subtotal-val">Rp0</span>
               </div>
-              <div class="line-item discount" role="listitem" id="row-voucher" style="display:none">
-                <span class="li-label">
-                  <svg viewBox="0 0 24 24"><path d="M20 12V8a2 2 0 00-2-2H4M4 12v4a2 2 0 002 2h14a2 2 0 002-2v-4"/><path d="M12 6v12"/></svg>
-                  Diskon Voucher
-                  <span class="kage-badge kage-badge-gold" id="voucher-code-badge" style="font-size:10px;margin-left:4px"></span>
-                </span>
+              <div class="line-item discount" id="row-voucher" style="display:none">
+                <span class="li-label">Diskon Voucher (<span id="voucher-code-badge"></span>)</span>
                 <span class="li-val" id="voucher-val">−Rp0</span>
               </div>
-              <div class="line-item discount" role="listitem" id="row-points" style="display:none">
-                <span class="li-label">
-                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg>
-                  Potongan Poin
-                </span>
+              <div class="line-item discount" id="row-points" style="display:none">
+                <span class="li-label">Potongan Poin</span>
                 <span class="li-val" id="points-val">−Rp0</span>
               </div>
-              <div class="line-item" role="listitem">
-                <span class="li-label">
-                  <svg viewBox="0 0 24 24"><path d="M4 3h16a1 1 0 011 1v14a1 1 0 01-1 1H4a1 1 0 01-1-1V4a1 1 0 011-1zM8 21h8M12 17v4"/></svg>
-                  Biaya Layanan
-                </span>
+              <div class="line-item">
+                <span class="li-label">Biaya Layanan (1.5%)</span>
                 <span class="li-val" id="fee-val">Rp0</span>
               </div>
-              <div class="summary-divider" style="margin:6px 0"></div>
-              <div class="line-item total-line" role="listitem">
+              <div class="summary-divider"></div>
+              <div class="line-item total-line">
                 <span class="li-label">Total</span>
                 <span class="li-val" id="total-val">Rp0</span>
               </div>
@@ -576,327 +332,394 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:64px 0 36
           </div>
 
           <div class="summary-cta">
-            <button class="btn btn-red" id="kage-btn-primary" type="button" disabled aria-label="Buat pesanan">
-              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l4.5 4.5L19 7"/></svg>
+            <button class="btn btn-red" id="kage-btn-primary" type="button" disabled>
               Buat Pesanan
             </button>
-            <p class="cta-note">
-              <svg viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/></svg>
-              Dengan melanjutkan, kamu menyetujui Syarat &amp; Ketentuan Kagemaya. Pembayaran aman terenkripsi.
-            </p>
           </div>
         </div>
-      </div><!-- /right-col -->
+      </div>
 
-    </div><!-- /checkout-grid -->
-  </div><!-- /wrap -->
+    </div>
+  </div>
 </main>
 
-<!-- ═══ 7. STICKY MOBILE CTA BAR ══════════════════════════════════ -->
-<div class="mbar" id="mbar" role="region" aria-label="Total &amp; buat pesanan">
+<!-- STICKY MOBILE CTA -->
+<div class="mbar" id="mbar">
   <div class="mbar-info">
     <small id="m-count">Pilih tiketmu</small>
-    <b id="m-total">—</b>
+    <b id="m-total">Rp0</b>
   </div>
   <button class="btn btn-red" id="m-cta" type="button" disabled>
     Buat Pesanan
   </button>
 </div>
 
-<!-- ═══ 8. FOOTER ══════════════════════════════════════════════════ -->
-<footer>
-  <div class="wrap">
-    <div class="f-top">
-      <div class="f-brand">
-        <a class="logo" href="#"><b>KAGEMAYA</b><i>影幻</i></a>
-        <p>Di balik bayangan, ilusi menjadi nyata.</p>
-      </div>
-      <div>
-        <h6>Jelajahi</h6>
-        <a class="l" href="#">Event</a>
-        <a class="l" href="#">Kategori</a>
-        <a class="l" href="#">Organizer</a>
-      </div>
-      <div>
-        <h6>Perusahaan</h6>
-        <a class="l" href="#">Tentang Kagemaya</a>
-        <a class="l" href="#">Karir</a>
-        <a class="l" href="#">Blog</a>
-      </div>
-      <div>
-        <h6>Dukungan</h6>
-        <a class="l" href="#">Bantuan</a>
-        <a class="l" href="#">Kebijakan Refund</a>
-        <a class="l" href="#">Kontak</a>
-      </div>
-      <div>
-        <h6>Legal</h6>
-        <a class="l" href="#">Syarat &amp; Ketentuan</a>
-        <a class="l" href="#">Privasi</a>
-      </div>
-    </div>
-    <div class="f-bottom">
-      <span>© 2026 Kagemaya. Semua hak dilindungi.</span>
-      <div class="soc">
-        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r=".6"/></svg></a>
-        <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="3.5"/><path d="M10 9.5v5l4.5-2.5z"/></svg></a>
-        <a href="#" aria-label="X"><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></a>
-        <a href="#" aria-label="TikTok"><svg viewBox="0 0 24 24"><path d="M14 4v10.5a3.5 3.5 0 11-3.5-3.5M14 4c.4 2.6 2 4 4.5 4.2"/></svg></a>
-      </div>
-    </div>
-  </div>
-</footer>
-
-<!-- ═══ SCRIPT ═════════════════════════════════════════════════════ -->
+<!-- SCRIPT -->
 <script>
-(function(){
-  'use strict';
+const API_BASE = 'http://localhost:5000/api';
 
-  // ── state ──────────────────────────────────────────────────────
-  const state = {
-    tickets: { regular: 0, premium: 0, vip: 0 },
-    prices:  { regular: 150000, premium: 250000, vip: 400000 },
-    quotas:  { regular: 84, premium: 32, vip: 9 },
-    maxPer:  { regular: 5, premium: 5, vip: 4 },
-    names:   { regular: 'Regular', premium: 'Premium', vip: 'VIP' },
-    voucher: { code: null, pct: 0, flat: 0 },
-    usePoints: false,
-    pointBalance: 3250,
-    serviceFeeRate: 0.015,   // 1.5 %
-    maxPointPct: 0.5,        // 50 % of total
-  };
+const state = {
+  eventId: null,
+  event: null,
+  userPoints: 3250,
+  tickets: {},
+  prices: {},
+  quotas: {},
+  maxPer: {},
+  names: {},
+  voucher: { code: null, pct: 0, flat: 0 },
+  usePoints: false,
+  serviceFeeRate: 0.015
+};
 
-  const VOUCHERS = {
-    'KAGE20': { pct: 20, label: '20% off' },
-    'MAYA10': { flat: 50000, label: 'Rp50.000 off' },
-  };
+function escapeHtml(val) {
+  if (val === null || val === undefined) return '';
+  return String(val).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[c]);
+}
 
-  // ── DOM refs ───────────────────────────────────────────────────
-  const rows = {
-    regular: document.getElementById('tk-regular'),
-    premium: document.getElementById('tk-premium'),
-    vip:     document.getElementById('tk-vip'),
-  };
+function loadLoggedInUser() {
+  const userNameElement = document.getElementById('userName');
 
-  // ── stepper setup ──────────────────────────────────────────────
-  Object.keys(rows).forEach(key => {
-    const row = rows[key];
-    const minus = row.querySelector('.tk-minus');
-    const plus  = row.querySelector('.tk-plus');
-    const count = row.querySelector('.tk-count');
+  if (!userNameElement) return;
 
-    plus.addEventListener('click', () => {
-      const total = totalQty();
-      if (total >= 5) return;
-      if (state.tickets[key] >= state.maxPer[key]) return;
-      if (state.tickets[key] >= state.quotas[key]) return;
-      state.tickets[key]++;
-      refresh();
-    });
+  const token = localStorage.getItem('kagemaya_token');
+  const userJson = localStorage.getItem('kagemaya_user');
 
-    minus.addEventListener('click', () => {
-      if (state.tickets[key] <= 0) return;
-      state.tickets[key]--;
-      refresh();
-    });
+  // Belum login
+  if (!token || !userJson) {
+    userNameElement.textContent = 'User';
+    return;
+  }
+
+  try {
+    const user = JSON.parse(userJson);
+
+    const displayName =
+      user.name ||
+      user.username ||
+      user.fullName ||
+      user.full_name ||
+      user.email ||
+      'User';
+
+    userNameElement.textContent = displayName;
+  } catch (error) {
+    console.error('Gagal membaca data user:', error);
+    userNameElement.textContent = 'User';
+  }
+}
+
+function formatRupiah(amount) {
+  return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount || 0);
+}
+
+function applyQuickVoucher(code) {
+  document.getElementById('voucher-input').value = code;
+  document.getElementById('voucher-btn').click();
+}
+
+async function loadCheckoutEvent() {
+  const params = new URLSearchParams(window.location.search);
+  state.eventId = params.get("id");
+
+  if (!state.eventId) {
+    alert("ID event tidak ditemukan di URL.");
+    window.location.href = "kagemaya-event-discovery.html";
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE}/events/${encodeURIComponent(state.eventId)}`);
+    const contentType = response.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      throw new Error(`Gagal terhubung ke API. URL backend salah atau endpoint tidak ditemukan (${response.status}).`);
+    }
+
+    if (!response.ok) throw new Error("Gagal mengambil data event dari server.");
+    
+    const result = await response.json();
+    const event = result.data || result;
+    state.event = event;
+
+    renderCheckoutEvent(event);
+    renderTicketList(event.tickets || event.ticket_types || event.Ticket || []);
+  } catch (error) {
+    console.error("Load Event Error:", error);
+    alert(error.message);
+  }
+}
+
+function renderCheckoutEvent(event) {
+  document.getElementById('checkout-event-title').textContent = event.title || event.name || 'Event';
+  document.getElementById('checkout-event-category').textContent = event.category?.name || event.category || 'Event';
+  document.getElementById('checkout-event-date').textContent = event.start_date ? new Date(event.start_date).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) : '-';
+  document.getElementById('checkout-event-time').textContent = event.start_time || event.time || '-';
+  document.getElementById('checkout-event-location').textContent = event.venue_name || event.city || 'Online';
+  
+  if (event.banner_url || event.image) {
+    document.getElementById('checkout-event-image').src = event.banner_url || event.image;
+  }
+}
+
+function renderTicketList(tickets) {
+  const listContainer = document.getElementById('ticket-list-container');
+  listContainer.innerHTML = '';
+
+  state.tickets = {};
+  state.prices = {};
+  state.quotas = {};
+  state.maxPer = {};
+  state.names = {};
+
+  if (!Array.isArray(tickets) || tickets.length === 0) {
+    listContainer.innerHTML = `<li style="padding:24px;color:#85837f;text-align:center">Tiket belum tersedia.</li>`;
+    updateSummary();
+    return;
+  }
+
+  tickets.forEach((ticket, index) => {
+    const key = String(ticket.id || ticket.objectId || `ticket-${index}`);
+
+    state.tickets[key] = 0;
+    state.prices[key] = Number(ticket.price) || 0;
+    state.quotas[key] = Number(ticket.quota || ticket.stock || 0);
+    state.maxPer[key] = Number(ticket.max_per_transaction || 5);
+    state.names[key] = ticket.name || 'Tiket';
+
+    const li = document.createElement('li');
+    li.className = 'kage-ticket-card';
+    li.innerHTML = `
+      <div>
+        <div class="tk-tier">${escapeHtml(state.names[key])}</div>
+        <div class="tk-price">${formatRupiah(state.prices[key])}</div>
+        <div class="tk-quota">${state.quotas[key] > 0 ? 'Tersisa ' + state.quotas[key] + ' tiket' : 'Tersedia'}</div>
+      </div>
+      <div class="kage-stepper">
+        <button type="button" onclick="changeTicket('${key}', -1)">−</button>
+        <span class="sep"></span>
+        <output id="qty-${key}">0</output>
+        <span class="sep"></span>
+        <button type="button" onclick="changeTicket('${key}', 1)">+</button>
+      </div>
+    `;
+    listContainer.appendChild(li);
   });
 
-  function totalQty(){
-    return Object.values(state.tickets).reduce((a,b)=>a+b,0);
-  }
+  updateSummary();
+}
 
-  // ── voucher logic ──────────────────────────────────────────────
-  const vInput  = document.getElementById('voucher-input');
-  const vBtn    = document.getElementById('voucher-btn');
-  const vNote   = document.getElementById('voucher-note');
-  const vWrap   = document.getElementById('voucher-wrap');
+function changeTicket(key, delta) {
+  if (!(key in state.tickets)) return;
 
-  vInput.addEventListener('input', () => {
-    if (state.voucher.code) resetVoucher();
-  });
+  let current = state.tickets[key] + delta;
+  const max = Math.min(state.maxPer[key] || 5, state.quotas[key] > 0 ? state.quotas[key] : 99);
+  
+  if (current < 0) current = 0;
+  if (current > max) current = max;
 
-  vBtn.addEventListener('click', () => {
-    if (state.voucher.code) {
-      resetVoucher();
-      vInput.value = '';
-      vBtn.textContent = 'Terapkan';
-      vBtn.classList.remove('applied');
-      vWrap.classList.remove('applied');
-      vNote.className = 'voucher-note';
-      vNote.innerHTML = '';
-      refresh();
-      return;
-    }
-    const code = vInput.value.trim().toUpperCase();
-    if (!code) {
-      showVoucherMsg('Masukkan kode voucher terlebih dahulu.', false);
-      return;
-    }
-    const v = VOUCHERS[code];
-    if (!v) {
-      showVoucherMsg('Kode voucher tidak valid atau sudah kadaluarsa.', false);
-      return;
-    }
-    state.voucher.code = code;
-    state.voucher.pct  = v.pct  || 0;
-    state.voucher.flat = v.flat || 0;
-    vBtn.textContent = 'Hapus';
-    vBtn.classList.add('applied');
-    vWrap.classList.add('applied');
-    vInput.disabled = true;
-    showVoucherMsg(`Voucher <strong>${code}</strong> berhasil diterapkan — ${v.label}`, true);
-    refresh();
-  });
+  state.tickets[key] = current;
+  document.getElementById(`qty-${key}`).textContent = current;
 
-  function resetVoucher(){
-    state.voucher = { code: null, pct: 0, flat: 0 };
-    vInput.disabled = false;
-  }
+  updateSummary();
+}
 
-  function showVoucherMsg(msg, ok){
-    const icon = ok
-      ? `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-5"/></svg>`
-      : `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>`;
-    vNote.className = 'voucher-note ' + (ok ? 'ok' : 'err');
-    vNote.innerHTML = icon + '<span>' + msg + '</span>';
-  }
+function updateSummary() {
+  let subtotal = 0;
+  let totalQty = 0;
+  const pillsContainer = document.getElementById('tix-pills');
+  pillsContainer.innerHTML = '';
 
-  // ── points toggle ──────────────────────────────────────────────
-  const ptToggle = document.getElementById('use-points');
-  ptToggle.addEventListener('change', () => {
-    state.usePoints = ptToggle.checked;
-    ptToggle.setAttribute('aria-checked', state.usePoints);
-    refresh();
-  });
+  Object.keys(state.tickets).forEach(key => {
+    const qty = state.tickets[key];
+    if (qty > 0) {
+      subtotal += qty * state.prices[key];
+      totalQty += qty;
 
-  // ── format helpers ─────────────────────────────────────────────
-  function fmt(n){
-    return 'Rp' + n.toLocaleString('id-ID');
-  }
-
-  // ── main refresh ───────────────────────────────────────────────
-  function refresh(){
-    const qty = state.tickets;
-
-    // update steppers
-    const totalQ = totalQty();
-    Object.keys(rows).forEach(key => {
-      const row   = rows[key];
-      const minus = row.querySelector('.tk-minus');
-      const plus  = row.querySelector('.tk-plus');
-      const cnt   = row.querySelector('.tk-count');
-      cnt.textContent = qty[key];
-      minus.disabled = qty[key] <= 0;
-      plus.disabled  = totalQ >= 5 || qty[key] >= state.maxPer[key] || qty[key] >= state.quotas[key];
-      row.classList.toggle('active', qty[key] > 0);
-    });
-
-    // subtotal
-    const subtotal = Object.keys(qty).reduce((s,k)=> s + qty[k]*state.prices[k], 0);
-
-    // voucher discount
-    let voucherDisc = 0;
-    if (state.voucher.code && subtotal > 0){
-      if (state.voucher.pct)  voucherDisc = Math.round(subtotal * state.voucher.pct / 100);
-      if (state.voucher.flat) voucherDisc = Math.min(state.voucher.flat, subtotal);
-    }
-
-    // after-voucher base
-    const afterVoucher = Math.max(0, subtotal - voucherDisc);
-
-    // service fee (on after-voucher)
-    const fee = subtotal > 0 ? Math.round(afterVoucher * state.serviceFeeRate) : 0;
-
-    // points
-    let pointsDisc = 0;
-    if (state.usePoints && state.pointBalance > 0 && subtotal > 0){
-      const maxByPoints = Math.min(state.pointBalance, Math.round((afterVoucher + fee) * state.maxPointPct));
-      pointsDisc = maxByPoints;
-    }
-
-    // total
-    const total = Math.max(0, afterVoucher + fee - pointsDisc);
-
-    // update DOM
-    document.getElementById('subtotal-val').textContent = fmt(subtotal);
-    document.getElementById('fee-val').textContent      = fmt(fee);
-    document.getElementById('total-val').textContent    = fmt(total);
-
-    // voucher row
-    const rowV = document.getElementById('row-voucher');
-    if (voucherDisc > 0){
-      rowV.style.display = '';
-      document.getElementById('voucher-val').textContent = '−' + fmt(voucherDisc);
-      document.getElementById('voucher-code-badge').textContent = state.voucher.code;
-    } else {
-      rowV.style.display = 'none';
-    }
-
-    // points row
-    const rowP = document.getElementById('row-points');
-    if (pointsDisc > 0){
-      rowP.style.display = '';
-      document.getElementById('points-val').textContent = '−' + fmt(pointsDisc);
-    } else {
-      rowP.style.display = 'none';
-    }
-
-    // ticket pills
-    updatePills(qty, subtotal);
-
-    // CTAs
-    const hasTickets = totalQ > 0;
-    document.getElementById('kage-btn-primary').disabled = !hasTickets;
-    const mCta = document.getElementById('m-cta');
-    mCta.disabled = !hasTickets;
-    document.getElementById('m-total').textContent  = hasTickets ? fmt(total) : '—';
-    document.getElementById('m-count').textContent  = hasTickets
-      ? `${totalQ} tiket · Total`
-      : 'Pilih tiketmu';
-
-    // points note
-    const pNote = document.getElementById('points-note');
-    if (state.usePoints && subtotal > 0){
-      pNote.innerHTML = `<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12l3 3 5-5"/></svg>Menggunakan ${fmt(pointsDisc)} poin — sisa ${fmt(state.pointBalance - pointsDisc)} poin.`;
-      pNote.style.color = 'var(--gold)';
-    } else {
-      pNote.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4M12 16h.01"/></svg>1 poin = Rp1. Poin dapat menutup hingga 50% dari total transaksi.`;
-      pNote.style.color = '';
-    }
-  }
-
-  function updatePills(qty, subtotal){
-    const container = document.getElementById('tix-pills');
-    const placeholder = document.getElementById('pill-placeholder');
-    const hasAny = Object.values(qty).some(v => v > 0);
-    if (placeholder) placeholder.style.display = hasAny ? 'none' : '';
-
-    // remove existing pills
-    container.querySelectorAll('.tix-pill:not(#pill-placeholder)').forEach(el => el.remove());
-
-    Object.keys(qty).forEach(key => {
-      if (qty[key] <= 0) return;
       const pill = document.createElement('div');
       pill.className = 'tix-pill';
-      pill.innerHTML = `<span class="tp-name">${state.names[key]} × ${qty[key]}</span><span class="tp-qty">${fmt(qty[key] * state.prices[key])}</span>`;
-      container.appendChild(pill);
-    });
-  }
-
-  // ── CTA button click ───────────────────────────────────────────
-  ['kage-btn-primary','m-cta'].forEach(id => {
-    const btn = document.getElementById(id);
-    if (!btn) return;
-    btn.addEventListener('click', () => {
-      if (btn.disabled) return;
-      // Simulate proceeding to payment
-      alert('Pesananmu diterima! Melanjutkan ke halaman pembayaran…');
-    });
+      pill.innerHTML = `<span class="tp-name">${escapeHtml(state.names[key])}</span><span class="tp-qty">${qty}x ${formatRupiah(state.prices[key])}</span>`;
+      pillsContainer.appendChild(pill);
+    }
   });
 
-  // init
-  refresh();
-})();
+  if (totalQty === 0) {
+    pillsContainer.innerHTML = `<div class="tix-pill" style="justify-content:center;color:var(--text2);font-style:italic">Belum ada tiket dipilih</div>`;
+  }
+
+  let voucherDiscount = 0;
+  if (state.voucher.pct > 0) {
+    voucherDiscount = Math.round(subtotal * (state.voucher.pct / 100));
+  } else if (state.voucher.flat > 0) {
+    voucherDiscount = state.voucher.flat;
+  }
+
+  const rowVoucher = document.getElementById('row-voucher');
+  if (voucherDiscount > 0) {
+    rowVoucher.style.display = 'flex';
+    document.getElementById('voucher-code-badge').textContent = state.voucher.code;
+    document.getElementById('voucher-val').textContent = `−${formatRupiah(voucherDiscount)}`;
+  } else {
+    rowVoucher.style.display = 'none';
+  }
+
+  const afterVoucher = Math.max(0, subtotal - voucherDiscount);
+
+  let pointsDiscount = 0;
+  const rowPoints = document.getElementById('row-points');
+  if (state.usePoints) {
+    const maxAllowedPoints = Math.floor(afterVoucher * 0.5);
+    pointsDiscount = Math.min(state.userPoints, maxAllowedPoints);
+    rowPoints.style.display = 'flex';
+    document.getElementById('points-val').textContent = `−${formatRupiah(pointsDiscount)}`;
+  } else {
+    rowPoints.style.display = 'none';
+  }
+
+  const afterPoints = Math.max(0, afterVoucher - pointsDiscount);
+  const serviceFee = subtotal > 0 ? Math.round(afterPoints * state.serviceFeeRate) : 0;
+  const grandTotal = afterPoints + serviceFee;
+
+  document.getElementById('subtotal-val').textContent = formatRupiah(subtotal);
+  document.getElementById('fee-val').textContent = formatRupiah(serviceFee);
+  document.getElementById('total-val').textContent = formatRupiah(grandTotal);
+
+  document.getElementById('m-count').textContent = totalQty > 0 ? `${totalQty} Tiket Dipilih` : 'Pilih tiketmu';
+  document.getElementById('m-total').textContent = formatRupiah(grandTotal);
+
+  const hasTickets = totalQty > 0;
+  document.getElementById('kage-btn-primary').disabled = !hasTickets;
+  document.getElementById('m-cta').disabled = !hasTickets;
+}
+
+function setupVoucher() {
+  document.getElementById('voucher-btn').addEventListener('click', () => {
+    const code = document.getElementById('voucher-input').value.trim().toUpperCase();
+    if (code === 'KAGE20') {
+      state.voucher = { code: 'KAGE20', pct: 20, flat: 0 };
+      alert('Voucher 20% berhasil dipasang!');
+    } else if (code === 'MAYA10') {
+      state.voucher = { code: 'MAYA10', pct: 10, flat: 0 };
+      alert('Voucher 10% berhasil dipasang!');
+    } else {
+      state.voucher = { code: null, pct: 0, flat: 0 };
+      alert('Kode voucher tidak valid');
+    }
+    updateSummary();
+  });
+}
+
+function setupPoints() {
+  document.getElementById('use-points').addEventListener('change', (e) => {
+    state.usePoints = e.target.checked;
+    updateSummary();
+  });
+}
+
+async function createOrder() {
+  const token = localStorage.getItem('kagemaya_token');
+
+  // 1. Susun tiket yang dipilih
+  const selectedTickets = Object.keys(state.tickets)
+    .filter(key => state.tickets[key] > 0)
+    .map(key => ({
+      ticket_id: key,
+      name: state.names[key],
+      quantity: state.tickets[key],
+      price: state.prices[key]
+    }));
+
+  // 2. Kalkulasi biaya
+  let subtotal = 0;
+  selectedTickets.forEach(t => subtotal += t.quantity * t.price);
+
+  let voucherDiscount = 0;
+  if (state.voucher.pct > 0) {
+    voucherDiscount = Math.round(subtotal * (state.voucher.pct / 100));
+  } else if (state.voucher.flat > 0) {
+    voucherDiscount = state.voucher.flat;
+  }
+
+  const afterVoucher = Math.max(0, subtotal - voucherDiscount);
+
+  let pointsDiscount = 0;
+  if (state.usePoints) {
+    const maxAllowedPoints = Math.floor(afterVoucher * 0.5);
+    pointsDiscount = Math.min(state.userPoints, maxAllowedPoints);
+  }
+
+  const afterPoints = Math.max(0, afterVoucher - pointsDiscount);
+  const serviceFee = subtotal > 0 ? Math.round(afterPoints * state.serviceFeeRate) : 0;
+  const grandTotal = afterPoints + serviceFee;
+
+  // 3. Susun Payload Lengkap
+  const payload = {
+    event_id: state.eventId,
+    event_title: state.event?.title || state.event?.name || document.getElementById('checkout-event-title')?.textContent || 'Event',
+    event_date: document.getElementById('checkout-event-date')?.textContent || '-',
+    event_time: document.getElementById('checkout-event-time')?.textContent || '-',
+    event_location: document.getElementById('checkout-event-location')?.textContent || '-',
+    tickets: selectedTickets,
+    subtotal: subtotal,
+    voucher_code: state.voucher.code,
+    voucher_discount: voucherDiscount,
+    points_discount: pointsDiscount,
+    service_fee: serviceFee,
+    total_amount: grandTotal
+  };
+
+  // 4. Kirim ke Backend API jika terhubung
+  try {
+    if (token) {
+      const res = await fetch(`${API_BASE}/orders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(payload)
+      });
+      const contentType = res.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const result = await res.json();
+        if (res.ok) {
+          const orderId = result.data?.id || result.id;
+          sessionStorage.setItem('last_order_id', orderId);
+          window.location.href = `kagemaya-transaction-payment.html?order_id=${encodeURIComponent(orderId)}&event_id=${encodeURIComponent(state.eventId)}`;
+          return;
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("API offline, menggunakan fallback sessionStorage.", err);
+  }
+
+  // 5. Fallback Lokal (Offline / Mocking)
+  const fallbackOrderId = 'TXN-' + Date.now().toString().slice(-6);
+  payload.id = fallbackOrderId;
+
+  sessionStorage.setItem(`order_${fallbackOrderId}`, JSON.stringify(payload));
+  sessionStorage.setItem('last_order_id', fallbackOrderId);
+
+  // Navigasi membawa order_id dan event_id
+  window.location.href = `kagemaya-transaction-payment.html?order_id=${fallbackOrderId}&event_id=${encodeURIComponent(state.eventId)}`;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  loadLoggedInUser();
+
+  setupVoucher();
+  setupPoints();
+
+  document
+    .getElementById('kage-btn-primary')
+    .addEventListener('click', createOrder);
+
+  document
+    .getElementById('m-cta')
+    .addEventListener('click', createOrder);
+
+  loadCheckoutEvent();
+});
 </script>
 
 </body>

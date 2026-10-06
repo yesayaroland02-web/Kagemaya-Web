@@ -8,16 +8,12 @@ import {
 
 const router = Router();
 
-// Endpoint Kategori
+// 1. Route Statis & Root dipasang lebih dulu
 router.get('/categories', getCategories);
-
-// Endpoint Stok Tiket
-router.get('/:id/stock', checkTicketStock);
-
-// Endpoint Detail Event
-router.get('/:id', getEventById);
-
-// Endpoint List Event dengan Filter
 router.get('/', getEvents);
+
+// 2. Route Dinamis (Parametric) dipasang di bawah
+router.get('/:id/stock', checkTicketStock);
+router.get('/:id', getEventById);
 
 export default router;
