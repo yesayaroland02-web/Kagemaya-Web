@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pertanyaan &amp; Jawaban — Yūgen · Kagemaya</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="kagemaya-tokens.css">
+<style>
+/* ─── DESIGN TOKENS ─────────────────────────────────────── */
+:root {
+  color-scheme: dark;
+  --bg: #0B0B0D;
+  --surface: #121216;
+  --elev: #1C1C22;
+  --red: #C62828;
+  --red-hi: #E5484D;
+  --gold: #D6A85F;
+  --text: #F4F0E8;
+  --text2: #B8B5B0;
+  --text3: #85837f;
+  --mist: #B8B5B0;
+  --border: #292930;
+  --serif: 'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', Georgia, serif;
+  --sans: 'Inter', 'Noto Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --r: 2px;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+html {
+  scroll-padding-top: 84px;
+  background: var(--bg);
+  scroll-behavior: smooth;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  padding-bottom: 120px; /* space for fixed bottom bar */
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+svg {
+  display: block;
+}
+
+/* ─── GRAIN ─────────────────────────────────────────────── */
+.grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: .22;
+  mix-blend-mode: overlay;
+  width: 100%;
+  height: 100%;
+}
+
+/* ─── WRAP ───────────────────────────────────────────────── */
+.wrap {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* ─── NAVBAR ─────────────────────────────────────────────── */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding-top: env(safe-area-inset-top, 0px);
+  background: rgba(11, 11, 13, .9);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.nav .wrap {
+  max-width: 1296px;
+  display: flex;
+  align-items: center;
+  height: 84px;
+  gap: 0;
+}
+
+.logo {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex: none;
+  margin-right: 40px;
+}
+
+.logo b {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 21px;
+  letter-spacing: .34em;
+  margin-right: -.34em;
+}
+
+.logo i {
+  font-family: var(--serif);
+  font-style: normal;
+  color: var(--red-hi);
+  font-size: 17px;
+  font-weight: 400;
+}
+
+.nav nav {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.nav ul {
+  display: flex;
+  gap: 36px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav ul a {
+  font-size: 14px;
+  color: var(--text2);
+  transition: color .2s;
+}
+
+.nav ul a:hover {
+  color: var(--text);
+}
+
+.nav-r {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex: none;
+}
+
+.icon-btn {
+  background: none;
+  border: 0;
+  color: var(--text2);
+  padding: 6px;
+  display: grid;
+  place-items: center;
+  transition: color .2s;
+  cursor: pointer;
+}
+
+.icon-btn:hover {
+  color: var(--text);
+}
+
+.login {
+  font-size: 14px;
+  color: var(--text2);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: 500 14px/1 var(--sans);
+  padding: 13px 24px;
+  border-radius: var(--r);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all .2s;
+  letter-spacing: .01em;
+  gap: 8px;
+}
+
+.btn-red {
+  background: var(--red);
+  color: var(--text);
+}
+
+.btn-red:hover {
+  background: var(--red-hi);
+}
+
+.btn-line {
+  border-color: rgba(244, 240, 232, .26);
+  color: var(--text);
+  background: transparent;
+}
+
+.btn-line:hover {
+  border-color: var(--text);
+}
+
+.btn-sm {
+  padding: 9px 18px;
+  font-size: 13px;
+}
+
+/* ─── PAGE HEADER & CONTEXT ──────────────────────────────── */
+.qa-header {
+  padding-top: calc(84px + 44px);
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 40px;
+}
+
+.crumb {
+  font-size: 13px;
+  color: var(--text2);
+  margin-bottom: 16px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.crumb a:hover {
+  color: var(--text);
+}
+
+.qa-header h1 {
+  font-family: var(--serif);
+  font-size: 36px;
+  font-weight: 400;
+  margin: 0 0 10px;
+  letter-spacing: -.01em;
+}
+
+.qa-header p {
+  color: var(--text2);
+  font-size: 15.5px;
+  margin: 0;
+  max-width: 600px;
+}
+
+/* ─── QUESTION & ANSWER CARDS ────────────────────────────── */
+.qa-list {
+  display: grid;
+  gap: 24px;
+}
+
+.q-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 24px 28px;
+  transition: border-color .25s;
+}
+
+.q-card:hover {
+  border-color: #3d3d47;
+}
+
+.q-card.pinned-border {
+  border-color: rgba(214, 168, 95, .4);
+}
+
+.q-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.q-author {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--elev);
+  border: 1px solid var(--border);
+  display: grid;
+  place-items: center;
+  font-family: var(--serif);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  flex: none;
+}
+
+.author-meta .name {
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.author-meta .time {
+  font-size: 12.5px;
+  color: var(--mist);
+}
+
+.reply-btn {
+  background: none;
+  border: none;
+  color: var(--text2);
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border-radius: var(--r);
+  transition: all .2s;
+}
+
+.reply-btn:hover {
+  color: var(--gold);
+  background: var(--elev);
+}
+
+.reply-btn svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  fill: none;
+  stroke-linecap: round;
+}
+
+.q-text {
+  font-size: 16px;
+  line-height: 1.7;
+  color: var(--text);
+  margin: 0 0 16px;
+}
+
+/* Answer Card */
+.a-card {
+  margin-top: 16px;
+  padding: 20px 22px;
+  background: var(--elev);
+  border-radius: var(--r);
+  border-left: 2px solid var(--gold);
+}
+
+.a-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.org-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--gold);
+  color: #0B0B0D;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 12px;
+}
+
+.org-name {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text);
+  margin-left: 6px;
+}
+
+.pin-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--gold);
+  font-size: 12px;
+}
+
+.pin-indicator svg {
+  width: 13px;
+  height: 13px;
+  stroke: currentColor;
+  fill: none;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+}
+
+.a-text {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--text);
+  margin: 0;
+}
+
+/* ─── FIXED BOTTOM INPUT BAR ─────────────────────────────── */
+.bottom-input-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 95;
+  background: rgba(18, 18, 22, .96);
+  border-top: 1px solid var(--border);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 16px 0 calc(16px + env(safe-area-inset-bottom, 0px));
+}
+
+.input-bar-inner {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 0 32px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.rounded-input-box {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--mist);
+  border-radius: 28px;
+  background: rgba(11, 11, 13, .7);
+  padding: 4px 8px 4px 20px;
+  transition: border-color .2s;
+}
+
+.rounded-input-box:focus-within {
+  border-color: var(--gold);
+}
+
+.rounded-input-box input {
+  flex: 1;
+  background: none;
+  border: none;
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15px;
+  padding: 10px 0;
+  min-width: 0;
+}
+
+.rounded-input-box input::placeholder {
+  color: var(--text3);
+}
+
+.rounded-input-box input:focus-visible {
+  outline: none;
+}
+
+.send-btn {
+  background: var(--red);
+  color: var(--text);
+  border: none;
+  padding: 10px 22px;
+  border-radius: 24px;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background .2s, transform .1s;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+}
+
+.send-btn:hover {
+  background: var(--red-hi);
+}
+
+.send-btn:active {
+  transform: scale(0.98);
+}
+
+.send-btn svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ─── EMPTY STATE ────────────────────────────────────────── */
+.empty-state {
+  display: none;
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.empty-state.show {
+  display: block;
+}
+
+.empty-illustration {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 24px;
+}
+
+.empty-illustration svg {
+  width: 100%;
+  height: 100%;
+}
+
+.empty-title {
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 400;
+  margin: 0 0 10px;
+  color: var(--text);
+}
+
+.empty-sub {
+  color: var(--text2);
+  font-size: 14.5px;
+  margin: 0 0 28px;
+}
+
+/* ─── FOOTER ─────────────────────────────────────────────── */
+footer {
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  padding: 64px 0 36px;
+  margin-top: 100px;
+}
+
+.f-top {
+  display: grid;
+  grid-template-columns: 1.4fr repeat(4, auto);
+  gap: 48px;
+  align-items: start;
+}
+
+.f-brand p {
+  color: var(--text2);
+  font-size: 14px;
+  margin: 14px 0 0;
+  max-width: 20em;
+  line-height: 1.65;
+}
+
+.f-top a.l {
+  font-size: 14px;
+  color: var(--text2);
+  padding: 2px 0;
+  display: block;
+  transition: color .2s;
+}
+
+.f-top a.l:hover {
+  color: var(--text);
+}
+
+.f-top h6 {
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin: 0 0 14px;
+  font-weight: 500;
+}
+
+.f-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 56px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  color: var(--text3);
+  font-size: 13px;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.soc {
+  display: flex;
+  gap: 10px;
+}
+
+.soc a {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--text2);
+  transition: border-color .2s, color .2s;
+}
+
+.soc a:hover {
+  border-color: var(--gold);
+  color: var(--text);
+}
+
+.soc svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (max-width: 760px) {
+  .wrap, .input-bar-inner {
+    padding: 0 20px;
+  }
+  .nav ul, .login {
+    display: none;
+  }
+  .nav .wrap {
+    gap: 12px;
+  }
+  .nav-r {
+    margin-left: auto;
+  }
+  .f-top {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ 1. NAVBAR ════════════════════════════════════════════ -->
+<header class="nav" role="banner">
+  <div class="wrap">
+    <a class="logo" href="kagemaya-landing-page-visual-anchor.html" aria-label="Kagemaya beranda">
+      <b>KAGEMAYA</b><i>影幻</i>
+    </a>
+    <nav aria-label="Utama">
+      <ul>
+        <li><a href="kagemaya-event-discovery.html">Event</a></li>
+        <li><a href="#">Kategori</a></li>
+        <li><a href="#">Organizer</a></li>
+      </ul>
+    </nav>
+    <div class="nav-r">
+      <button class="icon-btn" aria-label="Cari">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+      </button>
+      <a class="login" href="#">Hana M.</a>
+      <a class="btn btn-sm btn-line" href="#">Pesananku</a>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ MAIN Q&A WALL CONTENT ════════════════════════════════ -->
+<main class="wrap">
+  
+  <!-- 1. SECTION TITLE & CONTEXT -->
+  <section class="qa-header">
+    <nav class="crumb" aria-label="Breadcrumb">
+      <a href="kagemaya-event-discovery.html">Event</a>
+      <span>/</span>
+      <a href="kagemaya-event-detail.html">Yūgen: Film 4D Tokyo–Jakarta</a>
+      <span>/</span>
+      <span>Tanya Jawab</span>
+    </nav>
+    <h1>Pertanyaan &amp; Jawaban</h1>
+    <p>Ajukan pertanyaan langsung kepada Aozora Collective atau diskusikan detail acara bersama komunitas penonton lainnya.</p>
+  </section>
+
+  <!-- Q&A LIST -->
+  <div class="qa-list" id="qa-container">
+
+    <!-- Card 1: Pinned Organizer Answer -->
+    <article class="q-card pinned-border">
+      <div class="q-header">
+        <div class="q-author">
+          <div class="user-avatar">D</div>
+          <div class="author-meta">
+            <div class="name">Dinda R.</div>
+            <div class="time">3 hari yang lalu</div>
+          </div>
+        </div>
+        <button class="reply-btn" type="button" aria-label="Balas pertanyaan">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          Balas (1)
+        </button>
+      </div>
+
+      <p class="q-text">Apakah venue menyediakan area parkir untuk mobil dan motor, dan apakah ada akses ramah kursi roda?</p>
+
+      <!-- Answer Card -->
+      <div class="a-card">
+        <div class="a-header">
+          <div style="display:flex;align-items:center">
+            <span class="org-pill">Organizer</span>
+            <span class="org-name">Aozora Collective</span>
+          </div>
+          <span class="pin-indicator">
+            <svg viewBox="0 0 24 24"><path d="M9 4h6l-1 6 3 3H7l3-3zM12 13v8"/></svg>
+            Jawaban Disematkan
+          </span>
+        </div>
+        <p class="a-text">
+          Halo Dinda! Ya, Teater Sinar Maya memiliki area parkir luas di lantai basement B1–B2 dengan tarif flat akhir pekan. Tersedia juga lift khusus dan jalur ramp kursi roda menuju lobi utama teater.
+        </p>
+      </div>
+    </article>
+
+    <!-- Card 2: Organizer Answer -->
+    <article class="q-card">
+      <div class="q-header">
+        <div class="q-author">
+          <div class="user-avatar">R</div>
+          <div class="author-meta">
+            <div class="name">Raka Pratama</div>
+            <div class="time">5 hari yang lalu</div>
+          </div>
+        </div>
+        <button class="reply-btn" type="button" aria-label="Balas pertanyaan">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          Balas (1)
+        </button>
+      </div>
+
+      <p class="q-text">Apakah film memakai subtitle bahasa Indonesia atau bilingual Inggris-Jepang?</p>
+
+      <!-- Answer Card -->
+      <div class="a-card">
+        <div class="a-header">
+          <div style="display:flex;align-items:center">
+            <span class="org-pill">Organizer</span>
+            <span class="org-name">Aozora Collective</span>
+          </div>
+        </div>
+        <p class="a-text">
+          Film ditayangkan dengan dialog asli (bahasa Jepang dan Indonesia) disertai takarir ganda (Bahasa Indonesia &amp; Inggris) pada layar proyeksi bawah yang nyaman dibaca dari seluruh baris kursi.
+        </p>
+      </div>
+    </article>
+
+    <!-- Card 3: Unanswered Question -->
+    <article class="q-card">
+      <div class="q-header">
+        <div class="q-author">
+          <div class="user-avatar">M</div>
+          <div class="author-meta">
+            <div class="name">Maya Sartika</div>
+            <div class="time">1 hari yang lalu</div>
+          </div>
+        </div>
+        <button class="reply-btn" type="button" aria-label="Balas pertanyaan">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          Balas (0)
+        </button>
+      </div>
+
+      <p class="q-text">Untuk tiket kategori VIP, apakah sesi meet &amp; greet sutradara diadakan sebelum atau sesudah pemutaran film?</p>
+      
+      <div style="font-size:13px;color:var(--text3);margin-top:12px;font-style:italic">
+        Menunggu tanggapan organizer…
+      </div>
+    </article>
+
+  </div>
+
+  <!-- 5. EMPTY STATE (Hidden by default) -->
+  <div class="empty-state" id="empty-state">
+    <div class="empty-illustration" aria-hidden="true">
+      <svg viewBox="0 0 100 100">
+        <circle cx="50" cy="50" r="44" fill="none" stroke="#292930" stroke-width="1.5" stroke-dasharray="3 3"/>
+        <path d="M35 45 C35 37 42 30 50 30 C58 30 65 37 65 45 C65 52 58 56 50 62 L50 68" fill="none" stroke="#D6A85F" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="50" cy="74" r="2" fill="#D6A85F"/>
+      </svg>
+    </div>
+    <h2 class="empty-title">Belum ada pertanyaan.</h2>
+    <p class="empty-sub">Jadilah yang pertama menanyakan info seputar event ini.</p>
+    <button class="btn btn-red" type="button" onclick="document.getElementById('question-input').focus()">
+      Mulai Bertanya
+    </button>
+  </div>
+
+</main>
+
+<!-- ═══ 4. FIXED BOTTOM INPUT BAR ═════════════════════════════ -->
+<div class="bottom-input-bar">
+  <div class="input-bar-inner">
+    <div class="rounded-input-box">
+      <input type="text" id="question-input" placeholder="Tulis pertanyaan…" aria-label="Tulis pertanyaan untuk organizer">
+      <button class="send-btn" id="send-btn" type="button" aria-label="Kirim pertanyaan">
+        <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        Kirim
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ FOOTER ════════════════════════════════════════════════ -->
+<footer>
+  <div class="wrap" style="max-width:1296px">
+    <div class="f-top">
+      <div class="f-brand">
+        <a class="logo" href="#"><b>KAGEMAYA</b><i>影幻</i></a>
+        <p>Di balik bayangan, ilusi menjadi nyata.</p>
+      </div>
+      <div>
+        <h6>Jelajahi</h6>
+        <a class="l" href="#">Event</a>
+        <a class="l" href="#">Kategori</a>
+        <a class="l" href="#">Organizer</a>
+      </div>
+      <div>
+        <h6>Perusahaan</h6>
+        <a class="l" href="#">Tentang Kagemaya</a>
+        <a class="l" href="#">Karir</a>
+        <a class="l" href="#">Blog</a>
+      </div>
+      <div>
+        <h6>Dukungan</h6>
+        <a class="l" href="#">Bantuan</a>
+        <a class="l" href="#">Kebijakan Refund</a>
+        <a class="l" href="#">Kontak</a>
+      </div>
+    </div>
+    <div class="f-bottom">
+      <span>© 2026 Kagemaya. Semua hak dilindungi.</span>
+      <div class="soc">
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r=".6"/></svg></a>
+        <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="3.5"/><path d="M10 9.5v5l4.5-2.5z"/></svg></a>
+        <a href="#" aria-label="X"><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></a>
+        <a href="#" aria-label="TikTok"><svg viewBox="0 0 24 24"><path d="M14 4v10.5a3.5 3.5 0 11-3.5-3.5M14 4c.4 2.6 2 4 4.5 4.2"/></svg></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══ SCRIPT: SUBMIT QUESTION ═══════════════════════════════ -->
+<script>
+(function() {
+  'use strict';
+
+  const input = document.getElementById('question-input');
+  const sendBtn = document.getElementById('send-btn');
+  const container = document.getElementById('qa-container');
+  const emptyState = document.getElementById('empty-state');
+
+  function addQuestion() {
+    const text = input.value.trim();
+    if (!text) return;
+
+    const newCard = document.createElement('article');
+    newCard.className = 'q-card';
+    newCard.innerHTML = `
+      <div class="q-header">
+        <div class="q-author">
+          <div class="user-avatar" style="background:rgba(214,168,95,.15);color:var(--gold)">H</div>
+          <div class="author-meta">
+            <div class="name">Hana M.</div>
+            <div class="time">Baru saja</div>
+          </div>
+        </div>
+        <button class="reply-btn" type="button" aria-label="Balas pertanyaan">
+          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          Balas (0)
+        </button>
+      </div>
+      <p class="q-text">${escapeHtml(text)}</p>
+      <div style="font-size:13px;color:var(--text3);margin-top:12px;font-style:italic">
+        Menunggu tanggapan organizer…
+      </div>
+    `;
+
+    container.insertBefore(newCard, container.firstChild);
+    input.value = '';
+    emptyState.classList.remove('show');
+    container.style.display = 'grid';
+
+    newCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/[&<>"']/g, function(m) {
+      return {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      }[m];
+    });
+  }
+
+  sendBtn.addEventListener('click', addQuestion);
+  input.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addQuestion();
+    }
+  });
+
+})();
+</script>
+
+</body>
+</html>

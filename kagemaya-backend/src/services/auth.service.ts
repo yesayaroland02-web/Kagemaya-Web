@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 import { prisma } from '../lib/prisma';
 import { registerSchema, loginSchema } from '../validations/auth.validation';
+import config from '../config';
 
 const generateReferralCode = (name: string): string => {
   const prefix = name.replace(/\s+/g, '').slice(0, 3).toUpperCase();
@@ -112,7 +113,7 @@ export const loginUser = async (payload: z.infer<typeof loginSchema>) => {
   // 4. Generate JWT Token
   const token = jwt.sign(
     { id: user.id, email: user.email, role: user.role },
-    process.env.JWT_SECRET || 'secret_key_kagemaya',
+    config.jwtSecret,
     { expiresIn: '1d' }
   );
 

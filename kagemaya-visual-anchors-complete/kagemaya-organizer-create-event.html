@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Buat Event Baru — Dashboard Organizer · Kagemaya</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="kagemaya-tokens.css">
+<style>
+/* ─── DESIGN TOKENS ─────────────────────────────────────── */
+:root {
+  color-scheme: dark;
+  --bg: #0B0B0D;
+  --surface: #121216;
+  --elev: #1C1C22;
+  --red: #C62828;
+  --red-hi: #E5484D;
+  --gold: #D6A85F;
+  --gold-dim: rgba(214, 168, 95, 0.16);
+  --text: #F4F0E8;
+  --text2: #B8B5B0;
+  --text3: #85837f;
+  --mist: #B8B5B0;
+  --border: #292930;
+  --border-light: #3D3D47;
+  --green: #4ADE80;
+  --serif: 'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', Georgia, serif;
+  --sans: 'Inter', 'Noto Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --r: 2px;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14.5px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+svg {
+  display: block;
+}
+
+/* ─── APP SHELL ─────────────────────────────────────────── */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ─── SIDEBAR NAVIGATION ────────────────────────────────── */
+.sidebar {
+  width: 260px;
+  background: var(--bg);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  z-index: 50;
+  flex: none;
+}
+
+.sidebar-header {
+  padding: 28px 24px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.sidebar-logo b {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 19px;
+  letter-spacing: .34em;
+  margin-right: -.34em;
+}
+
+.sidebar-logo i {
+  font-family: var(--serif);
+  font-style: normal;
+  color: var(--red-hi);
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.portal-label {
+  font-size: 10.5px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  display: inline-block;
+  font-weight: 500;
+}
+
+.sidebar-nav {
+  padding: 20px 14px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border-radius: var(--r);
+  color: var(--mist);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all .2s;
+  letter-spacing: .01em;
+}
+
+.nav-link svg {
+  width: 18px;
+  height: 18px;
+  stroke: var(--mist);
+  stroke-width: 1.6;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex: none;
+  transition: stroke .2s;
+}
+
+.nav-link:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.nav-link:hover svg {
+  stroke: var(--text);
+}
+
+.nav-link.active {
+  background: var(--red);
+  color: #FFFFFF;
+}
+
+.nav-link.active svg {
+  stroke: #FFFFFF;
+}
+
+.sidebar-footer {
+  padding: 16px 14px;
+  border-top: 1px solid var(--border);
+}
+
+.nav-link.logout {
+  color: var(--text2);
+}
+
+.nav-link.logout:hover {
+  background: rgba(198, 40, 40, .1);
+  color: var(--red-hi);
+}
+
+/* ─── MAIN PANEL (Yoru Light #1C1C22) ───────────────────── */
+.main-panel {
+  flex: 1;
+  background: var(--elev);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── TOP HEADER ────────────────────────────────────────── */
+.top-header {
+  padding: 20px 40px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.back-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text2);
+  transition: color 0.2s;
+}
+.back-link:hover {
+  color: var(--gold);
+}
+
+.header-title h1 {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 400;
+  margin: 0;
+  color: var(--text);
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: 500 13.5px/1 var(--sans);
+  padding: 10px 20px;
+  border-radius: var(--r);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all .2s;
+  letter-spacing: .01em;
+  gap: 8px;
+}
+
+.btn-red {
+  background: var(--red);
+  color: var(--text);
+}
+.btn-red:hover {
+  background: var(--red-hi);
+}
+
+.btn-line {
+  border-color: rgba(244, 240, 232, .24);
+  color: var(--text);
+  background: transparent;
+}
+.btn-line:hover {
+  border-color: var(--text);
+  background: rgba(255,255,255,0.04);
+}
+
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+/* ─── FORM CONTENT LAYOUT ───────────────────────────────── */
+.form-content {
+  padding: 36px 40px 80px;
+  max-width: 1100px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 340px;
+  gap: 32px;
+  align-items: start;
+}
+
+/* Card Sections */
+.form-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  margin-bottom: 24px;
+  overflow: hidden;
+}
+
+.form-card-head {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.form-card-head h2 {
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 500;
+  margin: 0;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.form-card-body {
+  padding: 24px;
+}
+
+/* Form Controls */
+.form-group {
+  margin-bottom: 20px;
+}
+.form-group:last-child {
+  margin-bottom: 0;
+}
+
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.form-label .req {
+  color: var(--red-hi);
+  margin-left: 2px;
+}
+.form-hint {
+  font-size: 12px;
+  color: var(--text3);
+  margin-top: 6px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.kage-input, .kage-select, .kage-textarea {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  color: var(--text);
+  font: 400 14px var(--sans);
+  padding: 11px 14px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.kage-input:focus, .kage-select:focus, .kage-textarea:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold-dim);
+}
+.kage-input::placeholder, .kage-textarea::placeholder {
+  color: var(--text3);
+}
+
+.kage-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23B8B5B0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+
+.kage-textarea {
+  resize: vertical;
+  min-height: 110px;
+  line-height: 1.6;
+}
+
+/* ─── BANNER UPLOAD DROPZONE (16:9) ─────────────────────── */
+.banner-dropzone {
+  border: 2px dashed var(--border);
+  border-radius: var(--r);
+  background: rgba(11, 11, 13, 0.5);
+  aspect-ratio: 16 / 9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s;
+  position: relative;
+  overflow: hidden;
+}
+.banner-dropzone:hover {
+  border-color: var(--gold);
+  background: rgba(214, 168, 95, 0.04);
+}
+.banner-dropzone svg.up-icon {
+  width: 36px;
+  height: 36px;
+  stroke: var(--gold);
+  stroke-width: 1.5;
+  margin-bottom: 12px;
+}
+.banner-preview-img {
+  display: none;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.banner-overlay-change {
+  display: none;
+  position: absolute;
+  inset: 0;
+  background: rgba(11, 11, 13, 0.7);
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+}
+.banner-dropzone.has-image .banner-preview-img {
+  display: block;
+}
+.banner-dropzone.has-image:hover .banner-overlay-change {
+  display: flex;
+}
+
+/* ─── DYNAMIC TICKET TIERS TABLE ────────────────────────── */
+.tier-item {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 18px 20px;
+  margin-bottom: 14px;
+  position: relative;
+  transition: border-color 0.2s;
+}
+.tier-item:hover {
+  border-color: var(--border-light);
+}
+.tier-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.tier-title-input {
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text);
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed var(--border-light);
+  padding: 2px 4px;
+  outline: none;
+  width: 240px;
+}
+.tier-title-input:focus {
+  border-bottom-color: var(--gold);
+}
+.tier-remove-btn {
+  background: none;
+  border: none;
+  color: var(--text3);
+  padding: 4px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.tier-remove-btn:hover {
+  color: var(--red-hi);
+}
+
+.tier-fields-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1.6fr;
+  gap: 14px;
+  align-items: center;
+}
+
+/* Total Seats Invariant Banner */
+.seats-invariant-box {
+  background: rgba(214, 168, 95, 0.08);
+  border: 1px solid rgba(214, 168, 95, 0.25);
+  border-radius: var(--r);
+  padding: 14px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-top: 16px;
+}
+.seats-count-badge {
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--gold);
+}
+
+/* ─── SIDEBAR SUMMARY & STATUS CARD ─────────────────────── */
+.summary-widget {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 22px;
+  position: sticky;
+  top: 96px;
+}
+.summary-widget h3 {
+  font-family: var(--serif);
+  font-size: 16px;
+  margin: 0 0 16px;
+  color: var(--text);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+}
+.sum-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--text2);
+  margin-bottom: 10px;
+}
+.sum-row b {
+  color: var(--text);
+  font-weight: 500;
+}
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 8px;
+  border-radius: var(--r);
+  font-size: 11.5px;
+  font-weight: 500;
+  background: rgba(214, 168, 95, 0.1);
+  border: 1px solid var(--gold);
+  color: var(--gold);
+}
+
+/* ─── FOOTER ────────────────────────────────────────────── */
+footer {
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  padding: 24px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--text3);
+}
+
+/* ─── RESPONSIVE ────────────────────────────────────────── */
+@media (max-width: 1080px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 860px) {
+  .app-shell {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+  }
+  .sidebar-nav {
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 12px 16px;
+  }
+  .nav-link {
+    white-space: nowrap;
+  }
+  .top-header, .form-content, footer {
+    padding: 20px;
+  }
+  .form-row, .tier-fields-grid {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ═══ 1. SIDEBAR NAVIGATION ═══════════════════════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <a href="kagemaya-landing-page-visual-anchor.html">
+          <b>KAGEMAYA</b><i>影幻</i>
+        </a>
+      </div>
+      <span class="portal-label">Portal Organizer</span>
+    </div>
+
+    <nav class="sidebar-nav" aria-label="Menu Organizer">
+      <a href="kagemaya-organizer-dashboard.html" class="nav-link">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <!-- Active item: Event Saya / Buat Event -->
+      <a href="kagemaya-organizer-create-event.html" class="nav-link active">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Event Saya
+      </a>
+      <a href="kagemaya-organizer-transactions.html" class="nav-link">
+        <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        Transaksi
+      </a>
+      <a href="kagemaya-organizer-attendees.html" class="nav-link">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Daftar Hadir
+      </a>
+      <a href="kagemaya-organizer-vouchers.html" class="nav-link">
+        <svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M12 8v12"/><path d="M3 12h18"/></svg>
+        Voucher
+      </a>
+      <a href="kagemaya-organizer-profile.html" class="nav-link">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Profil
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="kagemaya-login.html" class="nav-link logout">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </a>
+    </div>
+  </aside>
+
+  <!-- ═══ MAIN PANEL ═══════════════════════════════════════════ -->
+  <div class="main-panel">
+    
+    <!-- TOP HEADER -->
+    <header class="top-header">
+      <div class="header-left">
+        <a href="kagemaya-organizer-dashboard.html" class="back-link">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>
+          Kembali ke Dashboard
+        </a>
+        <div class="header-title">
+          <h1>Buat Event Sinematik Baru</h1>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button type="button" class="btn btn-line" onclick="saveDraft()">Simpan Draf</button>
+        <button type="button" class="btn btn-red" onclick="publishEvent()">Publikasikan Event</button>
+      </div>
+    </header>
+
+    <!-- FORM BODY CONTENT -->
+    <main class="form-content">
+      <div class="form-grid">
+
+        <!-- LEFT COLUMN: MAIN FORM CARDS -->
+        <div class="form-main-col">
+
+          <!-- 1. INFORMASI DASAR EVENT -->
+          <section class="form-card">
+            <div class="form-card-head">
+              <h2>
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="var(--gold)" fill="none" stroke-width="1.8"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/></svg>
+                1. Informasi Dasar Event
+              </h2>
+            </div>
+            <div class="form-card-body">
+              <div class="form-group">
+                <label for="eventTitle" class="form-label">Judul Event Sinematik <span class="req">*</span></label>
+                <input 
+                  type="text" 
+                  id="eventTitle" 
+                  class="kage-input" 
+                  placeholder="mis. Yūgen: Film 4D Kolaborasi Tokyo–Jakarta" 
+                  value="Yūgen: Film 4D Kolaborasi Tokyo–Jakarta"
+                  oninput="updateSummary()">
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="eventCategory" class="form-label">Kategori <span class="req">*</span></label>
+                  <select id="eventCategory" class="kage-select" onchange="updateSummary()">
+                    <option value="Film 4D" selected>Film 4D (Multi-sensory Screening)</option>
+                    <option value="Workshop Kreatif">Workshop Kreatif</option>
+                    <option value="Talkshow Budaya">Talkshow Budaya</option>
+                    <option value="Anime & Manga">Anime &amp; Manga Exhibition</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="eventCity" class="form-label">Kota Pelaksanaan <span class="req">*</span></label>
+                  <select id="eventCity" class="kage-select" onchange="updateSummary()">
+                    <option value="Jakarta Selatan" selected>Jakarta Selatan</option>
+                    <option value="Jakarta Pusat">Jakarta Pusat</option>
+                    <option value="Bandung">Bandung</option>
+                    <option value="Surabaya">Surabaya</option>
+                    <option value="Yogyakarta">Yogyakarta</option>
+                    <option value="Tokyo (Virtual Live)">Tokyo (Virtual Live)</option>
+                  </select>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="eventLocation" class="form-label">Lokasi / Detail Venue <span class="req">*</span></label>
+                <input 
+                  type="text" 
+                  id="eventLocation" 
+                  class="kage-input" 
+                  placeholder="Nama gedung, teater, studio, dan alamat lengkap" 
+                  value="Teater Salihara & Dome 4D Experience, Jl. Salihara No. 16, Pasar Minggu">
+              </div>
+
+              <div class="form-group">
+                <label for="eventDesc" class="form-label">Sinopsis / Deskripsi Sinematik <span class="req">*</span></label>
+                <textarea 
+                  id="eventDesc" 
+                  class="kage-textarea" 
+                  placeholder="Ceritakan esensi dan atmosfer event ini kepada calon penonton...">Eksplorasi sensorik 4 dimensi pertama yang mempertemukan sutradara muda Tokyo dan Jakarta dalam panggung proyeksi 360 derajat disertai simulator gerak dan aroma kabut malam Kyoto.</textarea>
+              </div>
+            </div>
+          </section>
+
+          <!-- 2. POSTER BANNER SINEMATIK (16:9) -->
+          <section class="form-card">
+            <div class="form-card-head">
+              <h2>
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="var(--gold)" fill="none" stroke-width="1.8"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                2. Banner Poster Sinematik (16:9)
+              </h2>
+              <span style="font-size:12px;color:var(--text3)">Maksimal 5 MB (JPG, PNG, WebP)</span>
+            </div>
+            <div class="form-card-body">
+              <div class="banner-dropzone has-image" id="bannerZone" onclick="simulateUpload()">
+                <!-- Simulated Image Background -->
+                <svg class="banner-preview-img" viewBox="0 0 800 450" preserveAspectRatio="xMidYMid slice">
+                  <defs>
+                    <linearGradient id="pGrad" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stop-color="#1C1C22"/>
+                      <stop offset="50%" stop-color="#C62828" stop-opacity="0.35"/>
+                      <stop offset="100%" stop-color="#0B0B0D"/>
+                    </linearGradient>
+                  </defs>
+                  <rect width="100%" height="100%" fill="url(#pGrad)"/>
+                  <circle cx="400" cy="225" r="140" fill="#D6A85F" opacity="0.12"/>
+                  <text x="400" y="235" text-anchor="middle" font-family="'Noto Serif JP', serif" font-size="28" fill="#F4F0E8" letter-spacing="4">影 — YŪGEN 4D</text>
+                </svg>
+                <div class="banner-overlay-change">
+                  Klik untuk mengganti gambar poster (16:9)
+                </div>
+              </div>
+              <div class="form-hint">Rekomendasi rasio poster adalah 16:9 (1920×1080 px) untuk tampilan teater optimal pada desktop dan mobile.</div>
+            </div>
+          </section>
+
+          <!-- 3. JADWAL PELAKSANAAN -->
+          <section class="form-card">
+            <div class="form-card-head">
+              <h2>
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="var(--gold)" fill="none" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                3. Jadwal &amp; Waktu
+              </h2>
+            </div>
+            <div class="form-card-body">
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="startDate" class="form-label">Tanggal Mulai <span class="req">*</span></label>
+                  <input type="datetime-local" id="startDate" class="kage-input" value="2026-11-14T19:30">
+                </div>
+                <div class="form-group">
+                  <label for="endDate" class="form-label">Tanggal Selesai <span class="req">*</span></label>
+                  <input type="datetime-local" id="endDate" class="kage-input" value="2026-11-14T22:00">
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- 4. MANAJEMEN TIER TIKET (Dynamic Invariant) -->
+          <section class="form-card">
+            <div class="form-card-head">
+              <h2>
+                <svg viewBox="0 0 24 24" width="18" height="18" stroke="var(--gold)" fill="none" stroke-width="1.8"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2"/></svg>
+                4. Jenis &amp; Kuota Tiket (Tier Management)
+              </h2>
+              <button type="button" class="btn btn-line btn-sm" onclick="addTicketTier()">
+                <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                Tambah Jenis Tiket
+              </button>
+            </div>
+            <div class="form-card-body">
+              <div id="tierList">
+
+                <!-- TIER 1 -->
+                <div class="tier-item" id="tier-1">
+                  <div class="tier-head">
+                    <input type="text" class="tier-title-input" value="Regular 4D Experience" placeholder="Nama Jenis Tiket" oninput="calculateTotalSeats()">
+                    <button type="button" class="tier-remove-btn" onclick="removeTier('tier-1')" aria-label="Hapus tier">
+                      <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                  </div>
+                  <div class="tier-fields-grid">
+                    <div>
+                      <label class="form-label" style="font-size:11.5px;color:var(--text3)">Harga Satuan (IDR)</label>
+                      <input type="number" class="kage-input tier-price" value="185000" step="5000" min="0" oninput="calculateTotalSeats()">
+                    </div>
+                    <div>
+                      <label class="form-label" style="font-size:11.5px;color:var(--text3)">Kuota Tiket</label>
+                      <input type="number" class="kage-input tier-quota" value="120" min="1" oninput="calculateTotalSeats()">
+                    </div>
+                    <div>
+                      <label class="form-label" style="font-size:11.5px;color:var(--text3)">Benefit Ringkas</label>
+                      <input type="text" class="kage-input" value="Kursi standar dome 4D + booklet sinema">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- TIER 2 -->
+                <div class="tier-item" id="tier-2">
+                  <div class="tier-head">
+                    <input type="text" class="tier-title-input" value="VIP Curator Experience" placeholder="Nama Jenis Tiket" oninput="calculateTotalSeats()">
+                    <button type="button" class="tier-remove-btn" onclick="removeTier('tier-2')" aria-label="Hapus tier">
+                      <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </button>
+                  </div>
+                  <div class="tier-fields-grid">
+                    <div>
+                      <label class="form-label" style="font-size:11.5px;color:var(--text3)">Harga Satuan (IDR)</label>
+                      <input type="number" class="kage-input tier-price" value="320000" step="5000" min="0" oninput="calculateTotalSeats()">
+                    </div>
+                    <div>
+                      <label class="form-label" style="font-size:11.5px;color:var(--text3)">Kuota Tiket</label>
+                      <input type="number" class="kage-input tier-quota" value="40" min="1" oninput="calculateTotalSeats()">
+                    </div>
+                    <div>
+                      <label class="form-label" style="font-size:11.5px;color:var(--text3)">Benefit Ringkas</label>
+                      <input type="text" class="kage-input" value="Baris depan + Q&amp;A privat bersama sutradara Tokyo">
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+
+              <!-- INVARIANT BANNER -->
+              <div class="seats-invariant-box">
+                <div>
+                  <b style="color:var(--text)">Invarian Sistem: Total Kursi Terbuka</b>
+                  <div style="color:var(--text3);font-size:12px;margin-top:2px">
+                    <code>EVENTS.available_seats</code> otomatis dihitung dari akumulasi kuota tier tiket.
+                  </div>
+                </div>
+                <div class="seats-count-badge" id="totalSeatsDisplay">160 Kursi</div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- RIGHT COLUMN: SIDEBAR SUMMARY WIDGET -->
+        <aside class="form-side-col">
+          <div class="summary-widget">
+            <h3>Ringkasan Publikasi</h3>
+            
+            <div class="sum-row">
+              <span>Status Event:</span>
+              <span class="status-pill">Draf Tersimpan</span>
+            </div>
+            <div class="sum-row">
+              <span>Organizer:</span>
+              <b>Aozora Collective</b>
+            </div>
+            <div class="sum-row">
+              <span>Kategori:</span>
+              <b id="sumCategory">Film 4D</b>
+            </div>
+            <div class="sum-row">
+              <span>Kota:</span>
+              <b id="sumCity">Jakarta Selatan</b>
+            </div>
+            <div class="sum-row">
+              <span>Total Kursi:</span>
+              <b id="sumSeats">160 Kursi</b>
+            </div>
+            <div class="sum-row">
+              <span>Tier Tiket:</span>
+              <b id="sumTiers">2 Jenis</b>
+            </div>
+            <div class="sum-row">
+              <span>Mulai Dari:</span>
+              <b id="sumMinPrice" style="color:var(--gold)">Rp 185.000</b>
+            </div>
+
+            <div style="margin-top: 24px; display: flex; flex-direction: column; gap: 10px;">
+              <button type="button" class="btn btn-red" style="width: 100%;" onclick="publishEvent()">
+                Publikasikan Event
+              </button>
+              <button type="button" class="btn btn-line" style="width: 100%;" onclick="saveDraft()">
+                Simpan Sebagai Draf
+              </button>
+            </div>
+          </div>
+        </aside>
+
+      </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+      <div>&copy; 2026 Kagemaya.id — Panel Penyelenggara Event Budaya Indo-Jepang.</div>
+      <div style="font-family: var(--serif); color: var(--gold);">影と幻 · KAGE TO MAYA</div>
+    </footer>
+
+  </div>
+
+</div>
+
+<!-- INTERACTIVE SCRIPTS -->
+<script>
+let tierCounter = 2;
+
+function addTicketTier() {
+  tierCounter++;
+  const list = document.getElementById('tierList');
+  const div = document.createElement('div');
+  div.className = 'tier-item';
+  div.id = `tier-${tierCounter}`;
+  div.innerHTML = `
+    <div class="tier-head">
+      <input type="text" class="tier-title-input" value="Early Bird Tier ${tierCounter}" placeholder="Nama Jenis Tiket" oninput="calculateTotalSeats()">
+      <button type="button" class="tier-remove-btn" onclick="removeTier('tier-${tierCounter}')" aria-label="Hapus tier">
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="tier-fields-grid">
+      <div>
+        <label class="form-label" style="font-size:11.5px;color:var(--text3)">Harga Satuan (IDR)</label>
+        <input type="number" class="kage-input tier-price" value="150000" step="5000" min="0" oninput="calculateTotalSeats()">
+      </div>
+      <div>
+        <label class="form-label" style="font-size:11.5px;color:var(--text3)">Kuota Tiket</label>
+        <input type="number" class="kage-input tier-quota" value="30" min="1" oninput="calculateTotalSeats()">
+      </div>
+      <div>
+        <label class="form-label" style="font-size:11.5px;color:var(--text3)">Benefit Ringkas</label>
+        <input type="text" class="kage-input" value="Akses masuk umum dome 4D">
+      </div>
+    </div>
+  `;
+  list.appendChild(div);
+  calculateTotalSeats();
+}
+
+function removeTier(id) {
+  const item = document.getElementById(id);
+  if (item) {
+    item.remove();
+    calculateTotalSeats();
+  }
+}
+
+function calculateTotalSeats() {
+  const quotas = document.querySelectorAll('.tier-quota');
+  const prices = document.querySelectorAll('.tier-price');
+  let totalSeats = 0;
+  let minPrice = Infinity;
+
+  quotas.forEach(q => {
+    totalSeats += parseInt(q.value) || 0;
+  });
+
+  prices.forEach(p => {
+    const val = parseInt(p.value) || 0;
+    if (val < minPrice) minPrice = val;
+  });
+
+  if (minPrice === Infinity) minPrice = 0;
+
+  document.getElementById('totalSeatsDisplay').textContent = `${totalSeats} Kursi`;
+  document.getElementById('sumSeats').textContent = `${totalSeats} Kursi`;
+  document.getElementById('sumTiers').textContent = `${quotas.length} Jenis`;
+  document.getElementById('sumMinPrice').textContent = `Rp ${minPrice.toLocaleString('id-ID')}`;
+}
+
+function updateSummary() {
+  document.getElementById('sumCategory').textContent = document.getElementById('eventCategory').value;
+  document.getElementById('sumCity').textContent = document.getElementById('eventCity').value;
+}
+
+function simulateUpload() {
+  alert('Simulasi: File poster sinematik berhasil dipilih dan diverifikasi.');
+}
+
+function saveDraft() {
+  alert('Draf event berhasil disimpan di akun Organizer Anda.');
+}
+
+function publishEvent() {
+  alert('Selamat! Event berhasil dipublikasikan ke panggung Kagemaya dan dapat dipesan oleh pengunjung.');
+  window.location.href = 'kagemaya-organizer-dashboard.html';
+}
+
+window.addEventListener('DOMContentLoaded', calculateTotalSeats);
+</script>
+</body>
+</html>

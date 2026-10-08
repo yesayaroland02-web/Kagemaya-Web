@@ -109,6 +109,10 @@ model Event {
   event_discussions EventDiscussion[]
   reviews           Review[]
   transactions      Transaction[]
+
+  @@index([city])
+  @@index([start_date])
+  @@index([category_id])
 }
 
 model TicketType {

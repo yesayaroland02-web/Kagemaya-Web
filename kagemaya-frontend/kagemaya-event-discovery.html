@@ -231,47 +231,53 @@ let searchTimer = null;
 // ==========================================
 // 1. LOGIKA RENDER USERNAV (STATUS LOGIN)
 // ==========================================
+function escapeHtml(text) {
+  if (!text) return '';
+  return String(text).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]);
+}
+
 function renderNavbarAuth() {
   const authNav = document.getElementById('authNav');
   if (!authNav) return;
 
-  // Gunakan key yang sama dengan halaman Login dan Landing
   const token = localStorage.getItem('kagemaya_token');
   const userJson = localStorage.getItem('kagemaya_user');
 
-  if (token && userJson) {
-    try {
-      const user = JSON.parse(userJson);
-
-      const name = user.name || user.username || user.email || 'User';
-      const initial = name.charAt(0).toUpperCase();
-
-      authNav.innerHTML = `
-        <div class="user-profile">
-          <div class="user-avatar">${initial}</div>
-          <span class="user-name">${escapeHtml(name)}</span>
-
-          <a
-            href="kagemaya-pesananku.html"
-            class="btn btn-line btn-sm"
-          >
-            Pesananku
-          </a>
-
-          <button
-            onclick="handleLogout()"
-            class="btn-logout"
-          >
-            Keluar
-          </button>
-        </div>
-      `;
-    } catch (e) {
-      console.error('Error parsing user data:', e);
-
-      localStorage.removeItem('kagemaya_user');
-      renderGuestNav(authNav);
+  if (token) {
+    let name = 'User';
+    if (userJson) {
+      try {
+        const user = JSON.parse(userJson);
+        name = user.name || user.username || user.email || 'User';
+      } catch (e) {
+        console.error('Error parsing user data:', e);
+      }
     }
+
+    const initial = name.charAt(0).toUpperCase();
+
+    authNav.innerHTML = `
+      <div class="user-profile">
+        <a href="kagemaya-user-profile.html" style="display:flex; align-items:center; gap:8px; text-decoration:none;" title="Pengaturan Profil">
+          <div class="user-avatar">${initial}</div>
+          <span class="user-name" style="color:var(--gold); font-weight:500;">${escapeHtml(name)}</span>
+        </a>
+
+        <a
+          href="kagemaya-checkout.html"
+          class="btn btn-line btn-sm"
+        >
+          Pesananku
+        </a>
+
+        <button
+          onclick="handleLogout()"
+          class="btn-logout"
+        >
+          Keluar
+        </button>
+      </div>
+    `;
   } else {
     renderGuestNav(authNav);
   }
@@ -316,10 +322,7 @@ function getStartingPrice(event) {
   return directPrice !== undefined ? Number(directPrice) : 0;
 }
 
-function escapeHtml(text) {
-  if (!text) return '';
-  return text.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]);
-}
+
 
 async function loadEvents(page = 1) {
   currentPage = page;

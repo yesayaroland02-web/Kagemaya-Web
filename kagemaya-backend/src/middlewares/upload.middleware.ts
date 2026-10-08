@@ -1,43 +1,53 @@
-import multer, { FileFilterCallback } from 'multer';
+import multer from 'multer';
 import path from 'path';
-import { Request } from 'express';
+import fs from 'fs';
 
-// Storage configuration
+const uploadDir = path.join(process.cwd(), 'uploads');
+
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 const storage = multer.diskStorage({
-  destination: (
-    _req: Request,
-    _file: Express.Multer.File,
-    cb: (error: Error | null, destination: string) => void
-  ) => {
-    cb(null, 'uploads/');
+  destination: (_req, _file, cb) => {
+    cb(null, uploadDir);
   },
-  filename: (
-    _req: Request,
-    file: Express.Multer.File,
-    cb: (error: Error | null, filename: string) => void
-  ) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    cb(null, `${file.fieldname}-${uniqueSuffix}${path.extname(file.originalname)}`);
+
+  filename: (_req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+
+    const filename = `${Date.now()}-${Math.round(
+      Math.random() * 1e9
+    )}${ext}`;
+
+    cb(null, filename);
   },
 });
 
-// File filter (Hanya mengizinkan file gambar)
-const fileFilter = (
-  _req: Request,
-  file: Express.Multer.File,
-  cb: FileFilterCallback
+const fileFilter: multer.Options['fileFilter'] = (
+  _req,
+  file,
+  cb
 ) => {
-  const allowedMimeTypes = ['image/jpeg', 'image/png', 'image/jpg', 'image/webp'];
+  const allowedMimeTypes = [
+    'image/jpeg',
+    'image/png',
+    'image/webp',
+  ];
 
-  if (allowedMimeTypes.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(new Error('Format file tidak didukung. Harap unggah gambar (JPG, PNG, WEBP).'));
+  if (!allowedMimeTypes.includes(file.mimetype)) {
+    return cb(
+      new Error('Format gambar harus JPG, PNG, atau WEBP.')
+    );
   }
+
+  cb(null, true);
 };
 
 export const uploadSingleImage = multer({
   storage,
-  limits: { fileSize: 2 * 1024 * 1024 }, // Maksimal 2MB
   fileFilter,
+  limits: {
+    fileSize: 2 * 1024 * 1024,
+  },
 });

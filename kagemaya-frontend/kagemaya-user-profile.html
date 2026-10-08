@@ -1,0 +1,3115 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+<meta charset="utf-8">
+
+<meta
+  name="viewport"
+  content="width=device-width, initial-scale=1, viewport-fit=cover"
+>
+
+<title>Pengaturan Profil — Kagemaya</title>
+
+<link
+  rel="preconnect"
+  href="https://fonts.googleapis.com"
+>
+
+<link
+  rel="preconnect"
+  href="https://fonts.gstatic.com"
+  crossorigin
+>
+
+<link
+  href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap"
+  rel="stylesheet"
+>
+
+<link
+  rel="stylesheet"
+  href="kagemaya-tokens.css"
+>
+
+<style>
+
+/* =========================================================
+   DESIGN TOKENS
+========================================================= */
+
+:root {
+
+  color-scheme: dark;
+
+  --bg: #0B0B0D;
+  --surface: #121216;
+  --elev: #1C1C22;
+
+  --red: #C62828;
+  --red-hi: #E5484D;
+
+  --gold: #D6A85F;
+
+  --text: #F4F0E8;
+  --text2: #B8B5B0;
+  --text3: #85837f;
+
+  --mist: #B8B5B0;
+
+  --border: #292930;
+
+  --serif:
+    'Noto Serif JP',
+    'Hiragino Mincho ProN',
+    'Yu Mincho',
+    Georgia,
+    serif;
+
+  --sans:
+    'Inter',
+    'Noto Sans',
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    sans-serif;
+
+  --r: 2px;
+
+  box-sizing: border-box;
+
+  padding-top:
+    env(safe-area-inset-top, 0px);
+
+  padding-bottom:
+    env(safe-area-inset-bottom, 0px);
+}
+
+html {
+
+  scroll-padding-top: 84px;
+
+  background: var(--bg);
+
+  scroll-behavior: smooth;
+}
+
+*,
+*::before,
+*::after {
+
+  box-sizing: inherit;
+}
+
+body {
+
+  margin: 0;
+
+  background: var(--bg);
+
+  color: var(--text);
+
+  font-family: var(--sans);
+
+  font-size: 16px;
+
+  line-height: 1.6;
+
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+
+  color: inherit;
+
+  text-decoration: none;
+}
+
+button,
+input {
+
+  font-family: inherit;
+}
+
+button {
+
+  cursor: pointer;
+}
+
+button:disabled {
+
+  opacity: .6;
+
+  cursor: not-allowed;
+}
+
+:focus-visible {
+
+  outline: 2px solid var(--gold);
+
+  outline-offset: 3px;
+}
+
+svg {
+
+  display: block;
+}
+
+.wrap {
+
+  max-width: 1296px;
+
+  margin: 0 auto;
+
+  padding: 0 32px;
+}
+
+
+/* =========================================================
+   NAVBAR
+========================================================= */
+
+.nav {
+
+  position: fixed;
+
+  top: 0;
+  left: 0;
+  right: 0;
+
+  z-index: 100;
+
+  padding-top:
+    env(safe-area-inset-top, 0px);
+
+  background:
+    rgba(11, 11, 13, .9);
+
+  border-bottom:
+    1px solid var(--border);
+
+  backdrop-filter:
+    blur(10px);
+
+  -webkit-backdrop-filter:
+    blur(10px);
+}
+
+.nav .wrap {
+
+  display: flex;
+
+  align-items: center;
+
+  height: 84px;
+
+  gap: 0;
+}
+
+.logo {
+
+  display: flex;
+
+  align-items: baseline;
+
+  gap: 12px;
+
+  flex: none;
+
+  margin-right: 40px;
+}
+
+.logo b {
+
+  font-family: var(--serif);
+
+  font-weight: 500;
+
+  font-size: 21px;
+
+  letter-spacing: .34em;
+
+  margin-right: -.34em;
+}
+
+.logo i {
+
+  font-family: var(--serif);
+
+  font-style: normal;
+
+  color: var(--red-hi);
+
+  font-size: 17px;
+
+  font-weight: 400;
+}
+
+.nav nav {
+
+  flex: 1;
+
+  display: flex;
+
+  justify-content: center;
+}
+
+.nav ul {
+
+  display: flex;
+
+  gap: 36px;
+
+  list-style: none;
+
+  margin: 0;
+
+  padding: 0;
+}
+
+.nav ul a {
+
+  font-size: 14px;
+
+  color: var(--text2);
+
+  transition: color .2s;
+}
+
+.nav ul a:hover {
+
+  color: var(--text);
+}
+
+.nav-r {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 18px;
+
+  flex: none;
+}
+
+.nav-user-name {
+
+  font-size: 14px;
+
+  color: var(--gold);
+
+  white-space: nowrap;
+}
+
+.btn {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  font:
+    500 14px/1 var(--sans);
+
+  padding: 12px 24px;
+
+  border-radius: var(--r);
+
+  border:
+    1px solid transparent;
+
+  cursor: pointer;
+
+  transition: all .2s;
+
+  letter-spacing: .01em;
+
+  gap: 8px;
+}
+
+.btn-red {
+
+  background: var(--red);
+
+  color: var(--text);
+}
+
+.btn-red:hover {
+
+  background: var(--red-hi);
+}
+
+.btn-line {
+
+  border-color:
+    rgba(244, 240, 232, .26);
+
+  color: var(--text);
+
+  background: transparent;
+}
+
+.btn-line:hover {
+
+  border-color: var(--text);
+
+  background:
+    rgba(244, 240, 232, .03);
+}
+
+.btn-ghost-danger {
+
+  border-color:
+    rgba(229, 72, 77, .3);
+
+  color: var(--red-hi);
+
+  background: transparent;
+}
+
+.btn-ghost-danger:hover {
+
+  background:
+    rgba(229, 72, 77, .08);
+
+  border-color:
+    var(--red-hi);
+}
+
+
+/* =========================================================
+   PROFILE CONTAINER
+========================================================= */
+
+.profile-page {
+
+  padding-top:
+    calc(84px + 52px);
+
+  padding-bottom: 120px;
+}
+
+.profile-card-wrapper {
+
+  max-width: 820px;
+
+  margin: 0 auto;
+}
+
+.profile-crumb {
+
+  font-size: 13px;
+
+  color: var(--text2);
+
+  margin-bottom: 24px;
+
+  display: flex;
+
+  gap: 8px;
+
+  align-items: center;
+}
+
+.profile-card {
+
+  background: var(--surface);
+
+  border:
+    1px solid var(--border);
+
+  border-radius: var(--r);
+
+  overflow: hidden;
+
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, .4);
+
+  margin-bottom: 32px;
+}
+
+
+/* =========================================================
+   PROFILE HEADER
+========================================================= */
+
+.profile-header {
+
+  padding: 36px;
+
+  border-bottom:
+    1px solid var(--border);
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 24px;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(28, 28, 34, .6) 0%,
+      rgba(18, 18, 22, 1) 100%
+    );
+}
+
+.header-left {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 24px;
+}
+
+.user-avatar-circle {
+
+  width: 88px;
+
+  height: 88px;
+
+  border-radius: 50%;
+
+  background: var(--elev);
+
+  border:
+    2px solid var(--gold);
+
+  overflow: hidden;
+
+  display: grid;
+
+  place-items: center;
+
+  font-family: var(--serif);
+
+  font-size: 32px;
+
+  color: var(--gold);
+
+  flex: none;
+
+  box-shadow:
+    0 6px 20px rgba(0, 0, 0, .5);
+
+  position: relative;
+}
+
+.user-avatar-circle img {
+
+  width: 100%;
+
+  height: 100%;
+
+  object-fit: cover;
+}
+
+.header-title-box h1 {
+
+  font-family: var(--serif);
+
+  font-size: 26px;
+
+  font-weight: 500;
+
+  margin: 0 0 6px;
+
+  color: var(--text);
+}
+
+.user-tier-tag {
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  font-size: 11.5px;
+
+  letter-spacing: .08em;
+
+  text-transform: uppercase;
+
+  color: var(--gold);
+
+  background:
+    rgba(214, 168, 95, .1);
+
+  border:
+    1px solid rgba(214, 168, 95, .3);
+
+  padding: 3px 10px;
+
+  border-radius: 12px;
+}
+
+
+/* =========================================================
+   SETTINGS
+========================================================= */
+
+.settings-section {
+
+  padding: 36px;
+
+  border-bottom:
+    1px solid var(--border);
+}
+
+.settings-section:last-child {
+
+  border-bottom: none;
+}
+
+.settings-section h2 {
+
+  font-family: var(--serif);
+
+  font-size: 20px;
+
+  font-weight: 400;
+
+  margin: 0 0 8px;
+
+  color: var(--text);
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+}
+
+.settings-section p.sec-desc {
+
+  font-size: 13.5px;
+
+  color: var(--text2);
+
+  margin: 0 0 24px;
+}
+
+.form-group {
+
+  margin-bottom: 20px;
+}
+
+.form-label {
+
+  display: block;
+
+  font-size: 13px;
+
+  color: var(--mist);
+
+  margin-bottom: 8px;
+}
+
+.kage-input {
+
+  width: 100%;
+
+  background: var(--bg);
+
+  border:
+    1px solid var(--border);
+
+  border-radius: var(--r);
+
+  color: var(--text);
+
+  font:
+    400 14px var(--sans);
+
+  padding: 12px 14px;
+
+  outline: none;
+
+  transition:
+    border-color .2s;
+}
+
+.kage-input:focus {
+
+  border-color: var(--gold);
+}
+
+.kage-input:disabled {
+
+  background:
+    rgba(255, 255, 255, 0.03);
+
+  color: var(--text3);
+
+  cursor: not-allowed;
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+.toast-msg {
+
+  display: none;
+
+  padding: 12px 16px;
+
+  border-radius: var(--r);
+
+  font-size: 14px;
+
+  margin-bottom: 20px;
+}
+
+.toast-msg.success {
+
+  display: block;
+
+  background:
+    rgba(76, 175, 125, 0.15);
+
+  border:
+    1px solid #4CAF7D;
+
+  color: #4CAF7D;
+}
+
+.toast-msg.error {
+
+  display: block;
+
+  background:
+    rgba(224, 82, 82, 0.15);
+
+  border:
+    1px solid #E05252;
+
+  color: #E05252;
+}
+
+
+/* =========================================================
+   REWARDS
+========================================================= */
+
+.rewards-section {
+
+  padding: 36px;
+
+  border-top:
+    1px solid var(--border);
+}
+
+.rewards-section h2 {
+
+  font-family: var(--serif);
+
+  font-size: 20px;
+
+  font-weight: 400;
+
+  margin: 0 0 8px;
+
+  color: var(--text);
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+}
+
+.rewards-desc {
+
+  font-size: 13.5px;
+
+  color: var(--text2);
+
+  margin: 0 0 24px;
+}
+
+
+/* =========================================================
+   POINT CARD
+========================================================= */
+
+.points-card {
+
+  background:
+    linear-gradient(
+      135deg,
+      rgba(214, 168, 95, .16),
+      rgba(18, 18, 22, 1)
+    );
+
+  border:
+    1px solid rgba(214, 168, 95, .35);
+
+  border-radius: var(--r);
+
+  padding: 28px;
+
+  margin-bottom: 28px;
+
+  position: relative;
+
+  overflow: hidden;
+}
+
+.points-card::after {
+
+  content: "影";
+
+  position: absolute;
+
+  right: 24px;
+
+  top: 8px;
+
+  font-family: var(--serif);
+
+  font-size: 90px;
+
+  color:
+    rgba(214, 168, 95, .06);
+}
+
+.points-label {
+
+  font-size: 12px;
+
+  color: var(--text2);
+
+  text-transform: uppercase;
+
+  letter-spacing: .12em;
+
+  margin-bottom: 8px;
+}
+
+.points-balance {
+
+  font-family: var(--serif);
+
+  font-size: 38px;
+
+  color: var(--gold);
+
+  font-weight: 500;
+
+  line-height: 1.2;
+}
+
+.points-unit {
+
+  font-family: var(--sans);
+
+  font-size: 14px;
+
+  color: var(--text2);
+
+  margin-left: 5px;
+}
+
+
+/* =========================================================
+   REWARDS SUBTITLE
+========================================================= */
+
+.rewards-subtitle {
+
+  font-family: var(--serif);
+
+  font-size: 17px;
+
+  font-weight: 400;
+
+  margin: 0 0 14px;
+}
+
+
+/* =========================================================
+   POINT HISTORY
+========================================================= */
+
+.points-history {
+
+  display: flex;
+
+  flex-direction: column;
+
+  border:
+    1px solid var(--border);
+
+  border-radius: var(--r);
+
+  overflow: hidden;
+
+  margin-bottom: 32px;
+}
+
+.point-history-item {
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 16px 18px;
+
+  background: var(--surface);
+
+  border-bottom:
+    1px solid var(--border);
+}
+
+.point-history-item:last-child {
+
+  border-bottom: none;
+}
+
+.point-history-left {
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 14px;
+
+  min-width: 0;
+}
+
+.point-type-icon {
+
+  width: 38px;
+
+  height: 38px;
+
+  border-radius: 50%;
+
+  display: grid;
+
+  place-items: center;
+
+  flex: none;
+
+  font-weight: 600;
+
+  font-size: 16px;
+}
+
+.point-type-icon.earn,
+.point-type-icon.refund {
+
+  color: #4CAF7D;
+
+  background:
+    rgba(76, 175, 125, .12);
+}
+
+.point-type-icon.spend,
+.point-type-icon.expire {
+
+  color: var(--red-hi);
+
+  background:
+    rgba(229, 72, 77, .12);
+}
+
+.point-history-info {
+
+  min-width: 0;
+}
+
+.point-history-type {
+
+  font-size: 14px;
+
+  color: var(--text);
+
+  font-weight: 500;
+}
+
+.point-history-date {
+
+  font-size: 12px;
+
+  color: var(--text3);
+
+  margin-top: 2px;
+}
+
+.point-history-amount {
+
+  font-size: 14px;
+
+  font-weight: 600;
+
+  white-space: nowrap;
+}
+
+.point-history-amount.positive {
+
+  color: #4CAF7D;
+}
+
+.point-history-amount.negative {
+
+  color: var(--red-hi);
+}
+
+
+/* =========================================================
+   COUPON
+========================================================= */
+
+.coupon-list {
+
+  display: grid;
+
+  gap: 14px;
+}
+
+.coupon-card {
+
+  position: relative;
+
+  display: flex;
+
+  align-items: center;
+
+  justify-content: space-between;
+
+  gap: 20px;
+
+  padding: 20px;
+
+  background: var(--surface);
+
+  border:
+    1px solid var(--border);
+
+  border-left:
+    3px solid var(--red-hi);
+
+  border-radius: var(--r);
+}
+
+.coupon-info h4 {
+
+  margin: 0 0 5px;
+
+  font-family: var(--serif);
+
+  font-size: 17px;
+
+  font-weight: 400;
+}
+
+.coupon-discount {
+
+  color: var(--gold);
+
+  font-size: 20px;
+
+  font-weight: 600;
+}
+
+.coupon-expiry {
+
+  margin-top: 4px;
+
+  font-size: 12px;
+
+  color: var(--text3);
+}
+
+.coupon-status {
+
+  padding: 5px 10px;
+
+  border:
+    1px solid rgba(76, 175, 125, .35);
+
+  background:
+    rgba(76, 175, 125, .08);
+
+  color: #4CAF7D;
+
+  font-size: 11px;
+
+  border-radius: 12px;
+
+  white-space: nowrap;
+}
+
+
+/* =========================================================
+   EMPTY / LOADING
+========================================================= */
+
+.empty-rewards {
+
+  padding: 28px 20px;
+
+  text-align: center;
+
+  color: var(--text3);
+
+  font-size: 13px;
+
+  border:
+    1px dashed var(--border);
+
+  border-radius: var(--r);
+}
+
+.rewards-loading {
+
+  color: var(--text3);
+
+  font-size: 13px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 760px) {
+
+  .wrap {
+
+    padding: 0 20px;
+  }
+
+  .nav ul {
+
+    display: none;
+  }
+
+  .profile-header,
+  .settings-section,
+  .rewards-section {
+
+    padding: 24px 20px;
+  }
+
+  .points-card {
+
+    padding: 22px;
+  }
+
+  .points-balance {
+
+    font-size: 32px;
+  }
+
+  .point-history-item {
+
+    align-items: flex-start;
+  }
+
+  .coupon-card {
+
+    flex-direction: column;
+
+    align-items: flex-start;
+  }
+}
+
+</style>
+
+</head>
+
+<body>
+
+
+<!-- =======================================================
+     NAVBAR
+======================================================== -->
+
+<header class="nav">
+
+  <div class="wrap">
+
+    <a
+      class="logo"
+      href="kagemaya-landing-page-visual-anchor.html"
+    >
+      <b>KAGEMAYA</b>
+      <i>影幻</i>
+    </a>
+
+    <nav>
+
+      <ul>
+
+        <li>
+          <a href="kagemaya-event-discovery.html">
+            Event
+          </a>
+        </li>
+
+        <li>
+          <a href="kagemaya-landing-page-visual-anchor.html#kategori">
+            Kategori
+          </a>
+        </li>
+
+      </ul>
+
+    </nav>
+
+    <div class="nav-r">
+
+      <span
+        id="nav-user-name"
+        class="nav-user-name"
+      >
+        Memuat...
+      </span>
+
+      <button
+        type="button"
+        class="btn btn-ghost-danger"
+        id="nav-btn-logout"
+      >
+        Logout
+      </button>
+
+    </div>
+
+  </div>
+
+</header>
+
+
+<!-- =======================================================
+     MAIN
+======================================================== -->
+
+<main class="profile-page">
+
+  <div class="wrap">
+
+    <div class="profile-card-wrapper">
+
+
+      <!-- BREADCRUMB -->
+
+      <nav class="profile-crumb">
+
+        <a
+          href="kagemaya-landing-page-visual-anchor.html"
+        >
+          Beranda
+        </a>
+
+        <span>/</span>
+
+        <span>
+          Pengaturan Akun & Profil
+        </span>
+
+      </nav>
+
+
+      <!-- TOAST -->
+
+      <div
+        id="status-toast"
+        class="toast-msg"
+      ></div>
+
+
+      <!-- =================================================
+           PROFILE CARD
+      ================================================= -->
+
+      <article class="profile-card">
+
+
+        <!-- ===============================================
+             PROFILE HEADER
+        ================================================ -->
+
+        <div class="profile-header">
+
+          <div class="header-left">
+
+            <div
+              class="user-avatar-circle"
+              id="avatar-preview-box"
+            >
+
+              <span id="avatar-initial">
+                U
+              </span>
+
+              <img
+                id="avatar-img"
+                src=""
+                alt="Avatar"
+                style="display:none;"
+              >
+
+            </div>
+
+
+            <div class="header-title-box">
+
+              <h1 id="profile-display-name">
+                Memuat nama...
+              </h1>
+
+              <span
+                class="user-tier-tag"
+                id="profile-role-tag"
+              >
+                ROLE
+              </span>
+
+              <div
+                style="
+                  margin-top: 6px;
+                  font-size: 13px;
+                  color: var(--text3);
+                "
+              >
+
+                Kode Referral:
+
+                <strong
+                  id="profile-ref-code"
+                  style="
+                    color:var(--text);
+                    letter-spacing:0.05em;
+                  "
+                >
+                  -
+                </strong>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <!-- ===============================================
+             SECTION 1
+             UPDATE PROFILE
+        ================================================ -->
+
+        <section class="settings-section">
+
+          <h2>
+
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/>
+              <circle
+                cx="12"
+                cy="7"
+                r="4"
+              />
+            </svg>
+
+            Informasi Profil
+
+          </h2>
+
+
+          <p class="sec-desc">
+
+            Perbarui nama tampilan dan foto
+            profil avatar akun Anda.
+
+          </p>
+
+
+          <form id="form-update-profile">
+
+
+            <div class="form-group">
+
+              <label
+                class="form-label"
+                for="input-email"
+              >
+                Email Terdaftar
+                (Tidak dapat diubah)
+              </label>
+
+              <input
+                type="email"
+                id="input-email"
+                class="kage-input"
+                disabled
+              >
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label
+                class="form-label"
+                for="input-name"
+              >
+                Nama Lengkap
+              </label>
+
+              <input
+                type="text"
+                id="input-name"
+                class="kage-input"
+                required
+                placeholder="Masukkan nama Anda"
+              >
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label
+                class="form-label"
+                for="input-avatar"
+              >
+                Unggah Avatar Baru
+                (JPG, PNG, WEBP maks 2MB)
+              </label>
+
+              <input
+                type="file"
+                id="input-avatar"
+                accept="
+                  image/png,
+                  image/jpeg,
+                  image/jpg,
+                  image/webp
+                "
+                class="kage-input"
+              >
+
+            </div>
+
+
+            <button
+              type="submit"
+              class="btn btn-red"
+              id="btn-save-profile"
+            >
+              Simpan Perubahan Profil
+            </button>
+
+          </form>
+
+        </section>
+
+
+        <!-- ===============================================
+             SECTION 2
+             PASSWORD
+        ================================================ -->
+
+        <section class="settings-section">
+
+          <h2>
+
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <rect
+                x="3"
+                y="11"
+                width="18"
+                height="11"
+                rx="2"
+              />
+
+              <path
+                d="M7 11V7a5 5 0 0110 0v4"
+              />
+
+            </svg>
+
+            Ubah Kata Sandi
+
+          </h2>
+
+
+          <p class="sec-desc">
+
+            Pastikan kata sandi baru Anda
+            minimal 6 karakter dan tidak sama
+            dengan kata sandi lama.
+
+          </p>
+
+
+          <form id="form-update-password">
+
+
+            <div class="form-group">
+
+              <label
+                class="form-label"
+                for="input-current-password"
+              >
+                Kata Sandi Saat Ini
+              </label>
+
+              <input
+                type="password"
+                id="input-current-password"
+                class="kage-input"
+                required
+                placeholder="Masukkan kata sandi lama"
+              >
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label
+                class="form-label"
+                for="input-new-password"
+              >
+                Kata Sandi Baru
+              </label>
+
+              <input
+                type="password"
+                id="input-new-password"
+                class="kage-input"
+                minlength="6"
+                required
+                placeholder="Minimal 6 karakter"
+              >
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label
+                class="form-label"
+                for="input-confirm-password"
+              >
+                Konfirmasi Kata Sandi Baru
+              </label>
+
+              <input
+                type="password"
+                id="input-confirm-password"
+                class="kage-input"
+                minlength="6"
+                required
+                placeholder="Ulangi kata sandi baru"
+              >
+
+            </div>
+
+
+            <button
+              type="submit"
+              class="btn btn-line"
+              id="btn-save-password"
+            >
+              Perbarui Kata Sandi
+            </button>
+
+          </form>
+
+        </section>
+
+
+        <!-- ===============================================
+             SECTION 3
+             REWARDS
+        ================================================ -->
+
+        <section class="rewards-section">
+
+
+          <h2>
+
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+
+              <circle
+                cx="12"
+                cy="12"
+                r="9"
+              />
+
+              <path
+                d="M12 7v10"
+              />
+
+              <path
+                d="
+                  M8.5 10.5
+                  c0-1 1.2-1.8 3.5-1.8
+                  s3.5.8 3.5 1.8
+                  -1.2 1.7-3.5 1.7
+                  -3.5.8-3.5 1.8
+                  1.2 1.8 3.5 1.8
+                  s3.5-.8 3.5-1.8
+                "
+              />
+
+            </svg>
+
+            Rewards
+
+          </h2>
+
+
+          <p class="rewards-desc">
+
+            Gunakan poin dan kupon referral
+            Anda untuk mendapatkan keuntungan
+            lebih saat mengikuti event Kagemaya.
+
+          </p>
+
+
+          <!-- ============================================
+               SALDO POIN
+          ============================================= -->
+
+          <div class="points-card">
+
+            <div class="points-label">
+              Saldo Poin Anda
+            </div>
+
+            <div>
+
+              <span
+                id="points-balance"
+                class="points-balance"
+              >
+                0
+              </span>
+
+              <span class="points-unit">
+                Poin
+              </span>
+
+            </div>
+
+          </div>
+
+
+          <!-- ============================================
+               RIWAYAT POIN
+          ============================================= -->
+
+          <h3 class="rewards-subtitle">
+            Riwayat Transaksi Poin
+          </h3>
+
+
+          <div
+            id="points-history"
+            class="points-history"
+          >
+
+            <div class="empty-rewards">
+              Memuat riwayat poin...
+            </div>
+
+          </div>
+
+
+          <!-- ============================================
+               KUPON
+          ============================================= -->
+
+          <h3 class="rewards-subtitle">
+            Kupon Referral Aktif
+          </h3>
+
+
+          <div
+            id="coupon-list"
+            class="coupon-list"
+          >
+
+            <div class="empty-rewards">
+              Memuat kupon...
+            </div>
+
+          </div>
+
+
+        </section>
+
+
+      </article>
+
+    </div>
+
+  </div>
+
+</main>
+
+
+<script>
+
+(function () {
+
+  'use strict';
+
+
+  // =======================================================
+  // CONFIG
+  // =======================================================
+
+  const API_BASE =
+    'http://localhost:5000/api';
+
+  const BACKEND_URL =
+    'http://localhost:5000';
+
+  const token =
+    localStorage.getItem(
+      'kagemaya_token'
+    );
+
+
+  // =======================================================
+  // PROTEKSI HALAMAN
+  // =======================================================
+
+  if (!token) {
+
+    alert(
+      'Sesi masuk tidak ditemukan. Harap masuk terlebih dahulu.'
+    );
+
+    window.location.href =
+      'kagemaya-login.html';
+
+    return;
+  }
+
+
+  // =======================================================
+  // ELEMENT
+  // =======================================================
+
+  const toast =
+    document.getElementById(
+      'status-toast'
+    );
+
+  const navUserName =
+    document.getElementById(
+      'nav-user-name'
+    );
+
+  const profileDisplayName =
+    document.getElementById(
+      'profile-display-name'
+    );
+
+  const profileRoleTag =
+    document.getElementById(
+      'profile-role-tag'
+    );
+
+  const profileRefCode =
+    document.getElementById(
+      'profile-ref-code'
+    );
+
+  const inputEmail =
+    document.getElementById(
+      'input-email'
+    );
+
+  const inputName =
+    document.getElementById(
+      'input-name'
+    );
+
+  const inputAvatar =
+    document.getElementById(
+      'input-avatar'
+    );
+
+  const avatarInitial =
+    document.getElementById(
+      'avatar-initial'
+    );
+
+  const avatarImg =
+    document.getElementById(
+      'avatar-img'
+    );
+
+  const profileForm =
+    document.getElementById(
+      'form-update-profile'
+    );
+
+  const passwordForm =
+    document.getElementById(
+      'form-update-password'
+    );
+
+  const saveProfileButton =
+    document.getElementById(
+      'btn-save-profile'
+    );
+
+  const savePasswordButton =
+    document.getElementById(
+      'btn-save-password'
+    );
+
+
+  // =======================================================
+  // REWARDS ELEMENT
+  // =======================================================
+
+  const pointsBalance =
+    document.getElementById(
+      'points-balance'
+    );
+
+  const pointsHistory =
+    document.getElementById(
+      'points-history'
+    );
+
+  const couponList =
+    document.getElementById(
+      'coupon-list'
+    );
+
+
+  // =======================================================
+  // TOAST
+  // =======================================================
+
+  function showToast(
+    message,
+    isError = false
+  ) {
+
+    toast.className =
+      `toast-msg ${
+        isError
+          ? 'error'
+          : 'success'
+      }`;
+
+    toast.textContent =
+      message;
+
+    toast.style.display =
+      'block';
+
+    toast.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center'
+    });
+
+    setTimeout(() => {
+
+      toast.style.display =
+        'none';
+
+    }, 5000);
+  }
+
+
+  // =======================================================
+  // SESSION
+  // =======================================================
+
+  function clearSession() {
+
+    localStorage.removeItem(
+      'kagemaya_token'
+    );
+
+    localStorage.removeItem(
+      'kagemaya_user'
+    );
+  }
+
+
+  function redirectToLogin(
+    message
+  ) {
+
+    clearSession();
+
+    showToast(
+      message ||
+        'Sesi login telah berakhir. Silakan login kembali.',
+      true
+    );
+
+    setTimeout(() => {
+
+      window.location.href =
+        'kagemaya-login.html';
+
+    }, 1500);
+  }
+
+
+  // =======================================================
+  // AUTH RESPONSE
+  // =======================================================
+
+  function handleUnauthorized(
+    response
+  ) {
+
+    if (
+      response.status === 401 ||
+      response.status === 403
+    ) {
+
+      redirectToLogin(
+        'Sesi login telah berakhir. Silakan login kembali.'
+      );
+
+      return true;
+    }
+
+    return false;
+  }
+
+
+  // =======================================================
+  // LOAD PROFILE
+  // =======================================================
+
+  async function loadProfile() {
+
+    try {
+
+      const res =
+        await fetch(
+          `${API_BASE}/me/profile`,
+          {
+            method: 'GET',
+
+            headers: {
+              Authorization:
+                `Bearer ${token}`,
+
+              Accept:
+                'application/json'
+            }
+          }
+        );
+
+
+      let result = {};
+
+      try {
+
+        result =
+          await res.json();
+
+      } catch {
+
+        result = {};
+
+      }
+
+
+      if (
+        handleUnauthorized(res)
+      ) {
+
+        return;
+      }
+
+
+      if (!res.ok) {
+
+        throw new Error(
+          result.message ||
+          'Gagal memuat profil dari server.'
+        );
+      }
+
+
+      const user =
+        result.data;
+
+
+      if (!user) {
+
+        throw new Error(
+          'Data profil tidak ditemukan.'
+        );
+      }
+
+
+      // ===============================================
+      // PROFILE DATA
+      // ===============================================
+
+      const name =
+        user.name || 'User';
+
+
+      profileDisplayName.textContent =
+        name;
+
+
+      navUserName.textContent =
+        name;
+
+
+      inputName.value =
+        user.name || '';
+
+
+      inputEmail.value =
+        user.email || '';
+
+
+      profileRoleTag.textContent =
+        user.role || 'CUSTOMER';
+
+
+      profileRefCode.textContent =
+        user.referral_code || '-';
+
+
+      // ===============================================
+      // AVATAR
+      // ===============================================
+
+      const initial =
+        name
+          .charAt(0)
+          .toUpperCase();
+
+
+      avatarInitial.textContent =
+        initial;
+
+
+      if (
+        user.profile_picture
+      ) {
+
+        const fullImgUrl =
+          user.profile_picture
+            .startsWith('http')
+            ? user.profile_picture
+            : `${BACKEND_URL}${user.profile_picture}`;
+
+
+        avatarImg.onload =
+          () => {
+
+            avatarImg.style.display =
+              'block';
+
+            avatarInitial.style.display =
+              'none';
+
+          };
+
+
+        avatarImg.onerror =
+          () => {
+
+            avatarImg.style.display =
+              'none';
+
+            avatarInitial.style.display =
+              'block';
+
+            avatarInitial.textContent =
+              initial;
+
+          };
+
+
+        avatarImg.src =
+          `${fullImgUrl}?t=${Date.now()}`;
+
+      } else {
+
+        avatarImg.style.display =
+          'none';
+
+        avatarInitial.style.display =
+          'block';
+      }
+
+
+      // ===============================================
+      // LOCAL STORAGE
+      // ===============================================
+
+      let oldUser = {};
+
+      try {
+
+        oldUser =
+          JSON.parse(
+            localStorage.getItem(
+              'kagemaya_user'
+            ) || '{}'
+          );
+
+      } catch {
+
+        oldUser = {};
+
+      }
+
+
+      const updatedUser = {
+        ...oldUser,
+        ...user
+      };
+
+
+      localStorage.setItem(
+        'kagemaya_user',
+        JSON.stringify(
+          updatedUser
+        )
+      );
+
+
+    } catch (err) {
+
+      console.error(
+        'Load profile error:',
+        err
+      );
+
+      showToast(
+        err instanceof Error
+          ? err.message
+          : 'Gagal memuat profil.',
+        true
+      );
+    }
+  }
+
+
+  // =======================================================
+  // LOAD POINTS
+  // =======================================================
+
+  async function loadPoints() {
+
+    try {
+
+      const res =
+        await fetch(
+          `${API_BASE}/me/points`,
+          {
+            method: 'GET',
+
+            headers: {
+              Authorization:
+                `Bearer ${token}`,
+
+              Accept:
+                'application/json'
+            }
+          }
+        );
+
+
+      let result = {};
+
+      try {
+
+        result =
+          await res.json();
+
+      } catch {
+
+        result = {};
+
+      }
+
+
+      if (
+        handleUnauthorized(res)
+      ) {
+
+        return;
+      }
+
+
+      if (!res.ok) {
+
+        throw new Error(
+          result.message ||
+          'Gagal mengambil data poin.'
+        );
+      }
+
+
+      const data =
+        result.data;
+
+
+      if (!data) {
+
+        throw new Error(
+          'Data poin tidak ditemukan.'
+        );
+      }
+
+
+      // ===============================================
+      // BALANCE
+      // ===============================================
+
+      pointsBalance.textContent =
+        Number(
+          data.balance || 0
+        ).toLocaleString(
+          'id-ID'
+        );
+
+
+      // ===============================================
+      // HISTORY
+      // ===============================================
+
+      renderPointHistory(
+        data.history || []
+      );
+
+
+    } catch (err) {
+
+      console.error(
+        'Load points error:',
+        err
+      );
+
+
+      pointsBalance.textContent =
+        '0';
+
+
+      pointsHistory.innerHTML = `
+        <div class="empty-rewards">
+          Gagal memuat riwayat poin.
+        </div>
+      `;
+    }
+  }
+
+
+  // =======================================================
+  // RENDER POINT HISTORY
+  // =======================================================
+
+  function renderPointHistory(
+    history
+  ) {
+
+    if (!history.length) {
+
+      pointsHistory.innerHTML = `
+        <div class="empty-rewards">
+          Belum ada transaksi poin.
+        </div>
+      `;
+
+      return;
+    }
+
+
+    pointsHistory.innerHTML =
+      history
+        .map((item) => {
+
+          const type =
+            String(
+              item.type || ''
+            ).toUpperCase();
+
+
+          const isPositive =
+            type === 'EARN' ||
+            type === 'REFUND';
+
+
+          const sign =
+            isPositive
+              ? '+'
+              : '-';
+
+
+          const amount =
+            Math.abs(
+              Number(
+                item.amount || 0
+              )
+            );
+
+
+          const formattedAmount =
+            amount.toLocaleString(
+              'id-ID'
+            );
+
+
+          const date =
+            item.created_at
+              ? new Date(
+                  item.created_at
+                ).toLocaleDateString(
+                  'id-ID',
+                  {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                  }
+                )
+              : '-';
+
+
+          let label =
+            type;
+
+
+          if (
+            type === 'EARN'
+          ) {
+
+            label =
+              'Poin Diperoleh';
+
+          } else if (
+            type === 'SPEND'
+          ) {
+
+            label =
+              'Poin Digunakan';
+
+          } else if (
+            type === 'REFUND'
+          ) {
+
+            label =
+              'Pengembalian Poin';
+
+          } else if (
+            type === 'EXPIRE'
+          ) {
+
+            label =
+              'Poin Kedaluwarsa';
+          }
+
+
+          const icon =
+            isPositive
+              ? '+'
+              : '−';
+
+
+          const cssClass =
+            type.toLowerCase();
+
+
+          return `
+            <div class="point-history-item">
+
+              <div class="point-history-left">
+
+                <div
+                  class="
+                    point-type-icon
+                    ${cssClass}
+                  "
+                >
+                  ${icon}
+                </div>
+
+
+                <div
+                  class="point-history-info"
+                >
+
+                  <div
+                    class="point-history-type"
+                  >
+                    ${label}
+                  </div>
+
+
+                  <div
+                    class="point-history-date"
+                  >
+                    ${date}
+                  </div>
+
+                </div>
+
+              </div>
+
+
+              <div
+                class="
+                  point-history-amount
+                  ${
+                    isPositive
+                      ? 'positive'
+                      : 'negative'
+                  }
+                "
+              >
+                ${sign}${formattedAmount}
+              </div>
+
+            </div>
+          `;
+
+        })
+        .join('');
+  }
+
+
+  // =======================================================
+  // LOAD COUPONS
+  // =======================================================
+
+  async function loadCoupons() {
+
+    try {
+
+      const res =
+        await fetch(
+          `${API_BASE}/me/coupons`,
+          {
+            method: 'GET',
+
+            headers: {
+              Authorization:
+                `Bearer ${token}`,
+
+              Accept:
+                'application/json'
+            }
+          }
+        );
+
+
+      let result = {};
+
+      try {
+
+        result =
+          await res.json();
+
+      } catch {
+
+        result = {};
+
+      }
+
+
+      if (
+        handleUnauthorized(res)
+      ) {
+
+        return;
+      }
+
+
+      if (!res.ok) {
+
+        throw new Error(
+          result.message ||
+          'Gagal mengambil kupon.'
+        );
+      }
+
+
+      const coupons =
+        result.data || [];
+
+
+      renderCoupons(
+        coupons
+      );
+
+
+    } catch (err) {
+
+      console.error(
+        'Load coupons error:',
+        err
+      );
+
+
+      couponList.innerHTML = `
+        <div class="empty-rewards">
+          Gagal memuat kupon referral.
+        </div>
+      `;
+    }
+  }
+
+
+  // =======================================================
+  // RENDER COUPONS
+  // =======================================================
+
+  function renderCoupons(
+    coupons
+  ) {
+
+    if (!coupons.length) {
+
+      couponList.innerHTML = `
+        <div class="empty-rewards">
+          Belum ada kupon referral aktif.
+        </div>
+      `;
+
+      return;
+    }
+
+
+    couponList.innerHTML =
+      coupons
+        .map((coupon) => {
+
+          const discount =
+            Number(
+              coupon.discount_amount || 0
+            ).toLocaleString(
+              'id-ID'
+            );
+
+
+          const expiry =
+            coupon.expires_at
+              ? new Date(
+                  coupon.expires_at
+                ).toLocaleDateString(
+                  'id-ID',
+                  {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric'
+                  }
+                )
+              : '-';
+
+
+          return `
+            <div class="coupon-card">
+
+              <div class="coupon-info">
+
+                <h4>
+                  Kupon Referral
+                </h4>
+
+                <div class="coupon-discount">
+                  Diskon Rp${discount}
+                </div>
+
+                <div class="coupon-expiry">
+                  Berlaku sampai ${expiry}
+                </div>
+
+              </div>
+
+
+              <span class="coupon-status">
+                AKTIF
+              </span>
+
+            </div>
+          `;
+
+        })
+        .join('');
+  }
+
+
+  // =======================================================
+  // UPDATE PROFILE
+  // =======================================================
+
+  profileForm.addEventListener(
+    'submit',
+    async (e) => {
+
+      e.preventDefault();
+
+
+      const name =
+        inputName.value.trim();
+
+
+      const avatarFile =
+        inputAvatar.files &&
+        inputAvatar.files[0];
+
+
+      // ===============================================
+      // VALIDASI NAMA
+      // ===============================================
+
+      if (!name) {
+
+        showToast(
+          'Nama lengkap wajib diisi.',
+          true
+        );
+
+        return;
+      }
+
+
+      // ===============================================
+      // VALIDASI AVATAR
+      // ===============================================
+
+      if (avatarFile) {
+
+        const allowedTypes = [
+          'image/jpeg',
+          'image/png',
+          'image/webp'
+        ];
+
+
+        if (
+          !allowedTypes.includes(
+            avatarFile.type
+          )
+        ) {
+
+          showToast(
+            'Format avatar harus JPG, PNG, atau WEBP.',
+            true
+          );
+
+          inputAvatar.value =
+            '';
+
+          return;
+        }
+
+
+        const maxSize =
+          2 * 1024 * 1024;
+
+
+        if (
+          avatarFile.size >
+          maxSize
+        ) {
+
+          showToast(
+            'Ukuran avatar maksimal 2MB.',
+            true
+          );
+
+          inputAvatar.value =
+            '';
+
+          return;
+        }
+      }
+
+
+      // ===============================================
+      // FORM DATA
+      // ===============================================
+
+      const formData =
+        new FormData();
+
+
+      formData.append(
+        'name',
+        name
+      );
+
+
+      if (avatarFile) {
+
+        formData.append(
+          'avatar',
+          avatarFile
+        );
+      }
+
+
+      // ===============================================
+      // BUTTON
+      // ===============================================
+
+      saveProfileButton.disabled =
+        true;
+
+      saveProfileButton.textContent =
+        'Menyimpan...';
+
+
+      try {
+
+        const res =
+          await fetch(
+            `${API_BASE}/me/profile`,
+            {
+              method: 'PATCH',
+
+              headers: {
+                Authorization:
+                  `Bearer ${token}`
+              },
+
+              body: formData
+            }
+          );
+
+
+        let result = {};
+
+        try {
+
+          result =
+            await res.json();
+
+        } catch {
+
+          result = {};
+
+        }
+
+
+        if (
+          handleUnauthorized(res)
+        ) {
+
+          return;
+        }
+
+
+        if (!res.ok) {
+
+          throw new Error(
+            result.message ||
+            'Gagal memperbarui profil.'
+          );
+        }
+
+
+        // =============================================
+        // UPDATE LOCAL STORAGE
+        // =============================================
+
+        if (result.data) {
+
+          let oldUser = {};
+
+          try {
+
+            oldUser =
+              JSON.parse(
+                localStorage.getItem(
+                  'kagemaya_user'
+                ) || '{}'
+              );
+
+          } catch {
+
+            oldUser = {};
+
+          }
+
+
+          const updatedUser = {
+            ...oldUser,
+            ...result.data
+          };
+
+
+          localStorage.setItem(
+            'kagemaya_user',
+            JSON.stringify(
+              updatedUser
+            )
+          );
+        }
+
+
+        // =============================================
+        // SUCCESS
+        // =============================================
+
+        showToast(
+          result.message ||
+          'Profil berhasil diperbarui.'
+        );
+
+
+        inputAvatar.value =
+          '';
+
+
+        await loadProfile();
+
+
+      } catch (err) {
+
+        console.error(
+          'Update profile error:',
+          err
+        );
+
+
+        showToast(
+          err instanceof Error
+            ? err.message
+            : 'Gagal memperbarui profil.',
+          true
+        );
+
+
+      } finally {
+
+        saveProfileButton.disabled =
+          false;
+
+        saveProfileButton.textContent =
+          'Simpan Perubahan Profil';
+      }
+    }
+  );
+
+
+  // =======================================================
+  // UPDATE PASSWORD
+  // =======================================================
+
+  passwordForm.addEventListener(
+    'submit',
+    async (e) => {
+
+      e.preventDefault();
+
+
+      const currentPassword =
+        document.getElementById(
+          'input-current-password'
+        ).value;
+
+
+      const newPassword =
+        document.getElementById(
+          'input-new-password'
+        ).value;
+
+
+      const confirmPassword =
+        document.getElementById(
+          'input-confirm-password'
+        ).value;
+
+
+      // ===============================================
+      // VALIDASI
+      // ===============================================
+
+      if (
+        !currentPassword ||
+        !newPassword ||
+        !confirmPassword
+      ) {
+
+        showToast(
+          'Semua field kata sandi wajib diisi.',
+          true
+        );
+
+        return;
+      }
+
+
+      if (
+        newPassword.length < 6
+      ) {
+
+        showToast(
+          'Kata sandi baru minimal 6 karakter.',
+          true
+        );
+
+        return;
+      }
+
+
+      if (
+        newPassword !==
+        confirmPassword
+      ) {
+
+        showToast(
+          'Konfirmasi kata sandi baru tidak cocok.',
+          true
+        );
+
+        return;
+      }
+
+
+      // ===============================================
+      // BUTTON
+      // ===============================================
+
+      savePasswordButton.disabled =
+        true;
+
+      savePasswordButton.textContent =
+        'Memproses...';
+
+
+      try {
+
+        const res =
+          await fetch(
+            `${API_BASE}/me/password`,
+            {
+              method: 'PATCH',
+
+              headers: {
+                'Content-Type':
+                  'application/json',
+
+                Authorization:
+                  `Bearer ${token}`
+              },
+
+              body:
+                JSON.stringify({
+                  current_password:
+                    currentPassword,
+
+                  new_password:
+                    newPassword
+                })
+            }
+          );
+
+
+        let result = {};
+
+        try {
+
+          result =
+            await res.json();
+
+        } catch {
+
+          result = {};
+
+        }
+
+
+        // =============================================
+        // PASSWORD LAMA SALAH
+        // =============================================
+
+        if (
+          res.status === 401 &&
+          result.message &&
+          result.message.includes(
+            'Password saat ini tidak sesuai'
+          )
+        ) {
+
+          throw new Error(
+            result.message
+          );
+        }
+
+
+        // =============================================
+        // SESSION EXPIRED
+        // =============================================
+
+        if (
+          res.status === 403
+        ) {
+
+          redirectToLogin(
+            'Sesi login telah berakhir. Silakan login kembali.'
+          );
+
+          return;
+        }
+
+
+        if (
+          res.status === 401
+        ) {
+
+          redirectToLogin(
+            result.message ||
+            'Sesi login tidak valid.'
+          );
+
+          return;
+        }
+
+
+        if (!res.ok) {
+
+          throw new Error(
+            result.message ||
+            'Gagal mengubah kata sandi.'
+          );
+        }
+
+
+        // =============================================
+        // SUCCESS
+        // =============================================
+
+        showToast(
+          result.message ||
+          'Kata sandi berhasil diperbarui.'
+        );
+
+
+        passwordForm.reset();
+
+
+      } catch (err) {
+
+        console.error(
+          'Update password error:',
+          err
+        );
+
+
+        showToast(
+          err instanceof Error
+            ? err.message
+            : 'Gagal mengubah kata sandi.',
+          true
+        );
+
+
+      } finally {
+
+        savePasswordButton.disabled =
+          false;
+
+        savePasswordButton.textContent =
+          'Perbarui Kata Sandi';
+      }
+    }
+  );
+
+
+  // =======================================================
+  // LOGOUT
+  // =======================================================
+
+  document
+    .getElementById(
+      'nav-btn-logout'
+    )
+    .addEventListener(
+      'click',
+      () => {
+
+        const confirmed =
+          confirm(
+            'Apakah Anda yakin ingin keluar?'
+          );
+
+
+        if (!confirmed) {
+
+          return;
+        }
+
+
+        clearSession();
+
+
+        window.location.href =
+          'kagemaya-login.html';
+      }
+    );
+
+
+  // =======================================================
+  // LOAD SEMUA DATA
+  // =======================================================
+
+  loadProfile();
+
+  loadPoints();
+
+  loadCoupons();
+
+})();
+
+</script>
+
+</body>
+
+</html>

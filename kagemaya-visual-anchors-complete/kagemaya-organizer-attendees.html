@@ -1,0 +1,911 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Daftar Hadir Peserta — Dashboard Organizer · Kagemaya</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="kagemaya-tokens.css">
+<style>
+/* ─── DESIGN TOKENS ─────────────────────────────────────── */
+:root {
+  color-scheme: dark;
+  --bg: #0B0B0D;
+  --surface: #121216;
+  --elev: #1C1C22;
+  --red: #C62828;
+  --red-hi: #E5484D;
+  --gold: #D6A85F;
+  --gold-dim: rgba(214, 168, 95, 0.16);
+  --text: #F4F0E8;
+  --text2: #B8B5B0;
+  --text3: #85837f;
+  --mist: #B8B5B0;
+  --border: #292930;
+  --border-light: #3D3D47;
+  --green: #4ADE80;
+  --serif: 'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', Georgia, serif;
+  --sans: 'Inter', 'Noto Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --r: 2px;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button, input, select {
+  font-family: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+svg {
+  display: block;
+}
+
+/* ─── APP SHELL ─────────────────────────────────────────── */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ─── SIDEBAR NAVIGATION ────────────────────────────────── */
+.sidebar {
+  width: 260px;
+  background: var(--bg);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  z-index: 50;
+  flex: none;
+}
+
+.sidebar-header {
+  padding: 28px 24px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.sidebar-logo b {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 19px;
+  letter-spacing: .34em;
+  margin-right: -.34em;
+}
+
+.sidebar-logo i {
+  font-family: var(--serif);
+  font-style: normal;
+  color: var(--red-hi);
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.portal-label {
+  font-size: 10.5px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  display: inline-block;
+  font-weight: 500;
+}
+
+.sidebar-nav {
+  padding: 20px 14px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border-radius: var(--r);
+  color: var(--mist);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all .2s;
+  letter-spacing: .01em;
+}
+
+.nav-link svg {
+  width: 18px;
+  height: 18px;
+  stroke: var(--mist);
+  stroke-width: 1.6;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex: none;
+  transition: stroke .2s;
+}
+
+.nav-link:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.nav-link:hover svg {
+  stroke: var(--text);
+}
+
+.nav-link.active {
+  background: var(--red);
+  color: #FFFFFF;
+}
+
+.nav-link.active svg {
+  stroke: #FFFFFF;
+}
+
+.sidebar-footer {
+  padding: 16px 14px;
+  border-top: 1px solid var(--border);
+}
+
+.nav-link.logout {
+  color: var(--text2);
+}
+
+.nav-link.logout:hover {
+  background: rgba(198, 40, 40, .1);
+  color: var(--red-hi);
+}
+
+/* ─── MAIN PANEL ────────────────────────────────────────── */
+.main-panel {
+  flex: 1;
+  background: var(--elev);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── TOP HEADER ────────────────────────────────────────── */
+.top-header {
+  padding: 24px 40px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.header-title h1 {
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 400;
+  margin: 0 0 4px;
+  color: var(--text);
+}
+.header-title p {
+  color: var(--text2);
+  font-size: 13.5px;
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: 500 13px/1 var(--sans);
+  padding: 9px 18px;
+  border-radius: var(--r);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all .2s;
+  letter-spacing: .01em;
+  gap: 6px;
+}
+.btn-red {
+  background: var(--red);
+  color: var(--text);
+}
+.btn-red:hover {
+  background: var(--red-hi);
+}
+.btn-line {
+  border-color: rgba(244, 240, 232, .24);
+  color: var(--text);
+  background: transparent;
+}
+.btn-line:hover {
+  border-color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+}
+.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+/* ─── ATTENDEES CONTENT ─────────────────────────────────── */
+.attendees-content {
+  padding: 32px 40px 60px;
+  flex: 1;
+}
+
+/* Event Selector Bar */
+.event-selector-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 18px 24px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.selector-label-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.selector-label {
+  font-size: 13px;
+  color: var(--text2);
+  font-weight: 500;
+}
+.event-select-dropdown {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 14px;
+  padding: 9px 36px 9px 14px;
+  border-radius: var(--r);
+  outline: none;
+  min-width: 320px;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23B8B5B0' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+}
+.event-select-dropdown:focus {
+  border-color: var(--gold);
+}
+
+/* Attendance Progress Banner */
+.attendance-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 24px;
+}
+.kpi-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 20px 24px;
+  position: relative;
+}
+.kpi-title {
+  font-size: 12.5px;
+  color: var(--text2);
+  margin-bottom: 4px;
+}
+.kpi-num {
+  font-family: var(--serif);
+  font-size: 28px;
+  font-weight: 500;
+  color: var(--gold);
+}
+.kpi-sub {
+  font-size: 12px;
+  color: var(--text3);
+}
+
+/* PRD Rule Note Banner */
+.prd-done-note {
+  background: rgba(74, 222, 128, 0.06);
+  border: 1px solid rgba(74, 222, 128, 0.2);
+  border-radius: var(--r);
+  padding: 12px 18px;
+  margin-bottom: 24px;
+  font-size: 13px;
+  color: #a7f3d0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.prd-done-note svg {
+  width: 16px;
+  height: 16px;
+  stroke: var(--green);
+  fill: none;
+  stroke-width: 2;
+  flex: none;
+}
+
+/* Toolbar Card */
+.toolbar-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-tabs {
+  display: flex;
+  gap: 8px;
+}
+.f-tab {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  padding: 7px 14px;
+  border-radius: var(--r);
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.f-tab.active {
+  background: var(--gold-dim);
+  border-color: var(--gold);
+  color: var(--gold);
+  font-weight: 500;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 0 12px;
+  width: 300px;
+}
+.search-box svg {
+  width: 15px;
+  height: 15px;
+  stroke: var(--text3);
+  margin-right: 8px;
+}
+.search-input {
+  background: none;
+  border: none;
+  color: var(--text);
+  font: 400 13px var(--sans);
+  padding: 8px 0;
+  width: 100%;
+  outline: none;
+}
+
+/* ─── ATTENDEES TABLE ───────────────────────────────────── */
+.table-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.dash-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  text-align: left;
+}
+.dash-table th {
+  padding: 14px 20px;
+  color: var(--mist);
+  font-weight: 500;
+  border-bottom: 1px solid var(--border);
+  background: rgba(11, 11, 13, 0.35);
+  font-size: 12px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.dash-table td {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  vertical-align: middle;
+}
+.dash-table tr:last-child td {
+  border-bottom: none;
+}
+.dash-table tr:hover td {
+  background: rgba(28, 28, 34, 0.45);
+}
+
+.cust-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.cust-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--elev);
+  border: 1px solid var(--border);
+  display: grid;
+  place-items: center;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--gold);
+  flex: none;
+}
+
+.checkin-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--r);
+  font-size: 12px;
+  font-weight: 500;
+}
+.checkin-yes {
+  background: rgba(74, 222, 128, 0.1);
+  border: 1px solid var(--green);
+  color: var(--green);
+}
+.checkin-no {
+  background: rgba(184, 181, 176, 0.08);
+  border: 1px solid var(--border);
+  color: var(--mist);
+}
+
+/* ─── FOOTER ────────────────────────────────────────────── */
+footer {
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  padding: 24px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--text3);
+}
+
+/* ─── RESPONSIVE ────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .attendance-kpi-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 860px) {
+  .app-shell {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+  }
+  .sidebar-nav {
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 12px 16px;
+  }
+  .nav-link {
+    white-space: nowrap;
+  }
+  .top-header, .attendees-content, footer {
+    padding: 20px;
+  }
+  .event-selector-card, .toolbar-card {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .search-box {
+    width: 100%;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ═══ 1. SIDEBAR NAVIGATION ═══════════════════════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <a href="kagemaya-landing-page-visual-anchor.html">
+          <b>KAGEMAYA</b><i>影幻</i>
+        </a>
+      </div>
+      <span class="portal-label">Portal Organizer</span>
+    </div>
+
+    <nav class="sidebar-nav" aria-label="Menu Organizer">
+      <a href="kagemaya-organizer-dashboard.html" class="nav-link">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a href="kagemaya-organizer-create-event.html" class="nav-link">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Event Saya
+      </a>
+      <a href="kagemaya-organizer-transactions.html" class="nav-link">
+        <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        Transaksi
+      </a>
+      <!-- Active item: Daftar Hadir -->
+      <a href="kagemaya-organizer-attendees.html" class="nav-link active">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Daftar Hadir
+      </a>
+      <a href="kagemaya-organizer-vouchers.html" class="nav-link">
+        <svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M12 8v12"/><path d="M3 12h18"/></svg>
+        Voucher
+      </a>
+      <a href="kagemaya-organizer-profile.html" class="nav-link">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Profil
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="kagemaya-login.html" class="nav-link logout">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </a>
+    </div>
+  </aside>
+
+  <!-- ═══ MAIN PANEL ═══════════════════════════════════════════ -->
+  <div class="main-panel">
+    
+    <!-- TOP HEADER -->
+    <header class="top-header">
+      <div class="header-title">
+        <h1>Daftar Hadir Peserta Acara</h1>
+        <p>Kelola data kehadiran penonton terverifikasi (khusus transaksi berstatus DONE).</p>
+      </div>
+      <div class="header-actions">
+        <button type="button" class="btn btn-line" onclick="exportCSV()">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Unduh CSV
+        </button>
+        <button type="button" class="btn btn-red" onclick="scanTicketBarcode()">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><line x1="3" y1="5" x2="3" y2="19"/><line x1="7" y1="5" x2="7" y2="19"/><line x1="11" y1="5" x2="11" y2="19"/><line x1="15" y1="5" x2="15" y2="19"/><line x1="19" y1="5" x2="19" y2="19"/></svg>
+          Scan Barcode Tiket
+        </button>
+      </div>
+    </header>
+
+    <!-- CONTENT BODY -->
+    <main class="attendees-content">
+
+      <!-- Event Selector Bar -->
+      <section class="event-selector-card">
+        <div class="selector-label-group">
+          <span class="selector-label">Pilih Event Sinematik:</span>
+          <select class="event-select-dropdown" id="eventSelect" onchange="switchEvent(this.value)">
+            <option value="yugen">Yūgen: Film 4D Kolaborasi Tokyo–Jakarta (14 Nov 2026)</option>
+            <option value="foley">Workshop Foley ala Anime (22 Nov 2026)</option>
+            <option value="talkshow">Talkshow Budaya Tokyo–Nusantara (29 Nov 2026)</option>
+          </select>
+        </div>
+        <div style="font-size:12.5px;color:var(--text2)">
+          Venue: <b>Dome 4D Salihara, Jakarta Selatan</b>
+        </div>
+      </section>
+
+      <!-- PRD Invariant Banner: Only DONE Status Transactions -->
+      <div class="prd-done-note">
+        <svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <span>
+          <b>Kepatuhan Spesifikasi PRD v1.1 (Section 16):</b> Daftar hadir ini secara ketat hanya menampilkan transaksi yang telah berstatus <code>DONE</code> (pembayaran telah diverifikasi secara sah).
+        </span>
+      </div>
+
+      <!-- Attendance Metrics -->
+      <section class="attendance-kpi-grid">
+        <div class="kpi-card">
+          <div class="kpi-title">Total Tiket Terbit (DONE)</div>
+          <div class="kpi-num" id="kpiTotal">160 Tiket</div>
+          <div class="kpi-sub">Kapasitas penuh 100% terjual</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Sudah Hadir (Checked-In)</div>
+          <div class="kpi-num" style="color:var(--green)" id="kpiChecked">114 Hadir</div>
+          <div class="kpi-sub">Tingkat kehadiran saat ini: 71.2%</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-title">Belum Check-In di Venue</div>
+          <div class="kpi-num" style="color:var(--text)" id="kpiPending">46 Tiket</div>
+          <div class="kpi-sub">Menunggu verifikasi di meja registrasi</div>
+        </div>
+      </section>
+
+      <!-- Toolbar Card: Filter & Search -->
+      <div class="toolbar-card">
+        <div class="filter-tabs">
+          <button type="button" class="f-tab active" onclick="filterAttendees('all', this)">Semua Peserta</button>
+          <button type="button" class="f-tab" onclick="filterAttendees('checked', this)">Sudah Hadir</button>
+          <button type="button" class="f-tab" onclick="filterAttendees('unchecked', this)">Belum Hadir</button>
+        </div>
+        <div class="search-box">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" class="search-input" placeholder="Cari nama, email, atau ID tiket..." oninput="handleSearch(this.value)">
+        </div>
+      </div>
+
+      <!-- ATTENDEES TABLE -->
+      <section class="table-panel">
+        <div class="table-responsive">
+          <table class="dash-table" id="attendeesTable">
+            <thead>
+              <tr>
+                <th>Kode Tiket</th>
+                <th>Nama Peserta (Customer)</th>
+                <th>Jenis Tiket</th>
+                <th>Jumlah Tiket</th>
+                <th>Total Bayar</th>
+                <th>Status Kehadiran</th>
+                <th style="text-align:right">Aksi Check-in</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <!-- ATTENDEE 1 -->
+              <tr data-checkin="checked">
+                <td><span style="font-family:monospace;color:var(--gold)">#TIX-99214</span></td>
+                <td>
+                  <div class="cust-item">
+                    <div class="cust-avatar">RP</div>
+                    <div>
+                      <b>Rina Putri</b>
+                      <div style="font-size:12px;color:var(--text3)">rina.penikmat@kagemaya.id</div>
+                    </div>
+                  </div>
+                </td>
+                <td>VIP Curator Experience</td>
+                <td><b>2 Tiket</b></td>
+                <td>Rp 640.000</td>
+                <td>
+                  <span class="checkin-badge checkin-yes">
+                    ✓ Sudah Hadir (18:45 WIB)
+                  </span>
+                </td>
+                <td style="text-align:right">
+                  <button type="button" class="btn btn-line btn-sm" onclick="toggleCheckin(this)">Batalkan</button>
+                </td>
+              </tr>
+
+              <!-- ATTENDEE 2 -->
+              <tr data-checkin="checked">
+                <td><span style="font-family:monospace;color:var(--gold)">#TIX-99182</span></td>
+                <td>
+                  <div class="cust-item">
+                    <div class="cust-avatar">FH</div>
+                    <div>
+                      <b>Farhan Hidayat</b>
+                      <div style="font-size:12px;color:var(--text3)">farhan.h@yahoo.com</div>
+                    </div>
+                  </div>
+                </td>
+                <td>Regular 4D Experience</td>
+                <td><b>2 Tiket</b></td>
+                <td>Rp 370.000</td>
+                <td>
+                  <span class="checkin-badge checkin-yes">
+                    ✓ Sudah Hadir (19:02 WIB)
+                  </span>
+                </td>
+                <td style="text-align:right">
+                  <button type="button" class="btn btn-line btn-sm" onclick="toggleCheckin(this)">Batalkan</button>
+                </td>
+              </tr>
+
+              <!-- ATTENDEE 3 -->
+              <tr data-checkin="unchecked">
+                <td><span style="font-family:monospace;color:var(--gold)">#TIX-99150</span></td>
+                <td>
+                  <div class="cust-item">
+                    <div class="cust-avatar">AN</div>
+                    <div>
+                      <b>Anisa Novita</b>
+                      <div style="font-size:12px;color:var(--text3)">anisa.nov@gmail.com</div>
+                    </div>
+                  </div>
+                </td>
+                <td>Regular 4D Experience</td>
+                <td><b>1 Tiket</b></td>
+                <td>Rp 185.000</td>
+                <td>
+                  <span class="checkin-badge checkin-no">
+                    Belum Hadir
+                  </span>
+                </td>
+                <td style="text-align:right">
+                  <button type="button" class="btn btn-red btn-sm" onclick="toggleCheckin(this)">Check-in</button>
+                </td>
+              </tr>
+
+              <!-- ATTENDEE 4 -->
+              <tr data-checkin="unchecked">
+                <td><span style="font-family:monospace;color:var(--gold)">#TIX-99120</span></td>
+                <td>
+                  <div class="cust-item">
+                    <div class="cust-avatar">BS</div>
+                    <div>
+                      <b>Bambang Surya</b>
+                      <div style="font-size:12px;color:var(--text3)">bambang.s@corporate.id</div>
+                    </div>
+                  </div>
+                </td>
+                <td>VIP Curator Experience</td>
+                <td><b>1 Tiket</b></td>
+                <td>Rp 320.000</td>
+                <td>
+                  <span class="checkin-badge checkin-no">
+                    Belum Hadir
+                  </span>
+                </td>
+                <td style="text-align:right">
+                  <button type="button" class="btn btn-red btn-sm" onclick="toggleCheckin(this)">Check-in</button>
+                </td>
+              </tr>
+
+              <!-- ATTENDEE 5 -->
+              <tr data-checkin="checked">
+                <td><span style="font-family:monospace;color:var(--gold)">#TIX-99088</span></td>
+                <td>
+                  <div class="cust-item">
+                    <div class="cust-avatar">YT</div>
+                    <div>
+                      <b>Yudha Tanaka</b>
+                      <div style="font-size:12px;color:var(--text3)">yudha.tanaka@kagemaya.id</div>
+                    </div>
+                  </div>
+                </td>
+                <td>VIP Curator Experience</td>
+                <td><b>2 Tiket</b></td>
+                <td>Rp 640.000</td>
+                <td>
+                  <span class="checkin-badge checkin-yes">
+                    ✓ Sudah Hadir (18:55 WIB)
+                  </span>
+                </td>
+                <td style="text-align:right">
+                  <button type="button" class="btn btn-line btn-sm" onclick="toggleCheckin(this)">Batalkan</button>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+      <div>&copy; 2026 Kagemaya.id — Panel Penyelenggara Event Budaya Indo-Jepang.</div>
+      <div style="font-family: var(--serif); color: var(--gold);">影と幻 · KAGE TO MAYA</div>
+    </footer>
+
+  </div>
+
+</div>
+
+<!-- INTERACTIVE SCRIPTS -->
+<script>
+function toggleCheckin(btn) {
+  const row = btn.closest('tr');
+  const badge = row.querySelector('.checkin-badge');
+  const isChecked = row.getAttribute('data-checkin') === 'checked';
+
+  if (isChecked) {
+    row.setAttribute('data-checkin', 'unchecked');
+    badge.className = 'checkin-badge checkin-no';
+    badge.textContent = 'Belum Hadir';
+    btn.className = 'btn btn-red btn-sm';
+    btn.textContent = 'Check-in';
+    showToastNotice('Status kehadiran dibatalkan.');
+  } else {
+    row.setAttribute('data-checkin', 'checked');
+    badge.className = 'checkin-badge checkin-yes';
+    badge.textContent = '✓ Sudah Hadir (Baru Saja)';
+    btn.className = 'btn btn-line btn-sm';
+    btn.textContent = 'Batalkan';
+    showToastNotice('Check-in berhasil dikonfirmasi!');
+  }
+}
+
+function filterAttendees(filter, tab) {
+  document.querySelectorAll('.f-tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+
+  const rows = document.querySelectorAll('#attendeesTable tbody tr');
+  rows.forEach(r => {
+    const status = r.getAttribute('data-checkin');
+    if (filter === 'all') {
+      r.style.display = '';
+    } else if (filter === status) {
+      r.style.display = '';
+    } else {
+      r.style.display = 'none';
+    }
+  });
+}
+
+function handleSearch(q) {
+  const query = q.toLowerCase();
+  const rows = document.querySelectorAll('#attendeesTable tbody tr');
+  rows.forEach(r => {
+    const text = r.textContent.toLowerCase();
+    r.style.display = text.includes(query) ? '' : 'none';
+  });
+}
+
+function switchEvent(val) {
+  showToastNotice(`Memuat daftar hadir untuk event terpilih...`);
+}
+
+function scanTicketBarcode() {
+  alert('Simulasi: Pemindai barcode tiket aktif. Arahkan barcode fisik atau e-tiket penonton ke kamera.');
+}
+
+function exportCSV() {
+  alert('Mengunduh berkas CSV daftar hadir peserta resmi status DONE.');
+}
+
+function showToastNotice(msg) {
+  let toast = document.getElementById('qToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'qToast';
+    toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1C1C22;border:1px solid #D6A85F;color:#F4F0E8;padding:12px 18px;border-radius:4px;font-size:13px;z-index:999;box-shadow:0 8px 24px rgba(0,0,0,0.7);transition:opacity 0.3s;';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.style.opacity = '1';
+  setTimeout(() => { toast.style.opacity = '0'; }, 2600);
+}
+</script>
+</body>
+</html>

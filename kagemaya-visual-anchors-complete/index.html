@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kagemaya.id — Master Visual Anchors &amp; Prototype Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="kagemaya-tokens.css">
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #0B0B0D;
+  --surface: #121216;
+  --elev: #1C1C22;
+  --red: #C62828;
+  --red-hi: #E5484D;
+  --gold: #D6A85F;
+  --text: #F4F0E8;
+  --text2: #B8B5B0;
+  --text3: #85837f;
+  --border: #292930;
+  --border-light: #3D3D47;
+  --green: #4ADE80;
+  --serif: 'Noto Serif JP', Georgia, serif;
+  --sans: 'Inter', system-ui, sans-serif;
+  --r: 2px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  line-height: 1.6;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+a { color: inherit; text-decoration: none; }
+.wrap { max-width: 1200px; margin: 0 auto; padding: 0 32px; width: 100%; }
+
+/* Hero Hub Header */
+.hub-hero {
+  padding: 80px 0 48px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  background: radial-gradient(circle at 50% 20%, rgba(198, 40, 40, 0.14), transparent 60%);
+}
+.brand-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  border: 1px solid rgba(214, 168, 95, 0.3);
+  padding: 4px 12px;
+  border-radius: var(--r);
+  margin-bottom: 20px;
+}
+.hub-hero h1 {
+  font-family: var(--serif);
+  font-size: clamp(34px, 4.5vw, 54px);
+  font-weight: 400;
+  line-height: 1.2;
+  margin-bottom: 16px;
+}
+.hub-hero h1 em {
+  font-style: normal;
+  color: var(--red-hi);
+}
+.hub-hero p {
+  color: var(--text2);
+  font-size: 16px;
+  max-width: 680px;
+  margin-bottom: 32px;
+}
+.hero-cta-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.btn-main {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--red);
+  color: #fff;
+  padding: 14px 28px;
+  font-weight: 600;
+  border-radius: var(--r);
+  transition: all 0.2s;
+  font-size: 14.5px;
+}
+.btn-main:hover {
+  background: var(--red-hi);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(198, 40, 40, 0.4);
+}
+.btn-sec {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 14px 24px;
+  font-weight: 500;
+  border-radius: var(--r);
+  transition: all 0.2s;
+  font-size: 14px;
+}
+.btn-sec:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+/* Sections Grid */
+.hub-content {
+  padding: 56px 0 80px;
+  flex: 1;
+}
+.group-section {
+  margin-bottom: 56px;
+}
+.group-header {
+  margin-bottom: 24px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+}
+.group-title {
+  font-family: var(--serif);
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.group-tag {
+  font-size: 12px;
+  color: var(--gold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+}
+.anchor-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+.anchor-card:hover {
+  border-color: var(--gold);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.card-num {
+  font-size: 11px;
+  font-family: monospace;
+  color: var(--gold);
+  background: rgba(214, 168, 95, 0.1);
+  padding: 2px 6px;
+  border-radius: var(--r);
+}
+.card-type {
+  font-size: 11px;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.card-title {
+  font-family: var(--serif);
+  font-size: 18px;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+.card-desc {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.55;
+  margin-bottom: 16px;
+  flex: 1;
+}
+.card-file {
+  font-family: monospace;
+  font-size: 11.5px;
+  color: var(--text3);
+  background: var(--bg);
+  padding: 6px 10px;
+  border-radius: var(--r);
+  border: 1px solid var(--border);
+  margin-bottom: 16px;
+  word-break: break-all;
+}
+.card-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: var(--gold);
+  font-weight: 500;
+  margin-top: auto;
+}
+.card-link:hover {
+  text-decoration: underline;
+}
+
+/* Footer */
+footer {
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  padding: 32px 0;
+  font-size: 13px;
+  color: var(--text3);
+}
+footer .wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+</style>
+</head>
+<body>
+
+<!-- HERO HEADER -->
+<header class="hub-hero">
+  <div class="wrap">
+    <div class="brand-pill">KAGEMAYA.ID · DESIGN SYSTEM &amp; PROTOTYPE HUB</div>
+    <h1>Di balik bayangan,<br><em>ilusi</em> menjadi nyata.</h1>
+    <p>
+      Paket lengkap visual anchor interaktif untuk web aplikasi <b>kagemaya.id</b>. Dibangun berdasarkan spesifikasi PRD v1.1 dengan identitas visual <b>Cinematic Japanese Noir + Indonesian Warmth</b>. Seluruh halaman telah saling terhubung secara fungsional.
+    </p>
+    <div class="hero-cta-row">
+      <a href="kagemaya-landing-page-visual-anchor.html" class="btn-main">
+        <span>Buka Beranda Utama (Landing Page)</span>
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2.2"><path d="m9 18 6-6-6-6"/></svg>
+      </a>
+      <a href="kagemaya-organizer-dashboard.html" class="btn-sec">
+        <span>Buka Portal Dashboard Organizer</span>
+        <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" fill="none" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a href="kagemaya-tokens.css" class="btn-sec" target="_blank">
+        <span>Lihat Master Stylesheet (CSS Tokens)</span>
+      </a>
+    </div>
+  </div>
+</header>
+
+<!-- MAIN HUB CONTENT -->
+<main class="hub-content">
+  <div class="wrap">
+
+    <!-- 1. PUBLIC EXPERIENCE & CUSTOMER JOURNEY -->
+    <section class="group-section">
+      <div class="group-header">
+        <h2 class="group-title">1. Public Discovery &amp; Customer Flow</h2>
+        <span class="group-tag">8 Halaman Terhubung</span>
+      </div>
+      <div class="cards-grid">
+
+        <a href="kagemaya-landing-page-visual-anchor.html" class="anchor-card">
+          <div class="card-head"><span class="card-num">#01</span><span class="card-type">Public Page</span></div>
+          <h3 class="card-title">Landing Page Utama</h3>
+          <p class="card-desc">Beranda sinematik dengan hero visual Tokyo night, featured events, kategori motif kawung, daftar organizer populer, dan footer.</p>
+          <div class="card-file">kagemaya-landing-page-visual-anchor.html</div>
+          <span class="card-link">Buka Halaman →</span>
+        </a>
+
+        <a href="kagemaya-event-discovery.html" class="anchor-card">
+          <div class="card-head"><span class="card-num">#02</span><span class="card-type">Catalog</span></div>
+          <h3 class="card-title">Event Discovery &amp; Filters</h3>
+          <p class="card-desc">Katalog eksplorasi "Temukan Event" dengan pencarian, filter kategori (Film 4D, Workshop, Talkshow), filter kota, dan grid kartu event.</p>
+          <div class="card-file">kagemaya-event-discovery.html</div>
+          <span class="card-link">Buka Halaman →</span>
+        </a>
+
+        <a href="kagemaya-event-detail.html" class="anchor-card">
+          <div class="card-head"><span class="card-num">#03</span><span class="card-type">Center of Gravity</span></div>
+          <h3 class="card-title">Event Detail Sinematik</h3>
+          <p class="card-desc">Pusat gravitasi UX Kagemaya: banner 16:9, jadwal, lokasi, pemilihan tiket live stepper, ringkasan organizer, Q&amp;A wall, dan ulasan peserta.</p>
+          <div class="card-file">kagemaya-event-detail.html</div>
+          <span class="card-link">Buka Halaman →</span>
+        </a>
+
+        <a href="kagemaya-checkout.html" class="anchor-card">
+          <div class="card-head"><span class="card-num">#04</span><span class="card-type">Transaction</span></div>
+          <h3 class="card-title">Halaman Checkout Tiket</h3>
+          <p class="card-desc">Ringkasan pesanan tiket, penerapan voucher organizer, penukaran kupon diskon, pemotongan poin loyalty, dan kalkulasi transparan.</p>
+          <div class="card-file">kagemaya-checkout.html</div>
+          <span class="card-link">Buka Halaman →</span>
+        </a>
+
+        <a href="kagemaya-transaction-payment.html" class="anchor-card">
+          <div class="card-head"><span class="card-num">#05</span><span class="card-type">Payment Engine</span></div>
+          <h3 class="card-title">Unggah Bukti Pembayaran</h3>
+          <p class="card-desc">Instruksi transfer rekening BCA/Mandiri, countdown timer 2 jam (01:42:35), area dropzone bukti bayar, dan status badge otomatis.</p>
+          <div class="card-file">kagemaya-transaction-payment.html</div>
+          <span class="card-link">Buka Halaman →</span>
+        </a>
+
+        <a href="kagemaya-transaction-status.html" class="anchor-card">
+          <div class="card-head"><span class="card-num">#06</span><span class="card-type">6 States Engine</span></div>
+          <h3 class="card-title">Status Transaksi Interaktif</h3>
+          <p class="card-desc">Mencakup 6 state resmi: waiting_payment, waiting_confirmation, done, rejected, expired, dan canceled dengan tab switcher interaktif.</p>
+          <div class="card-file">kagemaya-transaction-status.html</div>
+          <span class="card-link">Buka Halaman →</span>
+        </a>
+
+        <a href="kagemaya-wishlist.html" class="anchor-card">
+          <div class="card-head"><span class="card-num">#07</span><span class="card-type">User Favorites</span></div>
+          <h3 class="card-title">Wishlist (Event Tersimpan)</h3>
+          <p class="card-desc">Event tersimpan favorit dengan tab "Mendatang" &amp; "Sudah Lewat", tombol hapus ghost, dan ilustrasi empty state.</p>
+          <div class="card-file">kagemaya-wishlist.html</div>
+          <span class="card-link">Buka Halaman →</span>
+        </a>
+
+        <a href="kagemaya-organizer-profile.html" class="anchor-card">
+          <div class="card-head"><span class="card-num">#08</span><span class="card-type">Public Profile</span></div>
+          <h3 class="card-title">Profil Publik Organizer</h3>
+          <p class="card-desc">Halaman profil kolektif penyelenggara: banner cover, avatar circular 80px, rating bintang, tombol follow, dan tab event/review.</p>
+          <div class="card-file">kagemaya-organizer-profile.html</div>
+          <span class="card-link">Buka Halaman →</span>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- 2. SOCIAL & REVIEWS -->
+    <section class="group-section">
+      <div class="group-header">
+        <h2 class="group-title">2. Interaksi Sosial &amp; Ulasan Komunitas</h2>
+        <span class="group-tag">2 Halaman Terhubung</span>
+      </div>
+      <div class="cards-grid">
+
+        <a href="kagemaya-qa-wall.html" class="anchor-card">
+          <div class="card-head"><span class="card-num">#09</span><span class="card-type">Discussion Wall</span></div>
+          <h3 class="card-title">Q&amp;A Discussion Wall</h3>
+          <p class="card-desc">Dinding tanya jawab komunitas dengan jawaban resmi organizer berbadge Maya Gold, pinning jawaban, dan bar input pertanyaan.</p>
+          <div class="card-file">kagemaya-qa-wall.html</div>
+          <span class="card-link">Buka Halaman →</span>
+        </a>
+
+        <a href="kagemaya-review.html" class="anchor-card">
+          <div class="card-head"><span class="card-num">#10</span><span class="card-type">Feedback Form</span></div>
+          <h3 class="card-title">Formulir Ulasan Pasca-Event</h3>
+          <p class="card-desc">Form ulasan khusus tiket status DONE: rating bintang 1–5 Maya Gold, masukan teks pengalaman penonton, dan toast notifikasi sukses.</p>
+          <div class="card-file">kagemaya-review.html</div>
+          <span class="card-link">Buka Halaman →</span>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- 3. AUTHENTICATION & USER PROFILE -->
+    <section class="group-section">
+      <div class="group-header">
+        <h2 class="group-title">3. Autentikasi &amp; Profil Pengguna</h2>
+        <span class="group-tag">3 Halaman Terhubung</span>
+      </div>
+      <div class="cards-grid">
+
+        <a href="kagemaya-login.html" class="anchor-card">
+          <div class="card-head"><span class="card-num">#11</span><span class="card-type">Authentication</span></div>
+          <h3 class="card-title">Halaman Masuk (Login)</h3>
+          <p class="card-desc">Showcase split sinematik noir, input email &amp; kata sandi, toggle mata, switcher error state demo, pengisi persona cepat, dan modal lupa sandi.</p>
+          <div class="card-file">kagemaya-login.html</div>
+          <span class="card-link">Buka Halaman →</span>
+        </a>
+
+        <a href="kagemaya-register.html" class="anchor-card">
+          <div class="card-head"><span class="card-num">#12</span><span class="card-type">Role Engine</span></div>
+          <h3 class="card-title">Registrasi Akun &amp; Role Selector</h3>
+          <p class="card-desc">Pemilih peran Customer vs Organizer interaktif. Menjalankan aturan PRD: field referral code muncul pada Customer dan hilang pada Organizer.</p>
+          <div class="card-file">kagemaya-register.html</div>
+          <span class="card-link">Buka Halaman →</span>
+        </a>
+
+        <a href="kagemaya-user-profile.html" class="anchor-card">
+          <div class="card-head"><span class="card-num">#13</span><span class="card-type">Customer Account</span></div>
+          <h3 class="card-title">Profil Akun Customer</h3>
+          <p class="card-desc">Manajemen akun pelanggan: foto avatar, kode referral pribadi, saldo poin hadiah, daftar kupon aktif, dan tautan riwayat pesanan.</p>
+          <div class="card-file">kagemaya-user-profile.html</div>
+          <span class="card-link">Buka Halaman →</span>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- 4. ORGANIZER MANAGEMENT PORTAL -->
+    <section class="group-section">
+      <div class="group-header">
+        <h2 class="group-title">4. Portal Manajemen Penyelenggara (Organizer)</h2>
+        <span class="group-tag">5 Halaman Terhubung</span>
+      </div>
+      <div class="cards-grid">
+
+        <a href="kagemaya-organizer-dashboard.html" class="anchor-card">
+          <div class="card-head"><span class="card-num">#14</span><span class="card-type">Dashboard Overview</span></div>
+          <h3 class="card-title">Dashboard Ikhtisar Penyelenggara</h3>
+          <p class="card-desc">Panel utama berlatar Yoru Light (#1C1C22), 3 kartu metrik horizontal, tabel ringkasan event aktif, transaksi terbaru, dan kartu voucher.</p>
+          <div class="card-file">kagemaya-organizer-dashboard.html</div>
+          <span class="card-link">Buka Halaman →</span>
+        </a>
+
+        <a href="kagemaya-organizer-create-event.html" class="anchor-card">
+          <div class="card-head"><span class="card-num">#15</span><span class="card-type">Event Creator</span></div>
+          <h3 class="card-title">Formulir Pembuatan Event Baru</h3>
+          <p class="card-desc">Dropzone banner 16:9, jadwal, detail venue, dan manajemen dinamis tier tiket dengan invarian EVENTS.available_seats terhitung otomatis.</p>
+          <div class="card-file">kagemaya-organizer-create-event.html</div>
+          <span class="card-link">Buka Halaman →</span>
+        </a>
+
+        <a href="kagemaya-organizer-transactions.html" class="anchor-card">
+          <div class="card-head"><span class="card-num">#16</span><span class="card-type">Verification Suite</span></div>
+          <h3 class="card-title">Verifikasi &amp; Bukti Transaksi</h3>
+          <p class="card-desc">Tabel transaksi, filter status (Menunggu Konfirmasi), modal preview bukti transfer m-Banking, dan alur Terima / Tolak dengan rollback.</p>
+          <div class="card-file">kagemaya-organizer-transactions.html</div>
+          <span class="card-link">Buka Halaman →</span>
+        </a>
+
+        <a href="kagemaya-organizer-attendees.html" class="anchor-card">
+          <div class="card-head"><span class="card-num">#17</span><span class="card-type">Attendance (DONE Only)</span></div>
+          <h3 class="card-title">Daftar Hadir Peserta Resmi</h3>
+          <p class="card-desc">Kepatuhan PRD Section 16: hanya memuat transaksi berstatus DONE. Dilengkapi fitur check-in interaktif, metrik kehadiran, dan ekspor CSV.</p>
+          <div class="card-file">kagemaya-organizer-attendees.html</div>
+          <span class="card-link">Buka Halaman →</span>
+        </a>
+
+        <a href="kagemaya-organizer-vouchers.html" class="anchor-card">
+          <div class="card-head"><span class="card-num">#18</span><span class="card-type">Promotions</span></div>
+          <h3 class="card-title">Manajemen Voucher Event</h3>
+          <p class="card-desc">Modal penerbitan voucher diskon % atau flat Rp khusus per-event, kuota pemakaian dengan progress bar, dan status aktif/kedaluwarsa.</p>
+          <div class="card-file">kagemaya-organizer-vouchers.html</div>
+          <span class="card-link">Buka Halaman →</span>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- 5. DESIGN SYSTEM & STANDALONE ASSETS -->
+    <section class="group-section">
+      <div class="group-header">
+        <h2 class="group-title">5. Design System Assets &amp; Reusable Components</h2>
+        <span class="group-tag">3 Berkas Fondasi</span>
+      </div>
+      <div class="cards-grid">
+
+        <a href="kagemaya-tokens.css" class="anchor-card" target="_blank">
+          <div class="card-head"><span class="card-num">#19</span><span class="card-type">Master CSS Stylesheet</span></div>
+          <h3 class="card-title">kagemaya-tokens.css</h3>
+          <p class="card-desc">File CSS mandiri lengkap: variabel warna :root, skala tipografi, reset, styling tombol, form controls, kartu, status badges, dan breakpoint responsif.</p>
+          <div class="card-file">kagemaya-tokens.css</div>
+          <span class="card-link">Buka File CSS →</span>
+        </a>
+
+        <a href="kagemaya-modals.html" class="anchor-card">
+          <div class="card-head"><span class="card-num">#20</span><span class="card-type">Component Set</span></div>
+          <h3 class="card-title">Modal Dialog Templates</h3>
+          <p class="card-desc">Kumpulan markup dialog modal siap pakai dalam elemen &lt;template&gt;: Confirm, Delete, Cancel Transaction, dan Accept/Reject Payment.</p>
+          <div class="card-file">kagemaya-modals.html</div>
+          <span class="card-link">Buka Template →</span>
+        </a>
+
+        <a href="kagemaya-toasts.html" class="anchor-card">
+          <div class="card-head"><span class="card-num">#21</span><span class="card-type">Component Set</span></div>
+          <h3 class="card-title">Toast Notification Templates</h3>
+          <p class="card-desc">Kumpulan markup notifikasi overlay pojok kanan bawah: Success (#4CAF7D), Warning (#D6A84F), Error (#E05252), dan Info (#121216).</p>
+          <div class="card-file">kagemaya-toasts.html</div>
+          <span class="card-link">Buka Template →</span>
+        </a>
+
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div>&copy; 2026 Kagemaya.id — Hak Cipta Dilindungi. Platform Sinema &amp; Budaya Indo-Jepang.</div>
+    <div style="font-family: var(--serif); color: var(--gold); letter-spacing: 0.15em;">影と幻 · KAGE TO MAYA</div>
+  </div>
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Status Transaksi — Kagemaya</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="kagemaya-tokens.css">
+<style>
+/* ─── DESIGN TOKENS ─────────────────────────────────────── */
+:root {
+  color-scheme: dark;
+  --bg: #0B0B0D;
+  --surface: #121216;
+  --elev: #1C1C22;
+  --red: #C62828;
+  --red-hi: #E5484D;
+  --gold: #D6A85F;
+  --text: #F4F0E8;
+  --text2: #B8B5B0;
+  --text3: #85837f;
+  --border: #292930;
+  --green: #4ADE80;
+  --serif: 'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', Georgia, serif;
+  --sans: 'Inter', 'Noto Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --r: 2px;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+html {
+  scroll-padding-top: 84px;
+  background: var(--bg);
+  scroll-behavior: smooth;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+svg {
+  display: block;
+}
+
+/* ─── GRAIN ─────────────────────────────────────────────── */
+.grain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: .18;
+  mix-blend-mode: overlay;
+  width: 100%;
+  height: 100%;
+}
+
+/* ─── WRAP ───────────────────────────────────────────────── */
+.wrap {
+  max-width: 1296px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* ─── NAVBAR ─────────────────────────────────────────────── */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding-top: env(safe-area-inset-top, 0px);
+  background: rgba(11, 11, 13, .9);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.nav .wrap {
+  display: flex;
+  align-items: center;
+  height: 84px;
+  gap: 0;
+}
+
+.logo {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  flex: none;
+  margin-right: 40px;
+}
+
+.logo b {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 21px;
+  letter-spacing: .34em;
+  margin-right: -.34em;
+}
+
+.logo i {
+  font-family: var(--serif);
+  font-style: normal;
+  color: var(--red-hi);
+  font-size: 17px;
+  font-weight: 400;
+}
+
+.nav nav {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.nav ul {
+  display: flex;
+  gap: 36px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.nav ul a {
+  font-size: 14px;
+  color: var(--text2);
+  transition: color .2s;
+}
+
+.nav ul a:hover {
+  color: var(--text);
+}
+
+.nav-r {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex: none;
+}
+
+.icon-btn {
+  background: none;
+  border: 0;
+  color: var(--text2);
+  padding: 6px;
+  display: grid;
+  place-items: center;
+  transition: color .2s;
+  cursor: pointer;
+}
+
+.icon-btn:hover {
+  color: var(--text);
+}
+
+.login {
+  font-size: 14px;
+  color: var(--text2);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: 500 14px/1 var(--sans);
+  padding: 13px 24px;
+  border-radius: var(--r);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background .2s, border-color .2s, color .2s, transform .1s;
+  letter-spacing: .01em;
+  gap: 8px;
+}
+
+.btn:active {
+  transform: scale(0.99);
+}
+
+.btn-red {
+  background: var(--red);
+  color: var(--text);
+}
+
+.btn-red:hover {
+  background: var(--red-hi);
+}
+
+.btn-line {
+  border-color: rgba(244, 240, 232, .24);
+  color: var(--text);
+  background: transparent;
+}
+
+.btn-line:hover {
+  border-color: var(--text);
+}
+
+.btn-sm {
+  padding: 9px 18px;
+  font-size: 13px;
+}
+
+/* ─── STATE SWITCHER BAR (Interactive Preview Control) ───── */
+.state-switcher-container {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 84px;
+  z-index: 90;
+}
+
+.state-switcher {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.state-switcher::-webkit-scrollbar {
+  display: none;
+}
+
+.state-switcher-label {
+  font-size: 11.5px;
+  color: var(--gold);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  font-family: var(--serif);
+  white-space: nowrap;
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.state-switcher-label::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--gold);
+}
+
+.state-pill {
+  background: var(--elev);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  padding: 6px 14px;
+  border-radius: var(--r);
+  font-size: 12.5px;
+  white-space: nowrap;
+  transition: all .2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.state-pill .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.state-pill:hover {
+  border-color: var(--text3);
+  color: var(--text);
+}
+
+.state-pill.active {
+  background: var(--surface);
+  border-color: var(--gold);
+  color: var(--gold);
+  font-weight: 500;
+}
+
+/* ─── MAIN CONTENT ───────────────────────────────────────── */
+.page {
+  padding-top: 48px;
+  padding-bottom: 120px;
+}
+
+.status-wrapper {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+/* ─── STATUS CARD ────────────────────────────────────────── */
+.status-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 48px 40px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+  transition: border-color .3s;
+}
+
+.status-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--gold);
+  opacity: .35;
+  transition: background .3s;
+}
+
+/* Card State Top Borders */
+.status-card[data-state="waiting_payment"]::before { background: var(--red); }
+.status-card[data-state="waiting_confirmation"]::before { background: var(--gold); }
+.status-card[data-state="done"]::before { background: var(--green); }
+.status-card[data-state="rejected"]::before { background: var(--red-hi); }
+.status-card[data-state="expired"]::before { background: var(--text3); }
+.status-card[data-state="canceled"]::before { background: var(--text3); }
+
+/* Icon Badge in Status Card */
+.status-icon-box {
+  width: 76px;
+  height: 76px;
+  margin: 0 auto 24px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  position: relative;
+  transition: all .3s;
+}
+
+.status-icon-box svg {
+  width: 36px;
+  height: 36px;
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+/* Status Icon Themes */
+.theme-red {
+  background: rgba(198, 40, 40, .12);
+  border: 1px solid rgba(198, 40, 40, .35);
+  color: var(--red-hi);
+}
+.theme-gold {
+  background: rgba(214, 168, 95, .12);
+  border: 1px solid rgba(214, 168, 95, .35);
+  color: var(--gold);
+}
+.theme-green {
+  background: rgba(74, 222, 128, .12);
+  border: 1px solid rgba(74, 222, 128, .35);
+  color: var(--green);
+}
+.theme-muted {
+  background: rgba(133, 131, 127, .12);
+  border: 1px solid rgba(133, 131, 127, .3);
+  color: var(--text3);
+}
+
+/* Status Badge Component */
+.kage-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 14px;
+  border-radius: var(--r);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  border: 1px solid;
+  margin-bottom: 16px;
+}
+
+.kage-badge .b-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.kage-badge-red {
+  background: rgba(198, 40, 40, .1);
+  border-color: rgba(198, 40, 40, .4);
+  color: var(--red-hi);
+}
+.kage-badge-gold {
+  background: rgba(214, 168, 95, .1);
+  border-color: rgba(214, 168, 95, .4);
+  color: var(--gold);
+}
+.kage-badge-green {
+  background: rgba(74, 222, 128, .1);
+  border-color: rgba(74, 222, 128, .4);
+  color: var(--green);
+}
+.kage-badge-muted {
+  background: rgba(133, 131, 127, .1);
+  border-color: rgba(133, 131, 127, .35);
+  color: var(--text2);
+}
+
+.status-title {
+  font-family: var(--serif);
+  font-size: 28px;
+  font-weight: 400;
+  margin: 0 0 14px;
+  letter-spacing: -.01em;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.status-desc {
+  color: var(--text2);
+  font-size: 15px;
+  line-height: 1.75;
+  max-width: 520px;
+  margin: 0 auto 32px;
+}
+
+.status-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+/* ─── TRANSACTION DETAILS CARD ───────────────────────────── */
+.detail-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  margin-top: 32px;
+  overflow: hidden;
+}
+
+.detail-card-head {
+  padding: 20px 28px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.detail-card-head h3 {
+  font-family: var(--serif);
+  font-size: 19px;
+  font-weight: 400;
+  margin: 0;
+}
+
+.detail-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.detail-table tr {
+  border-bottom: 1px solid var(--border);
+}
+
+.detail-table tr:last-child {
+  border-bottom: none;
+}
+
+.detail-table th {
+  text-align: left;
+  padding: 16px 28px;
+  font-size: 13.5px;
+  color: var(--text2);
+  font-weight: 400;
+  width: 32%;
+  vertical-align: top;
+}
+
+.detail-table td {
+  padding: 16px 28px;
+  font-size: 14.5px;
+  color: var(--text);
+  vertical-align: top;
+}
+
+.event-cell {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.event-cell-thumb {
+  width: 68px;
+  height: 52px;
+  border-radius: var(--r);
+  overflow: hidden;
+  position: relative;
+  background: #09090b;
+  border: 1px solid var(--border);
+  flex: none;
+}
+
+.event-cell-thumb svg {
+  width: 100%;
+  height: 100%;
+}
+
+.event-cell-info h4 {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 15px;
+  margin: 0 0 4px;
+  line-height: 1.35;
+}
+
+.event-cell-info p {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--text2);
+}
+
+.txn-id-badge {
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--elev);
+  border: 1px solid var(--border);
+  padding: 4px 10px;
+  border-radius: var(--r);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.txn-copy-btn {
+  background: none;
+  border: none;
+  color: var(--text3);
+  padding: 0;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: color .2s;
+}
+
+.txn-copy-btn:hover {
+  color: var(--gold);
+}
+
+.price-highlight {
+  font-family: var(--serif);
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--red-hi);
+}
+
+.ticket-pills-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ticket-row-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--elev);
+  border: 1px solid var(--border);
+  padding: 8px 12px;
+  border-radius: var(--r);
+  font-size: 13px;
+}
+
+.ticket-row-item span:first-child {
+  color: var(--text);
+}
+
+.ticket-row-item span:last-child {
+  color: var(--text2);
+  font-weight: 500;
+}
+
+/* ─── FOOTER ─────────────────────────────────────────────── */
+footer {
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  padding: 64px 0 36px;
+  margin-top: 80px;
+}
+
+.f-top {
+  display: grid;
+  grid-template-columns: 1.4fr repeat(4, auto);
+  gap: 48px;
+  align-items: start;
+}
+
+.f-brand p {
+  color: var(--text2);
+  font-size: 14px;
+  margin: 14px 0 0;
+  max-width: 20em;
+  line-height: 1.65;
+}
+
+.f-top a.l {
+  font-size: 14px;
+  color: var(--text2);
+  padding: 2px 0;
+  display: block;
+  transition: color .2s;
+}
+
+.f-top a.l:hover {
+  color: var(--text);
+}
+
+.f-top h6 {
+  font-size: 11px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin: 0 0 14px;
+  font-weight: 500;
+}
+
+.f-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 56px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  color: var(--text3);
+  font-size: 13px;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.soc {
+  display: flex;
+  gap: 10px;
+}
+
+.soc a {
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: var(--text2);
+  transition: border-color .2s, color .2s;
+}
+
+.soc a:hover {
+  border-color: var(--gold);
+  color: var(--text);
+}
+
+.soc svg {
+  width: 15px;
+  height: 15px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ─── RESPONSIVE ─────────────────────────────────────────── */
+@media (max-width: 760px) {
+  .wrap {
+    padding: 0 20px;
+  }
+  .nav ul, .login {
+    display: none;
+  }
+  .nav .wrap {
+    gap: 12px;
+  }
+  .nav-r {
+    margin-left: auto;
+  }
+  .status-card {
+    padding: 36px 20px;
+  }
+  .status-title {
+    font-size: 24px;
+  }
+  .detail-table th, .detail-table td {
+    padding: 14px 18px;
+  }
+  .detail-table th {
+    width: 38%;
+  }
+  .event-cell {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .event-cell-thumb {
+    width: 100%;
+    height: 90px;
+  }
+  .f-top {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ SVG DEFS ══════════════════════════════════════════════ -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" seed="7" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+    </filter>
+    <pattern id="kawung" width="36" height="36" patternUnits="userSpaceOnUse">
+      <g fill="none" stroke="#D6A85F" stroke-width=".8" opacity=".55">
+        <ellipse cx="18" cy="9" rx="8" ry="5"/><ellipse cx="18" cy="27" rx="8" ry="5"/>
+        <ellipse cx="9" cy="18" rx="5" ry="8"/><ellipse cx="27" cy="18" rx="5" ry="8"/>
+      </g>
+    </pattern>
+  </defs>
+</svg>
+
+<!-- ═══ 1. NAVBAR ════════════════════════════════════════════ -->
+<header class="nav" role="banner">
+  <div class="wrap">
+    <a class="logo" href="kagemaya-landing-page-visual-anchor.html" aria-label="Kagemaya beranda">
+      <b>KAGEMAYA</b><i>影幻</i>
+    </a>
+    <nav aria-label="Utama">
+      <ul>
+        <li><a href="#">Event</a></li>
+        <li><a href="#">Kategori</a></li>
+        <li><a href="#">Organizer</a></li>
+      </ul>
+    </nav>
+    <div class="nav-r">
+      <button class="icon-btn" aria-label="Cari">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+      </button>
+      <a class="login" href="#">Hana M.</a>
+      <a class="btn btn-sm btn-line" href="#">Pesananku</a>
+    </div>
+  </div>
+</header>
+
+<!-- ═══ INTERACTIVE STATE SWITCHER BAR ════════════════════════ -->
+<div class="state-switcher-container">
+  <div class="wrap">
+    <div class="state-switcher" role="tablist" aria-label="Pratinjau Status Transaksi">
+      <span class="state-switcher-label">Preview State</span>
+      <button class="state-pill active" role="tab" aria-selected="true" data-switch="waiting_payment">
+        <span class="dot"></span>waiting_payment
+      </button>
+      <button class="state-pill" role="tab" aria-selected="false" data-switch="waiting_confirmation">
+        <span class="dot"></span>waiting_confirmation
+      </button>
+      <button class="state-pill" role="tab" aria-selected="false" data-switch="done">
+        <span class="dot"></span>done
+      </button>
+      <button class="state-pill" role="tab" aria-selected="false" data-switch="rejected">
+        <span class="dot"></span>rejected
+      </button>
+      <button class="state-pill" role="tab" aria-selected="false" data-switch="expired">
+        <span class="dot"></span>expired
+      </button>
+      <button class="state-pill" role="tab" aria-selected="false" data-switch="canceled">
+        <span class="dot"></span>canceled
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MAIN CONTENT ══════════════════════════════════════════ -->
+<main class="page">
+  <div class="wrap">
+    <div class="status-wrapper">
+
+      <!-- ─── 2. CENTERED STATUS CARD ──────────────────────── -->
+      <section class="status-card" id="status-card" data-state="waiting_payment">
+        
+        <!-- Dynamic Icon Container -->
+        <div class="status-icon-box theme-red" id="status-icon-box">
+          <!-- Icon injected by JS -->
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+        </div>
+
+        <!-- Dynamic Badge -->
+        <div>
+          <span class="kage-badge kage-badge-red" id="status-badge">
+            <span class="b-dot"></span>
+            <span id="badge-text">Menunggu Pembayaran</span>
+          </span>
+        </div>
+
+        <!-- Dynamic Heading -->
+        <h1 class="status-title" id="status-title">Selesaikan Pembayaran Kamu</h1>
+
+        <!-- Dynamic Description -->
+        <p class="status-desc" id="status-desc">
+          Pesanan tiket berhasil dibuat. Silakan transfer dan unggah bukti pembayaran sebelum waktu habis agar kursi pilihanmu tidak dibatalkan otomatis.
+        </p>
+
+        <!-- Dynamic Action Buttons -->
+        <div class="status-actions" id="status-actions">
+          <a href="kagemaya-transaction-payment.html" class="btn btn-red" id="primary-cta">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            Upload Bukti Pembayaran
+          </a>
+          <a href="kagemaya-transaction-payment.html" class="btn btn-line" id="secondary-cta">
+            Detail Rekening Transfer
+          </a>
+        </div>
+
+      </section>
+
+      <!-- ─── 3. TRANSACTION DETAILS TABLE ─────────────────── -->
+      <section class="detail-card" aria-label="Detail Pesanan">
+        <div class="detail-card-head">
+          <h3>Rincian Transaksi</h3>
+          <span class="txn-id-badge">
+            <span id="txn-id-display">TXN-2026-KGM-008471</span>
+            <button class="txn-copy-btn" id="copy-btn" title="Salin No Transaksi" aria-label="Salin ID Transaksi">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+            </button>
+          </span>
+        </div>
+
+        <table class="detail-table">
+          <tbody>
+            <tr>
+              <th scope="row">Event</th>
+              <td>
+                <div class="event-cell">
+                  <div class="event-cell-thumb" aria-hidden="true">
+                    <svg viewBox="0 0 68 52" preserveAspectRatio="xMidYMid slice">
+                      <defs>
+                        <linearGradient id="sc-sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0b0b0d"/><stop offset="1" stop-color="#2a0e10"/></linearGradient>
+                        <radialGradient id="sc-moon" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#F4E3C4"/><stop offset=".3" stop-color="#E5484D" stop-opacity=".5"/><stop offset="1" stop-color="#C62828" stop-opacity="0"/></radialGradient>
+                      </defs>
+                      <rect width="68" height="52" fill="url(#sc-sky)"/>
+                      <circle cx="48" cy="18" r="24" fill="url(#sc-moon)" opacity=".85"/>
+                      <circle cx="48" cy="18" r="7" fill="#F1DFC0" opacity=".92"/>
+                      <g fill="#09090b">
+                        <rect x="4" y="28" width="6" height="24"/><rect x="12" y="22" width="6" height="30"/>
+                        <rect x="42" y="26" width="8" height="26"/><rect x="52" y="18" width="6" height="34"/>
+                      </g>
+                      <rect width="68" height="52" fill="url(#kawung)" opacity=".08"/>
+                    </svg>
+                    <svg class="grain" viewBox="0 0 68 52" preserveAspectRatio="none"><rect width="68" height="52" filter="url(#grain)"/></svg>
+                  </div>
+                  <div class="event-cell-info">
+                    <h4>Yūgen: Film 4D Kolaborasi Tokyo–Jakarta</h4>
+                    <p>Senin, 12 Okt 2026 · 19:00 WIB · Teater Sinar Maya, Jakarta</p>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Tiket Dipesan</th>
+              <td>
+                <div class="ticket-pills-wrap">
+                  <div class="ticket-row-item">
+                    <span>Regular Tier × 1</span>
+                    <span>Rp150.000</span>
+                  </div>
+                  <div class="ticket-row-item">
+                    <span>Premium Tier × 1</span>
+                    <span>Rp250.000</span>
+                  </div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <th scope="row">Waktu Transaksi</th>
+              <td>Senin, 12 Oktober 2026, 17:48 WIB</td>
+            </tr>
+            <tr>
+              <th scope="row">Metode Pembayaran</th>
+              <td>Transfer Bank BCA (Verifikasi Manual)</td>
+            </tr>
+            <tr>
+              <th scope="row">Total Pembayaran</th>
+              <td>
+                <div class="price-highlight">Rp456.750</div>
+                <div style="font-size:12px;color:var(--text3);margin-top:4px">Termasuk diskon voucher KAGE20 (-Rp40.000), poin (-Rp10.000), &amp; biaya layanan (Rp6.750)</div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </section>
+
+    </div>
+  </div>
+</main>
+
+<!-- ═══ 4. FOOTER ════════════════════════════════════════════ -->
+<footer>
+  <div class="wrap">
+    <div class="f-top">
+      <div class="f-brand">
+        <a class="logo" href="#"><b>KAGEMAYA</b><i>影幻</i></a>
+        <p>Di balik bayangan, ilusi menjadi nyata.</p>
+      </div>
+      <div>
+        <h6>Jelajahi</h6>
+        <a class="l" href="#">Event</a>
+        <a class="l" href="#">Kategori</a>
+        <a class="l" href="#">Organizer</a>
+      </div>
+      <div>
+        <h6>Perusahaan</h6>
+        <a class="l" href="#">Tentang Kagemaya</a>
+        <a class="l" href="#">Karir</a>
+        <a class="l" href="#">Blog</a>
+      </div>
+      <div>
+        <h6>Dukungan</h6>
+        <a class="l" href="#">Bantuan</a>
+        <a class="l" href="#">Kebijakan Refund</a>
+        <a class="l" href="#">Kontak</a>
+      </div>
+    </div>
+    <div class="f-bottom">
+      <span>© 2026 Kagemaya. Semua hak dilindungi.</span>
+      <div class="soc">
+        <a href="#" aria-label="Instagram"><svg viewBox="0 0 24 24"><rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17" cy="7" r=".6"/></svg></a>
+        <a href="#" aria-label="YouTube"><svg viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="3.5"/><path d="M10 9.5v5l4.5-2.5z"/></svg></a>
+        <a href="#" aria-label="X"><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></a>
+        <a href="#" aria-label="TikTok"><svg viewBox="0 0 24 24"><path d="M14 4v10.5a3.5 3.5 0 11-3.5-3.5M14 4c.4 2.6 2 4 4.5 4.2"/></svg></a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ═══ JAVASCRIPT STATE ENGINE ═══════════════════════════════ -->
+<script>
+(function() {
+  'use strict';
+
+  // Definition of the 6 Transaction States
+  const STATES = {
+    waiting_payment: {
+      badgeClass: 'kage-badge-red',
+      badgeText: 'Menunggu Pembayaran',
+      iconBoxClass: 'theme-red',
+      iconSvg: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>',
+      title: 'Selesaikan Pembayaran Kamu',
+      desc: 'Pesanan tiket telah dibuat. Silakan transfer tepat sesuai nominal unik dan unggah bukti transfer sebelum waktu berakhir agar kursi pilihanmu aman.',
+      primaryBtn: {
+        text: 'Upload Bukti Pembayaran',
+        icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>',
+        href: 'kagemaya-transaction-payment.html',
+        class: 'btn-red'
+      },
+      secondaryBtn: {
+        text: 'Detail Rekening Transfer',
+        href: 'kagemaya-transaction-payment.html',
+        class: 'btn-line'
+      }
+    },
+    waiting_confirmation: {
+      badgeClass: 'kage-badge-gold',
+      badgeText: 'Menunggu Konfirmasi Organizer',
+      iconBoxClass: 'theme-gold',
+      iconSvg: '<svg viewBox="0 0 24 24"><path d="M12 3v3m0 12v3M3 12h3m12 0h3M5.6 5.6l2.1 2.1m8.6 8.6l2.1 2.1M5.6 18.4l2.1-2.1m8.6-8.6l2.1-2.1"/><circle cx="12" cy="12" r="4"/></svg>',
+      title: 'Bukti Pembayaran Sedang Diverifikasi',
+      desc: 'Bukti transfer kamu telah berhasil kami terima. Organizer akan memverifikasi pembayaranmu dalam 1×24 jam kerja. Notifikasi e-tiket akan otomatis dikirimkan ke email terdaftar.',
+      primaryBtn: {
+        text: 'Hubungi Organizer',
+        icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>',
+        href: '#',
+        class: 'btn-line'
+      },
+      secondaryBtn: {
+        text: 'Kembali ke Beranda',
+        href: 'kagemaya-landing-page-visual-anchor.html',
+        class: 'btn-line'
+      }
+    },
+    done: {
+      badgeClass: 'kage-badge-green',
+      badgeText: 'Pembayaran Berhasil',
+      iconBoxClass: 'theme-green',
+      iconSvg: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.5l2.5 2.5 5-5"/></svg>',
+      title: 'Transaksi Berhasil & E-Tiket Terbit',
+      desc: 'Selamat! Pembayaranmu telah diverifikasi penuh oleh Aozora Collective. E-tiket barcode resmi telah diterbitkan dan dikirimkan ke emailmu. Tunjukkan tiket ini saat registrasi di venue.',
+      primaryBtn: {
+        text: 'Lihat E-Tiket Saya',
+        icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h6M7 16h4"/></svg>',
+        href: '#',
+        class: 'btn-red'
+      },
+      secondaryBtn: {
+        text: 'Download Invoice PDF',
+        href: '#',
+        class: 'btn-line'
+      }
+    },
+    rejected: {
+      badgeClass: 'kage-badge-red',
+      badgeText: 'Bukti Pembayaran Ditolak',
+      iconBoxClass: 'theme-red',
+      iconSvg: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>',
+      title: 'Verifikasi Pembayaran Ditolak',
+      desc: 'Organizer tidak dapat memvalidasi bukti transfer yang diunggah (misal: nominal tidak sesuai angka unik atau gambar buram). Silakan unggah ulang bukti asli yang jelas sebelum batas waktu berakhir.',
+      primaryBtn: {
+        text: 'Upload Ulang Bukti',
+        icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>',
+        href: 'kagemaya-transaction-payment.html',
+        class: 'btn-red'
+      },
+      secondaryBtn: {
+        text: 'Hubungi Organizer',
+        href: '#',
+        class: 'btn-line'
+      }
+    },
+    expired: {
+      badgeClass: 'kage-badge-muted',
+      badgeText: 'Kedaluwarsa',
+      iconBoxClass: 'theme-muted',
+      iconSvg: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l2.5 1.5M16 16l4 4"/></svg>',
+      title: 'Batas Waktu Pembayaran Habis',
+      desc: 'Waktu pembayaran untuk pesanan ini telah habis sehingga sistem secara otomatis membatalkan transaksi. Kuota kursi telah dikembalikan ke sistem. Kamu dapat memesan tiket baru kembali.',
+      primaryBtn: {
+        text: 'Pesan Ulang Tiket',
+        icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M1 4v6h6M23 20v-6h-6"/><path d="M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15"/></svg>',
+        href: 'kagemaya-checkout.html',
+        class: 'btn-red'
+      },
+      secondaryBtn: {
+        text: 'Kembali ke Event',
+        href: 'kagemaya-event-detail.html',
+        class: 'btn-line'
+      }
+    },
+    canceled: {
+      badgeClass: 'kage-badge-muted',
+      badgeText: 'Pesanan Dibatalkan',
+      iconBoxClass: 'theme-muted',
+      iconSvg: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M4.93 4.93l14.14 14.14"/></svg>',
+      title: 'Transaksi Telah Dibatalkan',
+      desc: 'Pesanan ini telah resmi dibatalkan oleh pengguna atau permintaan pembatalan sistem. Tidak ada tagihan atau penalti yang dikenakan.',
+      primaryBtn: {
+        text: 'Jelajahi Event Lain',
+        icon: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>',
+        href: 'kagemaya-landing-page-visual-anchor.html#event',
+        class: 'btn-red'
+      },
+      secondaryBtn: {
+        text: 'Kembali ke Beranda',
+        href: 'kagemaya-landing-page-visual-anchor.html',
+        class: 'btn-line'
+      }
+    }
+  };
+
+  // DOM elements
+  const card = document.getElementById('status-card');
+  const iconBox = document.getElementById('status-icon-box');
+  const badge = document.getElementById('status-badge');
+  const badgeText = document.getElementById('badge-text');
+  const title = document.getElementById('status-title');
+  const desc = document.getElementById('status-desc');
+  const actions = document.getElementById('status-actions');
+  const pills = document.querySelectorAll('.state-pill');
+  const copyBtn = document.getElementById('copy-btn');
+
+  // Render State function
+  function applyState(stateKey) {
+    const data = STATES[stateKey];
+    if (!data) return;
+
+    card.setAttribute('data-state', stateKey);
+    iconBox.className = 'status-icon-box ' + data.iconBoxClass;
+    iconBox.innerHTML = data.iconSvg;
+
+    badge.className = 'kage-badge ' + data.badgeClass;
+    badgeText.textContent = data.badgeText;
+
+    title.textContent = data.title;
+    desc.textContent = data.desc;
+
+    let actionsHtml = `<a href="${data.primaryBtn.href}" class="btn ${data.primaryBtn.class}">
+      ${data.primaryBtn.icon || ''}
+      ${data.primaryBtn.text}
+    </a>`;
+
+    if (data.secondaryBtn) {
+      actionsHtml += `<a href="${data.secondaryBtn.href}" class="btn ${data.secondaryBtn.class}">
+        ${data.secondaryBtn.text}
+      </a>`;
+    }
+
+    actions.innerHTML = actionsHtml;
+
+    // Update switcher pills
+    pills.forEach(p => {
+      const isCurrent = p.getAttribute('data-switch') === stateKey;
+      p.classList.toggle('active', isCurrent);
+      p.setAttribute('aria-selected', isCurrent);
+    });
+  }
+
+  // Switcher listeners
+  pills.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetState = btn.getAttribute('data-switch');
+      applyState(targetState);
+    });
+  });
+
+  // Copy transaction ID handler
+  if (copyBtn) {
+    copyBtn.addEventListener('click', () => {
+      const txt = document.getElementById('txn-id-display').textContent;
+      navigator.clipboard.writeText(txt).then(() => {
+        const origSvg = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2" stroke-linecap="round"><path d="M5 12l4.5 4.5L19 7"/></svg>';
+        setTimeout(() => {
+          copyBtn.innerHTML = origSvg;
+        }, 1800);
+      });
+    });
+  }
+
+  // Check URL param or default
+  const params = new URLSearchParams(window.location.search);
+  const initial = params.get('state') || 'waiting_payment';
+  applyState(initial);
+
+})();
+</script>
+
+</body>
+</html>

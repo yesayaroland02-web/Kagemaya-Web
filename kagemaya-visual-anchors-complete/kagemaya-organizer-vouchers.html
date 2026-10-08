@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Manajemen Voucher — Dashboard Organizer · Kagemaya</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="kagemaya-tokens.css">
+<style>
+/* ─── DESIGN TOKENS ─────────────────────────────────────── */
+:root {
+  color-scheme: dark;
+  --bg: #0B0B0D;
+  --surface: #121216;
+  --elev: #1C1C22;
+  --red: #C62828;
+  --red-hi: #E5484D;
+  --gold: #D6A85F;
+  --gold-dim: rgba(214, 168, 95, 0.16);
+  --text: #F4F0E8;
+  --text2: #B8B5B0;
+  --text3: #85837f;
+  --mist: #B8B5B0;
+  --border: #292930;
+  --border-light: #3D3D47;
+  --green: #4ADE80;
+  --serif: 'Noto Serif JP', 'Hiragino Mincho ProN', 'Yu Mincho', Georgia, serif;
+  --sans: 'Inter', 'Noto Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --r: 2px;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button, input, select {
+  font-family: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+svg {
+  display: block;
+}
+
+/* ─── APP SHELL ─────────────────────────────────────────── */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* ─── SIDEBAR NAVIGATION ────────────────────────────────── */
+.sidebar {
+  width: 260px;
+  background: var(--bg);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  z-index: 50;
+  flex: none;
+}
+
+.sidebar-header {
+  padding: 28px 24px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.sidebar-logo b {
+  font-family: var(--serif);
+  font-weight: 500;
+  font-size: 19px;
+  letter-spacing: .34em;
+  margin-right: -.34em;
+}
+
+.sidebar-logo i {
+  font-family: var(--serif);
+  font-style: normal;
+  color: var(--red-hi);
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.portal-label {
+  font-size: 10.5px;
+  letter-spacing: .16em;
+  text-transform: uppercase;
+  color: var(--gold);
+  display: inline-block;
+  font-weight: 500;
+}
+
+.sidebar-nav {
+  padding: 20px 14px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  overflow-y: auto;
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 16px;
+  border-radius: var(--r);
+  color: var(--mist);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all .2s;
+  letter-spacing: .01em;
+}
+
+.nav-link svg {
+  width: 18px;
+  height: 18px;
+  stroke: var(--mist);
+  stroke-width: 1.6;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  flex: none;
+  transition: stroke .2s;
+}
+
+.nav-link:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+.nav-link:hover svg {
+  stroke: var(--text);
+}
+
+.nav-link.active {
+  background: var(--red);
+  color: #FFFFFF;
+}
+
+.nav-link.active svg {
+  stroke: #FFFFFF;
+}
+
+.sidebar-footer {
+  padding: 16px 14px;
+  border-top: 1px solid var(--border);
+}
+
+.nav-link.logout {
+  color: var(--text2);
+}
+
+.nav-link.logout:hover {
+  background: rgba(198, 40, 40, .1);
+  color: var(--red-hi);
+}
+
+/* ─── MAIN PANEL ────────────────────────────────────────── */
+.main-panel {
+  flex: 1;
+  background: var(--elev);
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── TOP HEADER ────────────────────────────────────────── */
+.top-header {
+  padding: 24px 40px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.header-title h1 {
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 400;
+  margin: 0 0 4px;
+  color: var(--text);
+}
+.header-title p {
+  color: var(--text2);
+  font-size: 13.5px;
+  margin: 0;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font: 500 13px/1 var(--sans);
+  padding: 9px 18px;
+  border-radius: var(--r);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all .2s;
+  letter-spacing: .01em;
+  gap: 6px;
+}
+.btn-red {
+  background: var(--red);
+  color: var(--text);
+}
+.btn-red:hover {
+  background: var(--red-hi);
+}
+.btn-line {
+  border-color: rgba(244, 240, 232, .24);
+  color: var(--text);
+  background: transparent;
+}
+.btn-line:hover {
+  border-color: var(--text);
+  background: rgba(255, 255, 255, 0.04);
+}
+.btn-sm {
+  padding: 5px 10px;
+  font-size: 11.5px;
+}
+
+/* ─── VOUCHERS CONTENT ──────────────────────────────────── */
+.vouchers-content {
+  padding: 32px 40px 60px;
+  flex: 1;
+}
+
+/* Metrics Row */
+.metrics-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  margin-bottom: 28px;
+}
+.metric-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 20px 24px;
+}
+.metric-label {
+  font-size: 12.5px;
+  color: var(--text2);
+  margin-bottom: 4px;
+}
+.metric-value {
+  font-family: var(--serif);
+  font-size: 26px;
+  font-weight: 500;
+  color: var(--gold);
+}
+.metric-sub {
+  font-size: 12px;
+  color: var(--text3);
+}
+
+/* Toolbar Card */
+.toolbar-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  padding: 16px 20px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+.filter-tabs {
+  display: flex;
+  gap: 8px;
+}
+.f-tab {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  color: var(--text2);
+  padding: 7px 14px;
+  border-radius: var(--r);
+  font-size: 12.5px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.f-tab.active {
+  background: var(--gold-dim);
+  border-color: var(--gold);
+  color: var(--gold);
+  font-weight: 500;
+}
+
+/* Vouchers Table Panel */
+.table-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  overflow: hidden;
+}
+.dash-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+  text-align: left;
+}
+.dash-table th {
+  padding: 14px 20px;
+  color: var(--mist);
+  font-weight: 500;
+  border-bottom: 1px solid var(--border);
+  background: rgba(11, 11, 13, 0.35);
+  font-size: 12px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.dash-table td {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  vertical-align: middle;
+}
+.dash-table tr:last-child td {
+  border-bottom: none;
+}
+.dash-table tr:hover td {
+  background: rgba(28, 28, 34, 0.45);
+}
+
+/* Voucher Code Cell */
+.code-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Courier New', monospace;
+  font-weight: bold;
+  font-size: 13px;
+  color: var(--gold);
+  background: rgba(214, 168, 95, 0.08);
+  border: 1px solid rgba(214, 168, 95, 0.3);
+  padding: 4px 10px;
+  border-radius: var(--r);
+  letter-spacing: 0.06em;
+}
+
+/* Quota Progress Bar */
+.quota-progress-wrap {
+  width: 120px;
+  height: 5px;
+  background: var(--bg);
+  border-radius: 99px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+.quota-progress-bar {
+  height: 100%;
+  background: var(--gold);
+  border-radius: 99px;
+}
+
+/* Status Badges */
+.v-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 9px;
+  border-radius: var(--r);
+  font-size: 12px;
+  font-weight: 500;
+}
+.v-active {
+  background: rgba(74, 222, 128, 0.1);
+  border: 1px solid var(--green);
+  color: var(--green);
+}
+.v-fully-used {
+  background: rgba(214, 168, 95, 0.1);
+  border: 1px solid var(--gold);
+  color: var(--gold);
+}
+.v-expired {
+  background: rgba(184, 181, 176, 0.08);
+  border: 1px solid var(--border);
+  color: var(--mist);
+}
+
+/* ─── MODAL BUAT VOUCHER BARU ────────────────────────────── */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(11, 11, 13, 0.88);
+  backdrop-filter: blur(8px);
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.modal-overlay.active {
+  display: flex;
+}
+.modal-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  width: 100%;
+  max-width: 560px;
+  position: relative;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.85);
+  animation: fadeIn 0.2s ease;
+}
+.modal-head {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.modal-head h3 {
+  font-family: var(--serif);
+  font-size: 18px;
+  margin: 0;
+  color: var(--text);
+}
+.modal-close-btn {
+  background: none;
+  border: none;
+  color: var(--text2);
+  cursor: pointer;
+}
+.modal-body {
+  padding: 24px;
+}
+
+.form-group {
+  margin-bottom: 18px;
+}
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.kage-input, .kage-select {
+  width: 100%;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  color: var(--text);
+  font: 400 13.5px var(--sans);
+  padding: 10px 12px;
+  outline: none;
+}
+.kage-input:focus, .kage-select:focus {
+  border-color: var(--gold);
+}
+
+.modal-foot {
+  padding: 18px 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  background: rgba(11, 11, 13, 0.3);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/* ─── FOOTER ────────────────────────────────────────────── */
+footer {
+  background: var(--bg);
+  border-top: 1px solid var(--border);
+  padding: 24px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--text3);
+}
+
+/* ─── RESPONSIVE ────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .metrics-row {
+    grid-template-columns: 1fr;
+  }
+}
+@media (max-width: 860px) {
+  .app-shell {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+  }
+  .sidebar-nav {
+    flex-direction: row;
+    overflow-x: auto;
+    padding: 12px 16px;
+  }
+  .nav-link {
+    white-space: nowrap;
+  }
+  .top-header, .vouchers-content, footer {
+    padding: 20px;
+  }
+  .toolbar-card, .form-row {
+    flex-direction: column;
+    align-items: stretch;
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ═══ 1. SIDEBAR NAVIGATION ═══════════════════════════════ -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <a href="kagemaya-landing-page-visual-anchor.html">
+          <b>KAGEMAYA</b><i>影幻</i>
+        </a>
+      </div>
+      <span class="portal-label">Portal Organizer</span>
+    </div>
+
+    <nav class="sidebar-nav" aria-label="Menu Organizer">
+      <a href="kagemaya-organizer-dashboard.html" class="nav-link">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a href="kagemaya-organizer-create-event.html" class="nav-link">
+        <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Event Saya
+      </a>
+      <a href="kagemaya-organizer-transactions.html" class="nav-link">
+        <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+        Transaksi
+      </a>
+      <a href="kagemaya-organizer-attendees.html" class="nav-link">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        Daftar Hadir
+      </a>
+      <!-- Active item: Voucher -->
+      <a href="kagemaya-organizer-vouchers.html" class="nav-link active">
+        <svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="12" rx="2"/><path d="M12 8v12"/><path d="M3 12h18"/></svg>
+        Voucher
+      </a>
+      <a href="kagemaya-organizer-profile.html" class="nav-link">
+        <svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Profil
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="kagemaya-login.html" class="nav-link logout">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Logout
+      </a>
+    </div>
+  </aside>
+
+  <!-- ═══ MAIN PANEL ═══════════════════════════════════════════ -->
+  <div class="main-panel">
+    
+    <!-- TOP HEADER -->
+    <header class="top-header">
+      <div class="header-title">
+        <h1>Manajemen Voucher Promosi</h1>
+        <p>Rilis kode voucher diskon per-event untuk mendorong reservasi tiket lebih awal.</p>
+      </div>
+      <div class="header-actions">
+        <button type="button" class="btn btn-red" onclick="openCreateVoucherModal()">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Buat Voucher Baru
+        </button>
+      </div>
+    </header>
+
+    <!-- CONTENT BODY -->
+    <main class="vouchers-content">
+
+      <!-- Metrics Row -->
+      <section class="metrics-row">
+        <div class="metric-box">
+          <div class="metric-label">Voucher Aktif</div>
+          <div class="metric-value">2 Kampanye</div>
+          <div class="metric-sub">Dapat digunakan pada checkout event</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">Total Klaim Terpakai</div>
+          <div class="metric-value" style="color:var(--text)">58 Tiket</div>
+          <div class="metric-sub">Tingkat konversi pemakaian: 68.2%</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-label">Total Subsidi Diskon</div>
+          <div class="metric-value" style="color:var(--gold)">Rp 1.450.000</div>
+          <div class="metric-sub">Diperhitungkan ke mutasi pendapatan event</div>
+        </div>
+      </section>
+
+      <!-- Toolbar: Filter Tabs -->
+      <div class="toolbar-card">
+        <div class="filter-tabs">
+          <button type="button" class="f-tab active" onclick="filterVouchers('all', this)">Semua Voucher</button>
+          <button type="button" class="f-tab" onclick="filterVouchers('active', this)">Aktif</button>
+          <button type="button" class="f-tab" onclick="filterVouchers('fully_used', this)">Habis Terpakai</button>
+          <button type="button" class="f-tab" onclick="filterVouchers('expired', this)">Kedaluwarsa</button>
+        </div>
+        <div style="font-size:12px;color:var(--text3)">
+          *Voucher bersifat eksklusif per-event sesuai PRD v1.1
+        </div>
+      </div>
+
+      <!-- VOUCHERS TABLE PANEL -->
+      <section class="table-panel">
+        <div class="table-responsive">
+          <table class="dash-table" id="vouchersTable">
+            <thead>
+              <tr>
+                <th>Kode Voucher</th>
+                <th>Target Event</th>
+                <th>Tipe &amp; Nilai Diskon</th>
+                <th>Kuota &amp; Pemakaian</th>
+                <th>Masa Berlaku</th>
+                <th>Status</th>
+                <th style="text-align:right">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <!-- ROW 1 (Active) -->
+              <tr data-vstatus="active">
+                <td>
+                  <span class="code-badge">
+                    AOZORA4D20
+                  </span>
+                </td>
+                <td><b>Yūgen: Film 4D Tokyo–Jakarta</b></td>
+                <td>Diskon Persentase: <b>20%</b></td>
+                <td>
+                  <div style="font-size:12.5px;color:var(--text2)">35 / 50 Terpakai (70%)</div>
+                  <div class="quota-progress-wrap">
+                    <div class="quota-progress-bar" style="width: 70%"></div>
+                  </div>
+                </td>
+                <td style="font-size:12.5px;color:var(--text2)">01 Okt – 14 Nov 2026</td>
+                <td>
+                  <span class="v-status v-active">
+                    ● Aktif
+                  </span>
+                </td>
+                <td style="text-align:right">
+                  <button type="button" class="btn btn-line btn-sm" onclick="copyCode('AOZORA4D20')">Salin</button>
+                  <button type="button" class="btn btn-line btn-sm" onclick="deactivateVoucher(this)">Nonaktifkan</button>
+                </td>
+              </tr>
+
+              <!-- ROW 2 (Active) -->
+              <tr data-vstatus="active">
+                <td>
+                  <span class="code-badge">
+                    FOLEYSTUDIO50
+                  </span>
+                </td>
+                <td><b>Workshop Foley ala Anime</b></td>
+                <td>Potongan Tetap: <b>Rp 50.000</b></td>
+                <td>
+                  <div style="font-size:12.5px;color:var(--text2)">12 / 20 Terpakai (60%)</div>
+                  <div class="quota-progress-wrap">
+                    <div class="quota-progress-bar" style="width: 60%"></div>
+                  </div>
+                </td>
+                <td style="font-size:12.5px;color:var(--text2)">05 Okt – 20 Nov 2026</td>
+                <td>
+                  <span class="v-status v-active">
+                    ● Aktif
+                  </span>
+                </td>
+                <td style="text-align:right">
+                  <button type="button" class="btn btn-line btn-sm" onclick="copyCode('FOLEYSTUDIO50')">Salin</button>
+                  <button type="button" class="btn btn-line btn-sm" onclick="deactivateVoucher(this)">Nonaktifkan</button>
+                </td>
+              </tr>
+
+              <!-- ROW 3 (Fully Used) -->
+              <tr data-vstatus="fully_used">
+                <td>
+                  <span class="code-badge" style="opacity:0.7">
+                    EARLYAOZORA
+                  </span>
+                </td>
+                <td><b>Yūgen: Film 4D Tokyo–Jakarta</b></td>
+                <td>Diskon Persentase: <b>25%</b></td>
+                <td>
+                  <div style="font-size:12.5px;color:var(--gold)">30 / 30 Terpakai (100%)</div>
+                  <div class="quota-progress-wrap">
+                    <div class="quota-progress-bar" style="width: 100%; background:var(--gold)"></div>
+                  </div>
+                </td>
+                <td style="font-size:12.5px;color:var(--text3)">01 Sep – 15 Sep 2026</td>
+                <td>
+                  <span class="v-status v-fully-used">
+                    ● Habis Terpakai
+                  </span>
+                </td>
+                <td style="text-align:right;color:var(--text3);font-size:12px">
+                  Kuota Penuh
+                </td>
+              </tr>
+
+              <!-- ROW 4 (Expired) -->
+              <tr data-vstatus="expired">
+                <td>
+                  <span class="code-badge" style="opacity:0.5;color:var(--mist)">
+                    SEPTEMBERNOIR
+                  </span>
+                </td>
+                <td><b>Talkshow Budaya Tokyo–Nusantara</b></td>
+                <td>Potongan Tetap: <b>Rp 25.000</b></td>
+                <td>
+                  <div style="font-size:12.5px;color:var(--text3)">8 / 25 Terpakai</div>
+                  <div class="quota-progress-wrap">
+                    <div class="quota-progress-bar" style="width: 32%; background:var(--text3)"></div>
+                  </div>
+                </td>
+                <td style="font-size:12.5px;color:var(--text3)">01 Sep – 25 Sep 2026</td>
+                <td>
+                  <span class="v-status v-expired">
+                    ● Kedaluwarsa
+                  </span>
+                </td>
+                <td style="text-align:right;color:var(--text3);font-size:12px">
+                  Arsip
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+      <div>&copy; 2026 Kagemaya.id — Panel Penyelenggara Event Budaya Indo-Jepang.</div>
+      <div style="font-family: var(--serif); color: var(--gold);">影と幻 · KAGE TO MAYA</div>
+    </footer>
+
+  </div>
+
+</div>
+
+<!-- ═══ MODAL BUAT VOUCHER BARU ══════════════════════════════ -->
+<div class="modal-overlay" id="createVoucherModal" onclick="closeModalOnBg(event, 'createVoucherModal')">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Buat Voucher Promosi Baru</h3>
+      <button class="modal-close-btn" onclick="closeModal('createVoucherModal')">
+        <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" fill="none" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <form onsubmit="handleCreateVoucher(event)">
+      <div class="modal-body">
+
+        <!-- Target Event -->
+        <div class="form-group">
+          <label for="vTargetEvent" class="form-label">Target Event Sinematik</label>
+          <select id="vTargetEvent" class="kage-select" required>
+            <option value="Yūgen: Film 4D Tokyo–Jakarta">Yūgen: Film 4D Kolaborasi Tokyo–Jakarta</option>
+            <option value="Workshop Foley ala Anime">Workshop Foley ala Anime</option>
+            <option value="Talkshow Budaya Tokyo–Nusantara">Talkshow Budaya Tokyo–Nusantara</option>
+          </select>
+        </div>
+
+        <!-- Kode Voucher -->
+        <div class="form-group">
+          <label for="vCode" class="form-label">Kode Voucher (Kapital, tanpa spasi)</label>
+          <input 
+            type="text" 
+            id="vCode" 
+            class="kage-input" 
+            placeholder="mis. NOIRFEST15" 
+            required 
+            style="text-transform:uppercase;font-family:monospace;letter-spacing:0.08em;">
+        </div>
+
+        <!-- Tipe & Nilai Diskon (2 Col) -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="vType" class="form-label">Tipe Diskon</label>
+            <select id="vType" class="kage-select" onchange="toggleDiscountType(this.value)">
+              <option value="percent">Persentase (%)</option>
+              <option value="fixed">Nominal Tetap (Rp)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="vValue" class="form-label" id="vValueLabel">Besaran Diskon (%)</label>
+            <input type="number" id="vValue" class="kage-input" placeholder="mis. 15" min="1" required>
+          </div>
+        </div>
+
+        <!-- Kuota & Tanggal -->
+        <div class="form-row">
+          <div class="form-group">
+            <label for="vQuota" class="form-label">Kuota Voucher</label>
+            <input type="number" id="vQuota" class="kage-input" placeholder="mis. 50" min="1" required>
+          </div>
+          <div class="form-group">
+            <label for="vEndDate" class="form-label">Berlaku Sampai</label>
+            <input type="date" id="vEndDate" class="kage-input" required value="2026-11-14">
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-foot">
+        <button type="button" class="btn btn-line" onclick="closeModal('createVoucherModal')">Batal</button>
+        <button type="submit" class="btn btn-red">Terbitkan Voucher</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- INTERACTIVE SCRIPTS -->
+<script>
+function openCreateVoucherModal() {
+  document.getElementById('createVoucherModal').classList.add('active');
+  document.getElementById('vCode').focus();
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
+function closeModalOnBg(e, id) {
+  if (e.target.id === id) closeModal(id);
+}
+
+function toggleDiscountType(val) {
+  const lbl = document.getElementById('vValueLabel');
+  const inp = document.getElementById('vValue');
+  if (val === 'percent') {
+    lbl.textContent = 'Besaran Diskon (%)';
+    inp.placeholder = 'mis. 20';
+    inp.max = '100';
+  } else {
+    lbl.textContent = 'Nominal Potongan (Rp)';
+    inp.placeholder = 'mis. 50000';
+    inp.removeAttribute('max');
+  }
+}
+
+function handleCreateVoucher(e) {
+  e.preventDefault();
+  const code = document.getElementById('vCode').value.trim().toUpperCase();
+  const eventName = document.getElementById('vTargetEvent').value;
+  const type = document.getElementById('vType').value;
+  const val = document.getElementById('vValue').value;
+  const quota = document.getElementById('vQuota').value;
+  const end = document.getElementById('vEndDate').value;
+
+  closeModal('createVoucherModal');
+
+  // Insert row into table
+  const tbody = document.querySelector('#vouchersTable tbody');
+  const tr = document.createElement('tr');
+  tr.setAttribute('data-vstatus', 'active');
+  tr.innerHTML = `
+    <td><span class="code-badge">${code}</span></td>
+    <td><b>${eventName}</b></td>
+    <td>${type === 'percent' ? `Diskon Persentase: <b>${val}%</b>` : `Potongan Tetap: <b>Rp ${parseInt(val).toLocaleString('id-ID')}</b>`}</td>
+    <td>
+      <div style="font-size:12.5px;color:var(--text2)">0 / ${quota} Terpakai (0%)</div>
+      <div class="quota-progress-wrap"><div class="quota-progress-bar" style="width: 0%"></div></div>
+    </td>
+    <td style="font-size:12.5px;color:var(--text2)">Hingga ${end}</td>
+    <td><span class="v-status v-active">● Aktif</span></td>
+    <td style="text-align:right">
+      <button type="button" class="btn btn-line btn-sm" onclick="copyCode('${code}')">Salin</button>
+      <button type="button" class="btn btn-line btn-sm" onclick="deactivateVoucher(this)">Nonaktifkan</button>
+    </td>
+  `;
+  tbody.insertBefore(tr, tbody.firstChild);
+
+  showToastNotice(`Voucher ${code} berhasil diterbitkan untuk event ${eventName}!`);
+}
+
+function copyCode(code) {
+  navigator.clipboard.writeText(code).then(() => {
+    showToastNotice(`Kode voucher "${code}" berhasil disalin ke papan klip!`);
+  });
+}
+
+function deactivateVoucher(btn) {
+  const row = btn.closest('tr');
+  row.setAttribute('data-vstatus', 'expired');
+  row.querySelector('.v-status').className = 'v-status v-expired';
+  row.querySelector('.v-status').textContent = '● Nonaktif';
+  btn.remove();
+  showToastNotice('Voucher dinonaktifkan.');
+}
+
+function filterVouchers(status, tab) {
+  document.querySelectorAll('.f-tab').forEach(t => t.classList.remove('active'));
+  tab.classList.add('active');
+
+  const rows = document.querySelectorAll('#vouchersTable tbody tr');
+  rows.forEach(r => {
+    const s = r.getAttribute('data-vstatus');
+    if (status === 'all' || s === status) {
+      r.style.display = '';
+    } else {
+      r.style.display = 'none';
+    }
+  });
+}
+
+function showToastNotice(msg) {
+  let toast = document.getElementById('qToast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'qToast';
+    toast.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#1C1C22;border:1px solid #D6A85F;color:#F4F0E8;padding:12px 18px;border-radius:4px;font-size:13px;z-index:999;box-shadow:0 8px 24px rgba(0,0,0,0.7);transition:opacity 0.3s;';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.style.opacity = '1';
+  setTimeout(() => { toast.style.opacity = '0'; }, 3000);
+}
+</script>
+</body>
+</html>
