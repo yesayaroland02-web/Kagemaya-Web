@@ -5,13 +5,12 @@ const auth_middleware_1 = require("../middlewares/auth.middleware");
 const upload_middleware_1 = require("../middlewares/upload.middleware");
 const user_controller_1 = require("../controllers/user.controller");
 const router = (0, express_1.Router)();
-// Semua route di sini memerlukan autentikasi
+// Semua route di bawah membutuhkan token
 router.use(auth_middleware_1.authenticateToken);
-// GET  /api/me/profile  → ambil profil user yang login
+// GET /api/me/profile
 router.get('/profile', user_controller_1.getMyProfile);
-// PATCH /api/me/profile → update nama dan/atau foto profil
-// Field upload: "avatar" (form-data)
+// PATCH /api/me/profile
 router.patch('/profile', upload_middleware_1.uploadSingleImage.single('avatar'), user_controller_1.updateMyProfile);
-// PATCH /api/me/password → ganti password
+// PATCH /api/me/password
 router.patch('/password', user_controller_1.updateMyPassword);
 exports.default = router;

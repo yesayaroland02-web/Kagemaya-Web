@@ -5,7 +5,7 @@ dotenv.config();
 const config = {
   port: process.env.PORT || 5000,
   dbUrl: process.env.DATABASE_URL,
-  jwtSecret: process.env.JWT_SECRET || 'default_jwt_secret',
+  jwtSecret: process.env.JWT_SECRET || 'secret_key_kagemaya',
   nodeEnv: process.env.NODE_ENV || 'development',
 };
 

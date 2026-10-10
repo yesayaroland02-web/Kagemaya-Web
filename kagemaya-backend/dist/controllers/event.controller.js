@@ -50,7 +50,7 @@ const getEventById = async (req, res) => {
 exports.getEventById = getEventById;
 const checkTicketStock = async (req, res) => {
     try {
-        const { ticketTypeId } = req.params;
+        const ticketTypeId = req.params.ticketTypeId || req.params.id;
         const qty = req.query.qty ? Number(req.query.qty) : 1;
         const result = await (0, event_service_2.validateTicketStockService)(ticketTypeId, qty);
         if (!result.is_available) {

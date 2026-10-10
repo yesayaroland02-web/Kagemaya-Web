@@ -11,32 +11,33 @@ const generateReferralCode = (name: string): string => {
   return `${prefix}${randomStr}`;
 };
 
-// ... dilanjutkan fungsi registerUser & loginUser
-// Pastikan fungsi di-export menggunakan kata kunci 'export'
 export const registerUser = async (payload: z.infer<typeof registerSchema>) => {
   const { name, email, password, role, referredBy } = registerSchema.parse(payload);
 
-  // 1. Cek email
+  // 1. Cek email unik
   const existingUser = await prisma.user.findUnique({ where: { email } });
   if (existingUser) {
-    throw new Error('Email sudah terdaftar');
+    throw new Error('Email sudah terdaftar. Silakan gunakan email lain atau masuk ke akun Anda.');
   }
 
-  // 2. Hash password & buat referral code
+  // 2. Hash password & buat referral code unik
   const hashedPassword = await bcrypt.hash(password, 10);
   const userReferralCode = generateReferralCode(name);
 
   // 3. Cek referral code pengajak
   let referrerUser = null;
   if (referredBy) {
+    if (role === 'ORGANIZER') {
+      throw new Error('Kode referral hanya berlaku untuk pendaftaran akun Penonton (Customer).');
+    }
+
     referrerUser = await prisma.user.findUnique({ where: { referral_code: referredBy } });
     if (!referrerUser) {
-      throw new Error('Kode referral tidak valid');
+      throw new Error('Kode referral tidak valid atau tidak ditemukan.');
     }
   }
 
   // 4. Eksekusi Transaction
-  // WAJIB tambahkan kata kunci 'return' di depan prisma.$transaction
   return await prisma.$transaction(async (tx) => {
     const newUser = await tx.user.create({
       data: {
@@ -45,6 +46,7 @@ export const registerUser = async (payload: z.infer<typeof registerSchema>) => {
         password: hashedPassword,
         role,
         referral_code: userReferralCode,
+        referred_by_id: referrerUser ? referrerUser.id : null,
       },
     });
 
@@ -58,6 +60,7 @@ export const registerUser = async (payload: z.infer<typeof registerSchema>) => {
       });
     }
 
+    // Berikan reward jika menggunakan referral
     if (referrerUser) {
       const expiresAt = new Date();
       expiresAt.setMonth(expiresAt.getMonth() + 3);
@@ -73,7 +76,7 @@ export const registerUser = async (payload: z.infer<typeof registerSchema>) => {
         },
       });
 
-      // Pendaftar baru mendapat Kupon Diskon Referral
+      // Pendaftar baru mendapat Kupon Diskon Referral Rp25.000
       await tx.coupon.create({
         data: {
           user_id: newUser.id,
@@ -83,13 +86,23 @@ export const registerUser = async (payload: z.infer<typeof registerSchema>) => {
         },
       });
     }
-    // WAJIB mengembalikan data user baru dari dalam callback transaction
+
+    // Generate JWT token otomatis saat registrasi sukses
+    const token = jwt.sign(
+      { id: newUser.id, email: newUser.email, role: newUser.role },
+      config.jwtSecret,
+      { expiresIn: '1d' }
+    );
+
     return {
-      id: newUser.id,
-      name: newUser.name,
-      email: newUser.email,
-      role: newUser.role,
-      referral_code: newUser.referral_code,
+      user: {
+        id: newUser.id,
+        name: newUser.name,
+        email: newUser.email,
+        role: newUser.role,
+        referral_code: newUser.referral_code,
+      },
+      token,
     };
   });
 };
@@ -101,13 +114,13 @@ export const loginUser = async (payload: z.infer<typeof loginSchema>) => {
   // 2. Cari user berdasarkan email
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) {
-    throw new Error('Email atau password salah');
+    throw new Error('Email atau password salah.');
   }
 
   // 3. Verifikasi password
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) {
-    throw new Error('Email atau password salah');
+    throw new Error('Email atau password salah.');
   }
 
   // 4. Generate JWT Token
@@ -117,7 +130,6 @@ export const loginUser = async (payload: z.infer<typeof loginSchema>) => {
     { expiresIn: '1d' }
   );
 
-  // 5. WAJIB RETURN OBJEK DATA (agar tidak null)
   return {
     user: {
       id: user.id,
@@ -125,6 +137,7 @@ export const loginUser = async (payload: z.infer<typeof loginSchema>) => {
       email: user.email,
       role: user.role,
       referral_code: user.referral_code,
+      profile_picture: user.profile_picture,
     },
     token,
   };
