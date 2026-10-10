@@ -264,6 +264,18 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:64px 0 36
   .txn-thumb{width:100%;height:100px}
   .f-top{grid-template-columns:1fr 1fr}
 }
+
+/* ─── AUTHENTICATED USER NAVBAR ───────────────────────────── */
+#authNav{display:flex;align-items:center;gap:16px;min-width:0}
+.user-profile-link{display:inline-flex;align-items:center;gap:9px;min-width:0;color:var(--gold);text-decoration:none}
+.user-avatar{width:36px;height:36px;min-width:36px;border:1px solid var(--gold);border-radius:50%;background:var(--elev);color:var(--gold);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:13px;font-weight:600}
+.user-avatar img{width:100%;height:100%;display:block;object-fit:cover;border-radius:50%}
+.user-name{color:var(--gold);font-size:14px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:760px){
+  #authNav{gap:8px}
+  .user-name{max-width:75px}
+}
+
 </style>
 </head>
 <body>
@@ -295,12 +307,12 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:64px 0 36
       <li><a href="#">Kategori</a></li>
       <li><a href="#">Organizer</a></li>
     </ul></nav>
-    <div class="nav-r">
-      <button class="icon-btn" aria-label="Cari">
+    <div class="nav-r" id="authNav">
+      <button class="icon-btn" aria-label="Cari" type="button">
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
       </button>
-      <a class="login" href="#" id="userName">User</a>
-      <a class="btn btn-sm btn-line" href="#">Pesananku</a>
+      <a class="login" href="kagemaya-user-profile.html" id="userName">User</a>
+      <a class="btn btn-sm btn-line" href="kagemaya-pesananku.html">Pesananku</a>
     </div>
   </div>
 </header>
@@ -686,41 +698,94 @@ footer{background:var(--bg);border-top:1px solid var(--border);padding:64px 0 36
     return;
   }
 
-  function loadLoggedInUser() {
-  const userNameElement = document.getElementById('userName');
+  async function loadLoggedInUser() {
+    const authNav = document.getElementById('authNav');
+    if (!authNav) return;
 
-  if (!userNameElement) return;
+    const token = localStorage.getItem('kagemaya_token');
+    if (!token) {
+      authNav.innerHTML = `
+        <button class="icon-btn" aria-label="Cari" type="button">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+        </button>
+        <a href="kagemaya-login.html" class="login">Login</a>
+        <a href="kagemaya-register.html" class="btn btn-red btn-sm">Daftar</a>
+        <a href="kagemaya-pesananku.html" class="btn btn-sm btn-line">Pesananku</a>
+      `;
+      return;
+    }
 
-  const token = localStorage.getItem('kagemaya_token');
-  const userJson = localStorage.getItem('kagemaya_user');
+    let cachedUser = {};
+    try {
+      const parsed = JSON.parse(localStorage.getItem('kagemaya_user') || '{}');
+      cachedUser = parsed.user || parsed.data?.user || parsed.data || parsed;
+    } catch (error) {
+      console.warn('Data user di localStorage tidak valid:', error);
+    }
 
-  // Belum login
-  if (!token || !userJson) {
-    userNameElement.textContent = 'User';
-    return;
+    const getName = user => user?.name || user?.username || user?.full_name ||
+      user?.fullName || user?.email || 'User';
+    const getPhoto = user => user?.profile_picture || user?.profilePicture ||
+      user?.avatar || user?.avatar_url || user?.photo || user?.image;
+    const backendOrigin = API_BASE.replace(/\/api\/?$/, '');
+    const toImageUrl = photo => {
+      if (typeof photo !== 'string' || !photo.trim()) return '';
+      const value = photo.trim();
+      return /^https?:\/\//i.test(value) ? value : `${backendOrigin}/${value.replace(/^\/+/, '')}`;
+    };
+
+    authNav.innerHTML = `
+      <button class="icon-btn" aria-label="Cari" type="button">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg>
+      </button>
+      <a href="kagemaya-user-profile.html" class="user-profile-link" title="Lihat profil" aria-label="Lihat profil">
+        <span class="user-avatar" id="nav-user-avatar">U</span>
+        <span class="user-name" id="nav-user-name">User</span>
+      </a>
+      <a href="kagemaya-pesananku.html" class="btn btn-sm btn-line">Pesananku</a>
+    `;
+
+    const nameElement = document.getElementById('nav-user-name');
+    const avatarElement = document.getElementById('nav-user-avatar');
+
+    function renderUser(user) {
+      if (!user || typeof user !== 'object') return;
+      const displayName = getName(user);
+      if (nameElement) nameElement.textContent = displayName;
+      if (!avatarElement) return;
+      avatarElement.textContent = String(displayName).trim().charAt(0).toUpperCase() || 'U';
+
+      const imageUrl = toImageUrl(getPhoto(user));
+      if (!imageUrl) return;
+      const img = document.createElement('img');
+      img.alt = `Foto profil ${displayName}`;
+      img.loading = 'eager';
+      img.referrerPolicy = 'no-referrer';
+      img.onload = () => avatarElement.replaceChildren(img);
+      img.onerror = () => console.error('Foto profil navbar gagal dimuat:', imageUrl);
+      img.src = imageUrl;
+    }
+
+    // Tampilkan data cache terlebih dahulu supaya foto tidak menunggu respons API.
+    renderUser(cachedUser);
+
+    try {
+      const response = await fetch(`${API_BASE}/me/profile`, {
+        method: 'GET',
+        headers: { Authorization: `Bearer ${token}`, Accept: 'application/json' }
+      });
+      const result = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(result.message || `Gagal mengambil profil (${response.status}).`);
+
+      const user = result?.data?.user || result?.data?.profile || result?.data || result?.user || result;
+      if (!user || typeof user !== 'object') throw new Error('Format data profil tidak valid.');
+      localStorage.setItem('kagemaya_user', JSON.stringify(user));
+      renderUser(user);
+    } catch (error) {
+      console.error('Gagal mengambil profil navbar:', error);
+      // Data cache tetap ditampilkan jika API sedang tidak tersedia.
+    }
   }
-
-  try {
-    const parsedUser = JSON.parse(userJson);
-
-    // Mengantisipasi kalau data disimpan sebagai { user: {...} }
-    const user = parsedUser.user || parsedUser;
-
-    const displayName =
-      user.name ||
-      user.username ||
-      user.fullName ||
-      user.full_name ||
-      user.email ||
-      'User';
-
-    userNameElement.textContent = displayName;
-  } catch (error) {
-    console.error('Gagal membaca data user:', error);
-    userNameElement.textContent = 'User';
-  }
-}
-  
 
   function formatRupiah(amount) {
     return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(amount || 0);

@@ -8,6 +8,43 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
+
+  
+.user-profile-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid var(--gold);
+  border-radius: 50%;
+  background: var(--elev);
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.user-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.user-name {
+  color: var(--gold);
+  font-weight: 500;
+}
+
 :root{
   color-scheme: dark;
   --bg:#0B0B0D; --surface:#121216; --elev:#1C1C22;
@@ -747,6 +784,7 @@ function formatRupiah(amount) {
   }).format(amount);
 }
 
+
 // 2. Fungsi Fetch & Render Events
 async function fetchAndRenderEvents() {
   const container = document.getElementById('eventsContainer') || document.querySelector('.events-grid');
@@ -870,31 +908,137 @@ function resetFilter() {
   fetchAndRenderEvents();
 }
 
+
 function renderNavbarAuth() {
   const authNav = document.getElementById('authNav');
   if (!authNav) return;
 
   const token = localStorage.getItem('kagemaya_token');
-  const userJson = localStorage.getItem('kagemaya_user');
 
-  if (token && userJson) {
-    try {
-      const user = JSON.parse(userJson);
-      const name = user.name || user.email || 'Pengguna';
-      const initial = name.charAt(0).toUpperCase();
+  if (!token) return;
 
-      authNav.innerHTML = `
-        <button class="icon-btn" aria-label="Cari"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.6-3.6"/></svg></button>
-        <a href="kagemaya-user-profile.html" class="login" style="display:inline-flex; align-items:center; gap:8px; color:var(--gold); font-weight:500;" title="Buka Pengaturan Profil">
-          <span style="width:28px; height:28px; border-radius:50%; background:var(--elev); border:1px solid var(--gold); display:grid; place-items:center; font-size:12px; font-weight:600; color:var(--gold);">${initial}</span>
-          ${escapeHtml(name)}
-        </a>
-        <a class="btn btn-line btn-sm" href="kagemaya-checkout.html">Pesananku</a>
-        <button onclick="handleLogout()" class="btn btn-sm btn-ghost-danger" style="padding:6px 12px; font-size:12px;">Keluar</button>
-      `;
-    } catch (e) {
-      console.error('Error parse user in landing:', e);
+  let user = {};
+
+  try {
+    user = JSON.parse(localStorage.getItem('kagemaya_user') || '{}');
+  } catch (error) {
+    console.error('Data pengguna tidak valid:', error);
+  }
+
+  const name = user.name || user.username || user.email || 'Pengguna';
+  const initial = name.trim().charAt(0).toUpperCase() || 'U';
+
+  authNav.innerHTML = `
+    <button class="icon-btn" aria-label="Cari">
+      <svg width="20" height="20" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="1.6">
+        <circle cx="11" cy="11" r="7"></circle>
+        <path d="M20 20l-3.6-3.6"></path>
+      </svg>
+    </button>
+
+    <a href="kagemaya-user-profile.html"
+       class="login user-profile-link"
+       title="Buka Pengaturan Profil">
+      <span class="user-avatar">${initial}</span>
+      <span class="user-name"></span>
+    </a>
+
+    <a class="btn btn-line btn-sm"
+       href="kagemaya-checkout.html">Pesananku</a>
+
+    <button onclick="handleLogout()"
+       class="btn btn-sm btn-ghost-danger">
+       Keluar
+    </button>
+  `;
+
+  // Atur nama terlebih dahulu, kemudian ambil foto dari API.
+  authNav.querySelector('.user-name').textContent = name;
+
+  loadNavbarProfile();
+}
+
+
+async function loadNavbarProfile() {
+  const token = localStorage.getItem('kagemaya_token');
+  const authNav = document.getElementById('authNav');
+
+  if (!token || !authNav) return;
+
+  const avatar = authNav.querySelector('.user-avatar');
+  const nameElement = authNav.querySelector('.user-name');
+
+  if (!avatar) {
+    console.error('Elemen .user-avatar tidak ditemukan.');
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/me/profile`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/json'
+      }
+    });
+
+    const result = await response.json();
+
+    console.log('Status profil:', response.status);
+    console.log('Respons profil:', result);
+
+    if (!response.ok) {
+      throw new Error(result.message || 'Gagal mengambil profil.');
     }
+
+    const user =
+      result?.data?.user ??
+      result?.data ??
+      result?.user ??
+      result;
+
+    if (!user || typeof user !== 'object') {
+      throw new Error('Data profil tidak valid.');
+    }
+
+    localStorage.setItem('kagemaya_user', JSON.stringify(user));
+
+    const name = user.name || user.username || user.email || 'Pengguna';
+
+    if (nameElement) {
+      nameElement.textContent = name;
+    }
+
+    const photo = user.profile_picture;
+
+    if (typeof photo !== 'string' || !photo.trim()) {
+      console.warn('Foto profil belum tersedia pada respons API.');
+      return;
+    }
+
+    // API_URL adalah http://localhost:5000/api.
+    const backendOrigin = API_URL.replace(/\/api\/?$/, '');
+
+    const imageUrl = /^https?:\/\//i.test(photo)
+      ? photo
+      : `${backendOrigin}/${photo.replace(/^\/+/, '')}`;
+
+    const img = document.createElement('img');
+    img.src = imageUrl;
+    img.alt = `Foto profil ${name}`;
+
+    img.onload = () => {
+      avatar.replaceChildren(img);
+      console.log('Foto profil berhasil dimuat:', imageUrl);
+    };
+
+    img.onerror = () => {
+      console.error('Foto profil gagal dimuat:', imageUrl);
+    };
+
+  } catch (error) {
+    console.error('Gagal memuat foto profil:', error);
   }
 }
 

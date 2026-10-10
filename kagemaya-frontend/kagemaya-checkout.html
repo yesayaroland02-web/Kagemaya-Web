@@ -171,6 +171,18 @@ svg{display:block}
   .summary-cta .btn{display:none}
   .mbar{display:flex}
 }
+
+/* ─── AUTHENTICATED USER NAVBAR ───────────────────────────── */
+#authNav{display:flex;align-items:center;gap:16px;min-width:0}
+.user-profile-link{display:inline-flex;align-items:center;gap:9px;min-width:0;color:var(--gold);text-decoration:none}
+.user-avatar{width:36px;height:36px;min-width:36px;border:1px solid var(--gold);border-radius:50%;background:var(--elev);color:var(--gold);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:13px;font-weight:600}
+.user-avatar img{width:100%;height:100%;display:block;object-fit:cover;border-radius:50%}
+.user-name{color:var(--gold);font-size:14px;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:760px){
+  #authNav{gap:8px}
+  .user-name{max-width:75px}
+}
+
 </style>
 </head>
 <body>
@@ -377,35 +389,99 @@ function escapeHtml(val) {
   return String(val).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[c]);
 }
 
-function loadLoggedInUser() {
-  const userNameElement = document.getElementById('userName');
-
-  if (!userNameElement) return;
+async function loadLoggedInUser() {
+  const authNav = document.getElementById('authNav');
+  if (!authNav) return;
 
   const token = localStorage.getItem('kagemaya_token');
-  const userJson = localStorage.getItem('kagemaya_user');
 
-  // Belum login
-  if (!token || !userJson) {
-    userNameElement.textContent = 'User';
+  if (!token) {
+    authNav.innerHTML = `
+      <a href="kagemaya-login.html" class="login">Login</a>
+      <a href="kagemaya-register.html" class="btn btn-red btn-sm">Daftar</a>
+    `;
     return;
   }
 
+  let cachedUser = {};
   try {
-    const user = JSON.parse(userJson);
-
-    const displayName =
-      user.name ||
-      user.username ||
-      user.fullName ||
-      user.full_name ||
-      user.email ||
-      'User';
-
-    userNameElement.textContent = displayName;
+    const parsed = JSON.parse(localStorage.getItem('kagemaya_user') || '{}');
+    cachedUser = parsed.user || parsed.data?.user || parsed.data || parsed;
   } catch (error) {
-    console.error('Gagal membaca data user:', error);
-    userNameElement.textContent = 'User';
+    console.warn('Data user di localStorage tidak valid:', error);
+  }
+
+  const initialName = cachedUser.name || cachedUser.username ||
+    cachedUser.full_name || cachedUser.fullName || cachedUser.email || 'User';
+
+  authNav.innerHTML = `
+    <a href="kagemaya-user-profile.html" class="user-profile-link" title="Lihat profil">
+      <span class="user-avatar" id="nav-user-avatar">${escapeHtml(String(initialName).trim().charAt(0).toUpperCase() || 'U')}</span>
+      <span class="user-name" id="nav-user-name">${escapeHtml(initialName)}</span>
+    </a>
+    <a href="kagemaya-pesananku.html" class="btn btn-red btn-sm">Akun</a>
+  `;
+
+  const nameElement = document.getElementById('nav-user-name');
+  const avatarElement = document.getElementById('nav-user-avatar');
+
+  try {
+    const response = await fetch(`${API_BASE}/me/profile`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/json'
+      }
+    });
+
+    const result = await response.json().catch(() => ({}));
+    console.log('Status API profil navbar:', response.status, result);
+
+    if (!response.ok) {
+      throw new Error(result.message || `Gagal mengambil profil (${response.status}).`);
+    }
+
+    const user = result?.data?.user || result?.data || result?.user || result;
+    if (!user || typeof user !== 'object') {
+      throw new Error('Format data profil tidak valid.');
+    }
+
+    localStorage.setItem('kagemaya_user', JSON.stringify(user));
+
+    const displayName = user.name || user.username || user.full_name ||
+      user.fullName || user.email || initialName || 'User';
+
+    if (nameElement) nameElement.textContent = displayName;
+    if (avatarElement) {
+      avatarElement.textContent = String(displayName).trim().charAt(0).toUpperCase() || 'U';
+    }
+
+    const photo = user.profile_picture || user.profilePicture || user.avatar || user.avatar_url;
+    if (!avatarElement || typeof photo !== 'string' || !photo.trim()) {
+      console.warn('Foto profil tidak tersedia pada respons API.', user);
+      return;
+    }
+
+    const backendOrigin = API_BASE.replace(/\/api\/?$/, '');
+    const imageUrl = /^https?:\/\//i.test(photo)
+      ? photo
+      : `${backendOrigin}/${photo.replace(/^\/+/, '')}`;
+
+    const img = document.createElement('img');
+    img.alt = `Foto profil ${displayName}`;
+    img.loading = 'eager';
+    img.referrerPolicy = 'no-referrer';
+
+    img.onload = () => {
+      avatarElement.replaceChildren(img);
+      console.log('Foto profil navbar berhasil dimuat:', imageUrl);
+    };
+    img.onerror = () => {
+      console.error('Foto profil navbar gagal dimuat:', imageUrl);
+    };
+    img.src = imageUrl;
+  } catch (error) {
+    console.error('Gagal memuat profil navbar:', error);
   }
 }
 

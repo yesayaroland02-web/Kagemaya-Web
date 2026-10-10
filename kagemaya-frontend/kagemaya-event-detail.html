@@ -15,6 +15,43 @@
 >
 
 <style>
+
+
+.user-profile-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid var(--gold);
+  border-radius: 50%;
+  background: var(--elev);
+  color: var(--gold);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.user-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.user-name {
+  color: var(--gold);
+  font-weight: 500;
+}
+
 :root{
   color-scheme: dark;
 
@@ -1214,373 +1251,315 @@ footer{
      JAVASCRIPT
 ========================= -->
 
+
 <script>
+'use strict';
 
-const API_BASE =
-  'http://localhost:5000/api';
-
+// =========================================================
+// KONFIGURASI BACKEND
+// =========================================================
+const API_BASE = 'http://localhost:5000/api';
 
 let currentEventId = null;
 
 
-/* =========================================================
-   ESCAPE HTML
-========================================================= */
-
+// =========================================================
+// ESCAPE HTML
+// =========================================================
 function escapeHtml(value) {
+  if (value === null || value === undefined) return '';
 
-  if (
-    value === null ||
-    value === undefined
-  ) {
+  return String(value).replace(/[&<>"']/g, function (char) {
+    return {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    }[char];
+  });
+}
+
+
+// =========================================================
+// FORMAT RUPIAH
+// =========================================================
+function formatRupiah(amount) {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    maximumFractionDigits: 0
+  }).format(Number(amount) || 0);
+}
+
+
+// =========================================================
+// MEMBANGUN URL FOTO PROFIL
+// =========================================================
+function getProfileImageUrl(photo) {
+  if (typeof photo !== 'string' || !photo.trim()) {
     return '';
   }
 
+  const value = photo.trim();
 
-  return String(value).replace(
-    /[&<>"']/g,
-    function (char) {
+  // Jika API sudah mengembalikan URL lengkap.
+  if (/^https?:\/\//i.test(value)) {
+    return value;
+  }
 
-      return {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;'
-      }[char];
-
-    }
-  );
+  // Jika API mengembalikan path /uploads/foto.jpg.
+  const backendOrigin = API_BASE.replace(/\/api\/?$/, '');
+  return `${backendOrigin}/${value.replace(/^\/+/, '')}`;
 }
 
 
-/* =========================================================
-   RUPIAH
-========================================================= */
-
-function formatRupiah(amount) {
-
-  const number =
-    Number(amount) || 0;
-
-
-  return new Intl.NumberFormat(
-    'id-ID',
-    {
-      style: 'currency',
-      currency: 'IDR',
-      maximumFractionDigits: 0
-    }
-  ).format(number);
-}
-
-
-/* =========================================================
-   NAVBAR LOGIN
-========================================================= */
-
+// =========================================================
+// NAVBAR LOGIN DAN PROFIL
+// =========================================================
 function renderNavbarAuth() {
-
-  const authNav =
-    document.getElementById('authNav');
-
+  const authNav = document.getElementById('authNav');
 
   if (!authNav) {
+    console.error('Elemen #authNav tidak ditemukan.');
     return;
   }
 
+  const token = localStorage.getItem('kagemaya_token');
 
-  const token =
-    localStorage.getItem(
-      'kagemaya_token'
-    );
-
-
-  const userJson =
-    localStorage.getItem(
-      'kagemaya_user'
-    );
-
-
-  if (
-    !token ||
-    !userJson
-  ) {
-
-    authNav.innerHTML = `
-
-      <a href="kagemaya-login.html">
-        Login
-      </a>
-
-      <a
-        href="kagemaya-register.html"
-        class="btn btn-red"
-      >
-        Daftar
-      </a>
-
-    `;
-
+  // Jika belum login, biarkan tombol Login dan Daftar.
+  if (!token) {
     return;
   }
 
+  let user = {};
 
   try {
+    user = JSON.parse(
+      localStorage.getItem('kagemaya_user') || '{}'
+    );
+  } catch (error) {
+    console.error('Data pengguna tidak valid:', error);
+  }
 
+  const name =
+    user.name ||
+    user.username ||
+    user.email ||
+    'Pengguna';
+
+  const initial = name.trim().charAt(0).toUpperCase() || 'U';
+
+  authNav.innerHTML = `
+    <button class="icon-btn" type="button" aria-label="Cari">
+      <svg
+        width="20"
+        height="20"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.6"
+        stroke-linecap="round"
+      >
+        <circle cx="11" cy="11" r="7"></circle>
+        <path d="M20 20l-3.6-3.6"></path>
+      </svg>
+    </button>
+
+    <a
+      href="kagemaya-user-profile.html"
+      class="login user-profile-link"
+      title="Buka profil pengguna"
+    >
+      <span class="user-avatar">${initial}</span>
+      <span class="user-name"></span>
+    </a>
+
+    <a
+      class="btn btn-line btn-sm"
+      href="kagemaya-checkout.html"
+    >
+      Pesananku
+    </a>
+
+    <button
+      id="logoutButton"
+      type="button"
+      class="btn btn-sm btn-ghost-danger"
+    >
+      Keluar
+    </button>
+  `;
+
+  authNav.querySelector('.user-name').textContent = name;
+
+  // Pasang handler logout tanpa inline onclick.
+  const logoutButton = authNav.querySelector('#logoutButton');
+
+  logoutButton.addEventListener('click', handleLogout);
+
+  // Tampilkan foto profil dari API.
+  loadNavbarProfile();
+}
+
+
+// =========================================================
+// MEMUAT FOTO PROFIL DARI BACKEND
+// =========================================================
+async function loadNavbarProfile() {
+  const token = localStorage.getItem('kagemaya_token');
+  const authNav = document.getElementById('authNav');
+
+  if (!token || !authNav) return;
+
+  const avatar = authNav.querySelector('.user-avatar');
+  const nameElement = authNav.querySelector('.user-name');
+
+  if (!avatar) {
+    console.error('Elemen .user-avatar tidak ditemukan.');
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE}/me/profile`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/json'
+      }
+    });
+
+    const result = await response.json();
+
+    console.log('Status profil:', response.status);
+    console.log('Respons profil:', result);
+
+    if (!response.ok) {
+      throw new Error(
+        result.message || 'Gagal mengambil profil pengguna.'
+      );
+    }
+
+    // Mendukung beberapa format respons API.
     const user =
-      JSON.parse(userJson);
+      result?.data?.user ??
+      result?.data ??
+      result?.user ??
+      result;
 
+    if (!user || typeof user !== 'object') {
+      throw new Error('Format data profil tidak valid.');
+    }
+
+    // Simpan data terbaru agar halaman lain dapat menggunakannya.
+    localStorage.setItem('kagemaya_user', JSON.stringify(user));
 
     const name =
       user.name ||
       user.username ||
-      user.fullName ||
-      user.full_name ||
       user.email ||
-      'User';
+      'Pengguna';
 
+    if (nameElement) {
+      nameElement.textContent = name;
+    }
 
-    const initial =
-      name
-        .charAt(0)
-        .toUpperCase();
+    const photo = user.profile_picture;
 
+    if (typeof photo !== 'string' || !photo.trim()) {
+      console.warn(
+        'API tidak mengembalikan profile_picture. Avatar inisial tetap ditampilkan.'
+      );
+      return;
+    }
 
-    authNav.innerHTML = `
+    const imageUrl = getProfileImageUrl(photo);
 
-      <button
-        class="icon-btn"
-        aria-label="Cari"
-      >
-        <svg
-          width="20"
-          height="20"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="1.6"
-        >
-          <circle
-            cx="11"
-            cy="11"
-            r="7"
-          />
+    const img = document.createElement('img');
+    img.alt = `Foto profil ${name}`;
+    img.loading = 'eager';
 
-          <path
-            d="M20 20l-3.6-3.6"
-          />
-        </svg>
-      </button>
+    img.onload = function () {
+      // Pastikan navbar belum diganti saat request berlangsung.
+      if (authNav.contains(avatar)) {
+        avatar.replaceChildren(img);
+        console.log('Foto profil berhasil dimuat:', imageUrl);
+      }
+    };
 
+    img.onerror = function () {
+      console.error('Foto profil gagal dimuat:', imageUrl);
+    };
 
-      <a
-        href="kagemaya-user-profile.html"
-        style="
-          display:flex;
-          align-items:center;
-          gap:10px;
-          text-decoration:none;
-        "
-        title="Pengaturan Profil"
-      >
-
-        <div
-          style="
-            width:36px;
-            height:36px;
-            border-radius:50%;
-            background:#1c1c22;
-            border:1px solid #D6A85F;
-            display:grid;
-            place-items:center;
-            color:#D6A85F;
-          "
-        >
-          ${escapeHtml(initial)}
-        </div>
-
-
-        <span
-          style="
-            color:#D6A85F;
-            font-size:14px;
-            font-weight:500;
-          "
-        >
-          ${escapeHtml(name)}
-        </span>
-
-      </a>
-
-
-      <a
-        href="kagemaya-pesananku.html"
-        class="btn btn-line btn-sm"
-      >
-        Pesananku
-      </a>
-
-
-      <button
-        onclick="handleLogout()"
-        style="
-          background:none;
-          border:0;
-          color:#B8B5B0;
-          cursor:pointer;
-          font-size:14px;
-        "
-      >
-        Keluar
-      </button>
-
-    `;
+    img.src = imageUrl;
 
   } catch (error) {
-
-    console.error(
-      'Gagal membaca user:',
-      error
-    );
-
-
-    localStorage.removeItem(
-      'kagemaya_user'
-    );
-
-
-    renderNavbarAuth();
+    console.error('Gagal memuat foto profil:', error);
   }
 }
 
 
-/* =========================================================
-   LOGOUT
-========================================================= */
-
+// =========================================================
+// LOGOUT
+// =========================================================
 function handleLogout() {
-
-  localStorage.removeItem(
-    'kagemaya_token'
-  );
-
-
-  localStorage.removeItem(
-    'kagemaya_user'
-  );
-
+  localStorage.removeItem('kagemaya_token');
+  localStorage.removeItem('kagemaya_user');
 
   window.location.href =
     'kagemaya-landing-page-visual-anchor.html';
 }
 
 
-/* =========================================================
-   LOAD EVENT BERDASARKAN ID
-========================================================= */
-
+// =========================================================
+// MEMUAT DETAIL EVENT BERDASARKAN ID URL
+// =========================================================
 async function loadEventDetail() {
+  const params = new URLSearchParams(window.location.search);
+  const eventId = params.get('id');
 
-  const params =
-    new URLSearchParams(
-      window.location.search
-    );
+  currentEventId = eventId;
 
+  console.log('DETAIL EVENT ID:', eventId);
 
-  /*
-   * ID EVENT HARUS DARI URL
-   */
-  const eventId =
-    params.get('id');
+  const loading = document.getElementById('loading-state');
 
-
-  currentEventId =
-    eventId;
-
-
-  console.log(
-    'DETAIL EVENT ID:',
-    eventId
-  );
-
-
-  /*
-   * JIKA TIDAK ADA ID
-   * JANGAN MENGAMBIL EVENT LAIN
-   */
   if (!eventId) {
-
-    const loading =
-      document.getElementById(
-        'loading-state'
-      );
-
-
     if (loading) {
-
       loading.innerHTML = `
         <p style="color:#ff8b8b;">
-          ID event tidak ditemukan.
+          ID event tidak ditemukan pada URL.
         </p>
       `;
-
     }
-
-
     return;
   }
 
-
   try {
-
-    const response =
-      await fetch(
-        `${API_BASE}/events/${encodeURIComponent(eventId)}`
-      );
-
+    const response = await fetch(
+      `${API_BASE}/events/${encodeURIComponent(eventId)}`
+    );
 
     if (!response.ok) {
-
-      const errorData =
-        await response.json()
-          .catch(() => ({}));
-
+      const errorData = await response.json().catch(() => ({}));
 
       throw new Error(
         errorData.message ||
-        `Event tidak ditemukan (${response.status})`
+        `Event tidak ditemukan (${response.status}).`
       );
-
     }
 
+    const result = await response.json();
 
-    const result =
-      await response.json();
+    const event = result?.data?.event ?? result?.data ?? result?.event ?? result;
 
-
-    const event =
-      result.data ||
-      result;
-
-
-    if (!event) {
-
-      throw new Error(
-        'Data event kosong.'
-      );
-
+    if (!event || typeof event !== 'object') {
+      throw new Error('Data event kosong atau tidak valid.');
     }
 
-
-    console.log(
-      'EVENT DETAIL:',
-      event
-    );
-
+    console.log('EVENT DETAIL:', event);
 
     renderDetail(event);
-
 
     loadRelatedEvents(
       event.category_id ||
@@ -1590,336 +1569,119 @@ async function loadEventDetail() {
     );
 
   } catch (error) {
-
-    console.error(
-      'Fetch event detail failed:',
-      error
-    );
-
-
-    const loading =
-      document.getElementById(
-        'loading-state'
-      );
-
+    console.error('Fetch event detail gagal:', error);
 
     if (loading) {
-
       loading.innerHTML = `
-
-        <p
-          style="
-            color:#ff8b8b;
-          "
-        >
-          ${escapeHtml(
-            error.message
-          )}
+        <p style="color:#ff8b8b;">
+          ${escapeHtml(error.message)}
         </p>
-
       `;
-
     }
-
   }
 }
 
 
-/* =========================================================
-   RENDER DETAIL
-========================================================= */
-
+// =========================================================
+// RENDER DETAIL EVENT
+// =========================================================
 function renderDetail(event) {
+  const loading = document.getElementById('loading-state');
+  const content = document.getElementById('event-detail-content');
 
-  const loading =
-    document.getElementById(
-      'loading-state'
-    );
+  if (loading) loading.style.display = 'none';
+  if (content) content.style.display = 'block';
 
-
-  const content =
-    document.getElementById(
-      'event-detail-content'
-    );
-
-
-  if (loading) {
-    loading.style.display =
-      'none';
-  }
-
-
-  if (content) {
-    content.style.display =
-      'block';
-  }
-
-
-  const title =
-    event.title ||
-    event.name ||
-    'Event Tanpa Judul';
-
+  const title = event.title || event.name || 'Event Tanpa Judul';
 
   const categoryName =
     event.category?.name ||
-    event.category ||
+    (typeof event.category === 'string' ? event.category : '') ||
     'Event';
-
 
   const banner =
     event.banner_url ||
     event.bannerUrl ||
     event.image ||
-    'https://via.placeholder.com/800x450?text=Kagemaya';
-
+    'https://placehold.co/800x450?text=Kagemaya';
 
   const price =
-    event.starting_price ||
-    event.startingPrice ||
-    event.price ||
+    event.starting_price ??
+    event.startingPrice ??
+    event.price ??
     0;
 
+  const venue = event.venue_name || event.venueName || '';
+  const city = event.city || '';
 
-  const venue =
-    event.venue_name ||
-    event.venueName ||
-    '';
-
-
-  const city =
-    event.city ||
-    '';
-
-
-  const location =
-    venue
-      ? `${venue}${city ? ', ' + city : ''}`
-      : city || 'Online';
-
+  const location = venue
+    ? `${venue}${city ? ', ' + city : ''}`
+    : city || 'Online';
 
   const rawDate =
     event.start_date ||
     event.startDate ||
     event.date;
 
+  const startDate = rawDate
+    ? new Date(rawDate).toLocaleDateString('id-ID', {
+        weekday: 'long',
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric'
+      })
+    : 'Tanggal belum ditentukan';
 
-  const startDate =
-    rawDate
-      ? new Date(rawDate)
-          .toLocaleDateString(
-            'id-ID',
-            {
-              weekday: 'long',
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric'
-            }
-          )
-      : 'Tanggal belum ditentukan';
+  document.title = `${title} — Kagemaya`;
 
+  const setText = (id, value) => {
+    const element = document.getElementById(id);
+    if (element) element.textContent = value;
+  };
 
-  document.title =
-    `${title} — Kagemaya`;
+  setText('crumb-category', categoryName);
+  setText('crumb-title', title);
+  setText('event-title', title);
+  setText('event-category', categoryName);
+  setText(
+    'event-short-desc',
+    event.short_description || event.shortDescription || ''
+  );
+  setText(
+    'event-description',
+    event.description || 'Tidak ada deskripsi rinci.'
+  );
+  setText('event-price', formatRupiah(price));
+  setText('event-date', startDate);
+  setText('event-location', location);
 
-
-  const crumbCategory =
-    document.getElementById(
-      'crumb-category'
-    );
-
-
-  if (crumbCategory) {
-    crumbCategory.textContent =
-      categoryName;
-  }
-
-
-  const crumbTitle =
-    document.getElementById(
-      'crumb-title'
-    );
-
-
-  if (crumbTitle) {
-    crumbTitle.textContent =
-      title;
-  }
-
-
-  const titleElement =
-    document.getElementById(
-      'event-title'
-    );
-
-
-  if (titleElement) {
-    titleElement.textContent =
-      title;
-  }
-
-
-  const categoryElement =
-    document.getElementById(
-      'event-category'
-    );
-
-
-  if (categoryElement) {
-    categoryElement.textContent =
-      categoryName;
-  }
-
-
-  const bannerElement =
-    document.getElementById(
-      'event-banner'
-    );
-
+  const bannerElement = document.getElementById('event-banner');
 
   if (bannerElement) {
-
-    bannerElement.src =
-      banner;
-
-    bannerElement.alt =
-      title;
-
+    bannerElement.src = banner;
+    bannerElement.alt = title;
+    bannerElement.onerror = function () {
+      this.onerror = null;
+      this.src = 'https://placehold.co/800x450?text=Kagemaya';
+    };
   }
 
-
-  const shortDesc =
-    document.getElementById(
-      'event-short-desc'
-    );
-
-
-  if (shortDesc) {
-
-    shortDesc.textContent =
-      event.short_description ||
-      event.shortDescription ||
-      '';
-
-  }
-
-
-  const description =
-    document.getElementById(
-      'event-description'
-    );
-
-
-  if (description) {
-
-    description.textContent =
-      event.description ||
-      'Tidak ada deskripsi rinci.';
-
-  }
-
-
-  const priceElement =
-    document.getElementById(
-      'event-price'
-    );
-
-
-  if (priceElement) {
-
-    priceElement.textContent =
-      formatRupiah(price);
-
-  }
-
-
-  const dateElement =
-    document.getElementById(
-      'event-date'
-    );
-
-
-  if (dateElement) {
-
-    dateElement.textContent =
-      startDate;
-
-  }
-
-
-  const locationElement =
-    document.getElementById(
-      'event-location'
-    );
-
-
-  if (locationElement) {
-
-    locationElement.textContent =
-      location;
-
-  }
-
-
-  /*
-   * ORGANIZER
-   */
-
-  const organizer =
-    event.organizer ||
-    event.organizerProfile;
-
+  // Organizer
+  const organizer = event.organizer || event.organizerProfile;
 
   const organizerName =
     organizer?.name ||
     organizer?.companyName ||
     'Kagemaya Organizer';
 
+  setText('org-name', organizerName);
+  setText('org-initial', organizerName.charAt(0).toUpperCase());
 
-  const organizerElement =
-    document.getElementById(
-      'org-name'
-    );
-
-
-  if (organizerElement) {
-
-    organizerElement.textContent =
-      organizerName;
-
-  }
-
-
-  const organizerInitial =
-    document.getElementById(
-      'org-initial'
-    );
-
-
-  if (organizerInitial) {
-
-    organizerInitial.textContent =
-      organizerName
-        .charAt(0)
-        .toUpperCase();
-
-  }
-
-
-  /*
-   * TICKETS
-   */
-
+  // Jenis tiket
   const ticketContainer =
-    document.getElementById(
-      'ticket-types-container'
-    );
+    document.getElementById('ticket-types-container');
 
-
-  if (!ticketContainer) {
-    return;
-  }
-
+  if (!ticketContainer) return;
 
   const tickets =
     event.tickets ||
@@ -1927,292 +1689,130 @@ function renderDetail(event) {
     event.Ticket ||
     [];
 
-
-  if (
-    Array.isArray(tickets) &&
-    tickets.length > 0
-  ) {
-
-    ticketContainer.innerHTML =
-      tickets
-        .map(
-          ticket => `
-
-            <div
-              class="ticket-type-item"
-            >
-
-              <div>
-
-                <h4>
-                  ${escapeHtml(
-                    ticket.name ||
-                    'Tiket'
-                  )}
-                </h4>
-
-
-                <p>
-                  ${escapeHtml(
-                    ticket.description ||
-                    'Kuota terbatas'
-                  )}
-                </p>
-
-              </div>
-
-
-              <div
-                class="ticket-price"
-              >
-
-                <b>
-                  ${formatRupiah(
-                    ticket.price
-                  )}
-                </b>
-
-              </div>
-
-            </div>
-
-          `
-        )
-        .join('');
-
-  } else {
-
-    ticketContainer.innerHTML = `
-
-      <div
-        class="ticket-type-item"
-      >
-
+  if (Array.isArray(tickets) && tickets.length > 0) {
+    ticketContainer.innerHTML = tickets.map(ticket => `
+      <div class="ticket-type-item">
         <div>
-
-          <h4>
-            Tiket Reguler
-          </h4>
-
-          <p>
-            Akses masuk umum event
-          </p>
-
+          <h4>${escapeHtml(ticket.name || 'Tiket')}</h4>
+          <p>${escapeHtml(ticket.description || 'Kuota terbatas')}</p>
         </div>
-
-
-        <div
-          class="ticket-price"
-        >
-
-          <b>
-            ${formatRupiah(price)}
-          </b>
-
+        <div class="ticket-price">
+          <b>${formatRupiah(ticket.price)}</b>
         </div>
-
       </div>
-
+    `).join('');
+  } else {
+    ticketContainer.innerHTML = `
+      <div class="ticket-type-item">
+        <div>
+          <h4>Tiket Reguler</h4>
+          <p>Akses masuk umum event</p>
+        </div>
+        <div class="ticket-price">
+          <b>${formatRupiah(price)}</b>
+        </div>
+      </div>
     `;
-
   }
 }
 
 
-/* =========================================================
-   EVENT TERKAIT
-========================================================= */
-
-async function loadRelatedEvents(
-  categoryId,
-  currentId
-) {
-
+// =========================================================
+// EVENT TERKAIT
+// =========================================================
+async function loadRelatedEvents(categoryId, currentId) {
   try {
+    const response = await fetch(`${API_BASE}/events?limit=6`);
 
-    const response =
-      await fetch(
-        `${API_BASE}/events?limit=6`
-      );
+    if (!response.ok) return;
 
+    const result = await response.json();
+    const events = result?.data?.events ?? result?.data ?? result?.events ?? result;
 
-    if (!response.ok) {
-      return;
-    }
+    if (!Array.isArray(events)) return;
 
+    const container = document.getElementById('related-cards');
 
-    const result =
-      await response.json();
+    // Bagian related-cards opsional di HTML.
+    if (!container) return;
 
-
-    const events =
-      result.data ||
-      result;
-
-
-    if (
-      !Array.isArray(events)
-    ) {
-      return;
-    }
-
-
-    const container =
-      document.getElementById(
-        'related-cards'
-      );
-
-
-    if (!container) {
-      return;
-    }
-
-
-    const filtered =
-      events.filter(
-        event =>
-          String(
-            event.id ||
-            event._id
-          ) !==
-          String(currentId)
-      );
-
-
-    container.innerHTML =
-      filtered
-        .slice(0, 3)
-        .map(event => {
-
-          const id =
-            event.id ||
-            event._id;
-
-
-          const image =
-            event.banner_url ||
-            event.bannerUrl ||
-            event.image ||
-            '';
-
-
-          const price =
-            event.starting_price ||
-            event.startingPrice ||
-            event.price ||
-            0;
-
-
-          return `
-
-            <article
-              class="card"
-              style="cursor:pointer"
-              onclick="
-                window.location.href =
-                'kagemaya-event-detail.html?id=${encodeURIComponent(id)}'
-              "
-            >
-
-              <div class="img">
-
-                <img
-                  src="${escapeHtml(image)}"
-                  alt="${escapeHtml(event.title || 'Event')}"
-                  style="
-                    width:100%;
-                    height:100%;
-                    object-fit:cover;
-                  "
-                >
-
-              </div>
-
-
-              <div class="body">
-
-                <h3>
-                  ${escapeHtml(
-                    event.title ||
-                    'Event'
-                  )}
-                </h3>
-
-
-                <p class="s">
-                  ${escapeHtml(
-                    event.city ||
-                    'Online'
-                  )}
-                </p>
-
-
-                <div
-                  style="
-                    font-size:14px;
-                    color:var(--gold);
-                  "
-                >
-                  ${formatRupiah(price)}
-                </div>
-
-              </div>
-
-            </article>
-
-          `;
-
-        })
-        .join('');
-
-  } catch (error) {
-
-    console.error(
-      'Gagal memuat event terkait:',
-      error
+    const filtered = events.filter(event =>
+      String(event.id || event._id) !== String(currentId)
     );
 
+    container.innerHTML = filtered.slice(0, 3).map(event => {
+      const id = event.id || event._id;
+      const image = event.banner_url || event.bannerUrl || event.image || '';
+      const price =
+        event.starting_price ??
+        event.startingPrice ??
+        event.price ??
+        0;
+
+      return `
+        <article
+          class="card"
+          style="cursor:pointer"
+          data-event-id="${escapeHtml(id)}"
+        >
+          <div class="img">
+            <img
+              src="${escapeHtml(image)}"
+              alt="${escapeHtml(event.title || 'Event')}"
+              style="width:100%;height:100%;object-fit:cover;"
+            >
+          </div>
+          <div class="body">
+            <h3>${escapeHtml(event.title || 'Event')}</h3>
+            <p class="s">${escapeHtml(event.city || 'Online')}</p>
+            <div style="font-size:14px;color:var(--gold);">
+              ${formatRupiah(price)}
+            </div>
+          </div>
+        </article>
+      `;
+    }).join('');
+
+    container.querySelectorAll('[data-event-id]').forEach(card => {
+      card.addEventListener('click', function () {
+        const id = this.dataset.eventId;
+        window.location.href =
+          `kagemaya-event-detail.html?id=${encodeURIComponent(id)}`;
+      });
+    });
+
+  } catch (error) {
+    console.error('Gagal memuat event terkait:', error);
   }
 }
 
 
-/* =========================================================
-   BUY TICKET
-========================================================= */
-
+// =========================================================
+// BELI TIKET
+// =========================================================
 function buyTicket() {
-    // Ambil ID event dari URL
-    const params = new URLSearchParams(window.location.search);
-    const eventId = params.get("id");
+  const eventId =
+    new URLSearchParams(window.location.search).get('id');
 
-    console.log("Event ID:", eventId);
+  console.log('Event ID:', eventId);
 
-    // Cek apakah ID tersedia
-    if (!eventId) {
-        alert("ID event tidak ditemukan.");
-        return;
-    }
+  if (!eventId) {
+    alert('ID event tidak ditemukan.');
+    return;
+  }
 
-    // Pindah ke halaman checkout sambil membawa ID event
-    window.location.href =
-        `/kagemaya-checkout?id=${encodeURIComponent(eventId)}`;
+  window.location.href =
+    `/kagemaya-checkout?id=${encodeURIComponent(eventId)}`;
 }
 
-/* =========================================================
-   START
-========================================================= */
 
-document.addEventListener(
-  'DOMContentLoaded',
-  function () {
-
-    renderNavbarAuth();
-
-    loadEventDetail();
-
-  }
-);
-
+// =========================================================
+// START
+// =========================================================
+document.addEventListener('DOMContentLoaded', function () {
+  renderNavbarAuth();
+  loadEventDetail();
+});
 </script>
 
 </body>
