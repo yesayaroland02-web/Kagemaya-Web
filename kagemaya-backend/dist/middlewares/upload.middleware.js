@@ -36,6 +36,6 @@ exports.uploadSingleImage = (0, multer_1.default)({
     storage,
     fileFilter,
     limits: {
-        fileSize: 2 * 1024 * 1024,
+        fileSize: 5 * 1024 * 1024,
     },
 });

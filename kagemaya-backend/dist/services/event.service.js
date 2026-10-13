@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.validateTicketStockService = exports.getEventByIdService = exports.getCategoriesService = exports.getEventsService = void 0;
+exports.createEventService = exports.validateTicketStockService = exports.getEventByIdService = exports.getCategoriesService = exports.getEventsService = void 0;
 const prisma_1 = require("../lib/prisma");
 const getEventsService = async (params) => {
     const { search, category, city, date, price, sort, page = 1, limit = 6 } = params;
@@ -286,3 +286,68 @@ const validateTicketStockService = async (ticketTypeId, requestedQty) => {
     };
 };
 exports.validateTicketStockService = validateTicketStockService;
+const createEventService = async (input) => {
+    const { organizer_id, category_id, title, description, city, location, banner_url, start_date, end_date, tickets, } = input;
+    const startDateObj = new Date(start_date);
+    const endDateObj = new Date(end_date);
+    if (isNaN(startDateObj.getTime()) || isNaN(endDateObj.getTime())) {
+        throw new Error('Format tanggal mulai atau tanggal selesai tidak valid');
+    }
+    if (startDateObj >= endDateObj) {
+        throw new Error('Tanggal selesai harus lebih lambat dari tanggal mulai');
+    }
+    // Cari kategori berdasarkan id, slug, atau nama
+    let category = await prisma_1.prisma.category.findUnique({
+        where: { id: category_id },
+    });
+    if (!category) {
+        category = await prisma_1.prisma.category.findFirst({
+            where: {
+                OR: [
+                    { slug: category_id },
+                    { name: category_id },
+                ],
+            },
+        });
+    }
+    if (!category) {
+        throw new Error('Kategori event tidak ditemukan');
+    }
+    // Hitung total kuota untuk invariant PRD Section 8.4:
+    // available_seats = sum(ticket_types.quota)
+    const totalAvailableSeats = tickets.reduce((sum, t) => sum + Number(t.quota), 0);
+    // Jalankan dalam prisma transaction untuk konsistensi data
+    const createdEvent = await prisma_1.prisma.$transaction(async (tx) => {
+        const event = await tx.event.create({
+            data: {
+                organizer_id,
+                category_id: category.id,
+                title,
+                description,
+                city,
+                location,
+                banner_url: banner_url || null,
+                start_date: startDateObj,
+                end_date: endDateObj,
+                available_seats: totalAvailableSeats,
+                ticket_types: {
+                    create: tickets.map((t) => ({
+                        name: t.name,
+                        price: Number(t.price),
+                        quota: Number(t.quota),
+                        available_quota: Number(t.quota),
+                    })),
+                },
+            },
+            include: {
+                category: true,
+                ticket_types: {
+                    orderBy: { price: 'asc' },
+                },
+            },
+        });
+        return event;
+    });
+    return createdEvent;
+};
+exports.createEventService = createEventService;
