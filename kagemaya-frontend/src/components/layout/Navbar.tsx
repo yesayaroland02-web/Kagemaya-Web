@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { getImageUrl } from '@/lib/utils';
-import { Search, User as UserIcon, LogOut, ChevronDown, Menu, X, Sparkles, Ticket } from 'lucide-react';
+import { Search, User as UserIcon, LogOut, ChevronDown, Menu, X, Sparkles, Ticket, Plus } from 'lucide-react';
 
 export default function Navbar() {
   const { user, logout, isLoading } = useAuth();
@@ -94,13 +94,23 @@ export default function Navbar() {
             ) : user ? (
               <div className="flex items-center gap-3">
                 {/* Dashboard / Tiket Button */}
-                <Link
-                  href={user.role === 'ORGANIZER' ? '/organizer/dashboard' : '/events'}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium border border-kage-border-light text-kage-washi hover:border-kage-gold transition"
-                >
-                  <Ticket className="w-3.5 h-3.5 text-kage-gold" />
-                  <span>{user.role === 'ORGANIZER' ? 'Portal Organizer' : 'Cari Tiket'}</span>
-                </Link>
+                {user.role === 'ORGANIZER' ? (
+                  <Link
+                    href="/organizer/events/create"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold bg-kage-red hover:bg-kage-vermilion text-white shadow-sm transition"
+                  >
+                    <Plus className="w-3.5 h-3.5" />
+                    <span>Buat Event</span>
+                  </Link>
+                ) : (
+                  <Link
+                    href="/events"
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium border border-kage-border-light text-kage-washi hover:border-kage-gold transition"
+                  >
+                    <Ticket className="w-3.5 h-3.5 text-kage-gold" />
+                    <span>Cari Tiket</span>
+                  </Link>
+                )}
 
                 {/* Profile User Dropdown */}
                 <div className="relative" ref={dropdownRef}>
@@ -139,6 +149,16 @@ export default function Navbar() {
                       </div>
 
                       <div className="py-1">
+                        {user.role === 'ORGANIZER' && (
+                          <Link
+                            href="/organizer/events/create"
+                            onClick={() => setDropdownOpen(false)}
+                            className="flex items-center gap-2 px-4 py-2 text-xs text-kage-gold hover:text-kage-washi hover:bg-kage-yoru-light transition"
+                          >
+                            <Plus className="w-3.5 h-3.5 text-kage-gold" />
+                            <span>Buat Event Baru</span>
+                          </Link>
+                        )}
                         <Link
                           href="/user/profile"
                           onClick={() => setDropdownOpen(false)}

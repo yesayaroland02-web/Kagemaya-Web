@@ -25,6 +25,20 @@ app.use(
   )
 );
 
+// Root / Health Check
+app.get('/', (_req, res) => {
+  res.json({
+    status: 'ok',
+    message: 'Kagemaya Backend API is running 🚀',
+    version: '1.0.0',
+    endpoints: {
+      events: '/api/events',
+      categories: '/api/categories',
+      auth: '/api/auth',
+    },
+  });
+});
+
 // Routes Integration
 app.use('/api/auth', authRouter);
 app.use('/api/events', eventRouter);

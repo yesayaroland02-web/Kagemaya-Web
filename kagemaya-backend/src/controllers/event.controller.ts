@@ -1,8 +1,13 @@
 import { Request, Response } from 'express';
 import { errorResponse, successResponse } from '../utils/response';
-import { getCategoriesService, getEventByIdService, getEventsService } from '../services/event.service';
-
-import { validateTicketStockService } from '../services/event.service';
+import { 
+  getCategoriesService, 
+  getEventByIdService, 
+  getEventsService, 
+  validateTicketStockService,
+  createEventService 
+} from '../services/event.service';
+import { AuthenticatedRequest } from '../middlewares/auth.middleware';
 
 export const getEvents = async (req: Request, res: Response) => {
   try {
@@ -65,3 +70,75 @@ export const checkTicketStock = async (req: Request, res: Response) => {
     return errorResponse(res, error.message || 'Gagal memvalidasi kuota tiket', 500, error);
   }
 };
+
+export const createEvent = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return errorResponse(res, 'Autentikasi diperlukan. Silakan login sebagai Organizer.', 401);
+    }
+
+    const {
+      title,
+      category_id,
+      city,
+      location,
+      description,
+      start_date,
+      end_date,
+      tickets,
+    } = req.body;
+
+    if (!title || !category_id || !city || !location || !description || !start_date || !end_date) {
+      return errorResponse(
+        res,
+        'Semua data event (judul, kategori, kota, lokasi, deskripsi, tanggal mulai, tanggal selesai) wajib diisi',
+        400
+      );
+    }
+
+    let parsedTickets = tickets;
+    if (typeof tickets === 'string') {
+      try {
+        parsedTickets = JSON.parse(tickets);
+      } catch (e) {
+        return errorResponse(res, 'Format data tiket tidak valid (harus berupa array JSON)', 400);
+      }
+    }
+
+    if (!Array.isArray(parsedTickets) || parsedTickets.length === 0) {
+      return errorResponse(res, 'Minimal harus menyertakan satu jenis tiket', 400);
+    }
+
+    for (const ticket of parsedTickets) {
+      if (!ticket.name || ticket.price === undefined || ticket.quota === undefined) {
+        return errorResponse(res, 'Setiap jenis tiket harus memiliki nama, harga, dan kuota', 400);
+      }
+      if (Number(ticket.quota) <= 0) {
+        return errorResponse(res, 'Kuota tiket minimal 1', 400);
+      }
+      if (Number(ticket.price) < 0) {
+        return errorResponse(res, 'Harga tiket tidak boleh negatif', 400);
+      }
+    }
+
+    const bannerUrl = req.file ? `/uploads/${req.file.filename}` : req.body.banner_url || null;
+
+    const newEvent = await createEventService({
+      organizer_id: userId,
+      title,
+      category_id,
+      city,
+      location,
+      description,
+      start_date,
+      end_date,
+      banner_url: bannerUrl,
+      tickets: parsedTickets,
+    });
+
+    return successResponse(res, 'Event berhasil dibuat', newEvent, 201);
+  } catch (error: any) {
+    return errorResponse(res, error.message || 'Gagal membuat event', 500, error);
+  }
+};

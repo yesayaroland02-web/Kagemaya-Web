@@ -1,9 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkTicketStock = exports.getEventById = exports.getCategories = exports.getEvents = void 0;
+exports.createEvent = exports.checkTicketStock = exports.getEventById = exports.getCategories = exports.getEvents = void 0;
 const response_1 = require("../utils/response");
 const event_service_1 = require("../services/event.service");
-const event_service_2 = require("../services/event.service");
 const getEvents = async (req, res) => {
     try {
         // 1. Destructure semua parameter query dari frontend
@@ -52,7 +51,7 @@ const checkTicketStock = async (req, res) => {
     try {
         const ticketTypeId = req.params.ticketTypeId || req.params.id;
         const qty = req.query.qty ? Number(req.query.qty) : 1;
-        const result = await (0, event_service_2.validateTicketStockService)(ticketTypeId, qty);
+        const result = await (0, event_service_1.validateTicketStockService)(ticketTypeId, qty);
         if (!result.is_available) {
             return (0, response_1.errorResponse)(res, result.message, 400, result);
         }
@@ -63,3 +62,56 @@ const checkTicketStock = async (req, res) => {
     }
 };
 exports.checkTicketStock = checkTicketStock;
+const createEvent = async (req, res) => {
+    try {
+        const userId = req.user?.id;
+        if (!userId) {
+            return (0, response_1.errorResponse)(res, 'Autentikasi diperlukan. Silakan login sebagai Organizer.', 401);
+        }
+        const { title, category_id, city, location, description, start_date, end_date, tickets, } = req.body;
+        if (!title || !category_id || !city || !location || !description || !start_date || !end_date) {
+            return (0, response_1.errorResponse)(res, 'Semua data event (judul, kategori, kota, lokasi, deskripsi, tanggal mulai, tanggal selesai) wajib diisi', 400);
+        }
+        let parsedTickets = tickets;
+        if (typeof tickets === 'string') {
+            try {
+                parsedTickets = JSON.parse(tickets);
+            }
+            catch (e) {
+                return (0, response_1.errorResponse)(res, 'Format data tiket tidak valid (harus berupa array JSON)', 400);
+            }
+        }
+        if (!Array.isArray(parsedTickets) || parsedTickets.length === 0) {
+            return (0, response_1.errorResponse)(res, 'Minimal harus menyertakan satu jenis tiket', 400);
+        }
+        for (const ticket of parsedTickets) {
+            if (!ticket.name || ticket.price === undefined || ticket.quota === undefined) {
+                return (0, response_1.errorResponse)(res, 'Setiap jenis tiket harus memiliki nama, harga, dan kuota', 400);
+            }
+            if (Number(ticket.quota) <= 0) {
+                return (0, response_1.errorResponse)(res, 'Kuota tiket minimal 1', 400);
+            }
+            if (Number(ticket.price) < 0) {
+                return (0, response_1.errorResponse)(res, 'Harga tiket tidak boleh negatif', 400);
+            }
+        }
+        const bannerUrl = req.file ? `/uploads/${req.file.filename}` : req.body.banner_url || null;
+        const newEvent = await (0, event_service_1.createEventService)({
+            organizer_id: userId,
+            title,
+            category_id,
+            city,
+            location,
+            description,
+            start_date,
+            end_date,
+            banner_url: bannerUrl,
+            tickets: parsedTickets,
+        });
+        return (0, response_1.successResponse)(res, 'Event berhasil dibuat', newEvent, 201);
+    }
+    catch (error) {
+        return (0, response_1.errorResponse)(res, error.message || 'Gagal membuat event', 500, error);
+    }
+};
+exports.createEvent = createEvent;

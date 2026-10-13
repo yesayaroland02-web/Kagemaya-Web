@@ -20,6 +20,19 @@ app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 // Serve uploaded files (avatar, payment proof, banner) sebagai static
 app.use('/uploads', express_1.default.static(path_1.default.join(process.cwd(), 'uploads')));
+// Root / Health Check
+app.get('/', (_req, res) => {
+    res.json({
+        status: 'ok',
+        message: 'Kagemaya Backend API is running 🚀',
+        version: '1.0.0',
+        endpoints: {
+            events: '/api/events',
+            categories: '/api/categories',
+            auth: '/api/auth',
+        },
+    });
+});
 // Routes Integration
 app.use('/api/auth', auth_router_1.default);
 app.use('/api/events', event_router_1.default);
