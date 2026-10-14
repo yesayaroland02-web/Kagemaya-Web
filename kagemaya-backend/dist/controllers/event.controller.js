@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.getEventVouchers = exports.createEventVoucher = exports.updateEvent = exports.createEvent = exports.checkTicketStock = exports.getEventById = exports.getCategories = exports.getEvents = void 0;
 const response_1 = require("../utils/response");
 const event_service_1 = require("../services/event.service");
+const cloudinary_1 = require("../config/cloudinary");
 const getEvents = async (req, res) => {
     try {
         // 1. Destructure semua parameter query dari frontend
@@ -95,7 +96,10 @@ const createEvent = async (req, res) => {
                 return (0, response_1.errorResponse)(res, 'Harga tiket tidak boleh negatif', 400);
             }
         }
-        const bannerUrl = req.file ? `/uploads/${req.file.filename}` : req.body.banner_url || null;
+        let bannerUrl = req.body.banner_url || null;
+        if (req.file) {
+            bannerUrl = await (0, cloudinary_1.uploadToCloudinary)(req.file.buffer, 'kagemaya/banners');
+        }
         const newEvent = await (0, event_service_1.createEventService)({
             organizer_id: userId,
             title,
@@ -150,7 +154,7 @@ const updateEvent = async (req, res) => {
         }
         let bannerUrl = undefined;
         if (req.file) {
-            bannerUrl = `/uploads/${req.file.filename}`;
+            bannerUrl = await (0, cloudinary_1.uploadToCloudinary)(req.file.buffer, 'kagemaya/banners');
         }
         else if (req.body.banner_url !== undefined) {
             bannerUrl = req.body.banner_url;

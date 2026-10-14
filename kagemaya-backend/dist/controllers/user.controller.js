@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateMyPassword = exports.updateMyProfile = exports.getMyProfile = void 0;
+const cloudinary_1 = require("../config/cloudinary");
 const user_service_1 = require("../services/user.service");
 const response_1 = require("../utils/response");
 // ========================================
@@ -27,7 +28,7 @@ const updateMyProfile = async (req, res) => {
             ? req.body.name.trim()
             : undefined;
         const profile_picture = req.file
-            ? `/uploads/${req.file.filename}`
+            ? await (0, cloudinary_1.uploadToCloudinary)(req.file.buffer, 'kagemaya/avatars')
             : undefined;
         if (!name && !profile_picture) {
             return (0, response_1.errorResponse)(res, 'Nama atau foto profil wajib diisi.', 400);
@@ -39,7 +40,8 @@ const updateMyProfile = async (req, res) => {
         return (0, response_1.successResponse)(res, 'Profil berhasil diperbarui.', updated, 200);
     }
     catch (error) {
-        return (0, response_1.errorResponse)(res, error.message || 'Gagal memperbarui profil.', 400, error);
+        console.error('Error updating profile:', error);
+        return (0, response_1.errorResponse)(res, error.message || 'Gagal memperbarui profil.', error.statusCode || 500, error);
     }
 };
 exports.updateMyProfile = updateMyProfile;

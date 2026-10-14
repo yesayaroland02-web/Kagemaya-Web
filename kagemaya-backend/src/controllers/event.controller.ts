@@ -11,6 +11,7 @@ import {
   getEventVouchersService
 } from '../services/event.service';
 import { AuthenticatedRequest } from '../middlewares/auth.middleware';
+import { uploadToCloudinary } from '../config/cloudinary';
 
 export const getEvents = async (req: Request, res: Response) => {
   try {
@@ -125,7 +126,10 @@ export const createEvent = async (req: AuthenticatedRequest, res: Response) => {
       }
     }
 
-    const bannerUrl = req.file ? `/uploads/${req.file.filename}` : req.body.banner_url || null;
+    let bannerUrl: string | null = req.body.banner_url || null;
+    if (req.file) {
+      bannerUrl = await uploadToCloudinary(req.file.buffer, 'kagemaya/banners');
+    }
 
     const newEvent = await createEventService({
       organizer_id: userId,
@@ -194,7 +198,7 @@ export const updateEvent = async (req: AuthenticatedRequest, res: Response) => {
 
     let bannerUrl: string | undefined = undefined;
     if (req.file) {
-      bannerUrl = `/uploads/${req.file.filename}`;
+      bannerUrl = await uploadToCloudinary(req.file.buffer, 'kagemaya/banners');
     } else if (req.body.banner_url !== undefined) {
       bannerUrl = req.body.banner_url;
     }

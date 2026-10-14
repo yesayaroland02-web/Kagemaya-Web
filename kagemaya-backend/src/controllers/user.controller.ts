@@ -1,5 +1,6 @@
 import { Response } from 'express';
 import { AuthenticatedRequest } from '../middlewares/auth.middleware';
+import { uploadToCloudinary } from '../config/cloudinary';
 
 import {
   getMyProfileService,
@@ -59,7 +60,7 @@ export const updateMyProfile = async (
         : undefined;
 
     const profile_picture = req.file
-      ? `/uploads/${req.file.filename}`
+      ? await uploadToCloudinary(req.file.buffer, 'kagemaya/avatars')
       : undefined;
 
     if (!name && !profile_picture) {
@@ -83,10 +84,11 @@ export const updateMyProfile = async (
       200
     );
   } catch (error: any) {
+    console.error('Error updating profile:', error);
     return errorResponse(
       res,
       error.message || 'Gagal memperbarui profil.',
-      400,
+      error.statusCode || 500,
       error
     );
   }
