@@ -5,7 +5,10 @@ import {
   getEventByIdService, 
   getEventsService, 
   validateTicketStockService,
-  createEventService 
+  createEventService,
+  updateEventService,
+  createEventVoucherService,
+  getEventVouchersService
 } from '../services/event.service';
 import { AuthenticatedRequest } from '../middlewares/auth.middleware';
 
@@ -141,4 +144,142 @@ export const createEvent = async (req: AuthenticatedRequest, res: Response) => {
   } catch (error: any) {
     return errorResponse(res, error.message || 'Gagal membuat event', 500, error);
   }
-};
+};
+
+export const updateEvent = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return errorResponse(res, 'Autentikasi diperlukan. Silakan login sebagai Organizer.', 401);
+    }
+
+    const { id } = req.params;
+    const {
+      title,
+      category_id,
+      city,
+      location,
+      description,
+      start_date,
+      end_date,
+      tickets,
+    } = req.body;
+
+    let parsedTickets = tickets;
+    if (typeof tickets === 'string') {
+      try {
+        parsedTickets = JSON.parse(tickets);
+      } catch (e) {
+        return errorResponse(res, 'Format data tiket tidak valid (harus berupa array JSON)', 400);
+      }
+    }
+
+    if (parsedTickets && (!Array.isArray(parsedTickets) || parsedTickets.length === 0)) {
+      return errorResponse(res, 'Minimal harus menyertakan satu jenis tiket', 400);
+    }
+
+    if (parsedTickets) {
+      for (const ticket of parsedTickets) {
+        if (!ticket.name || ticket.price === undefined || ticket.quota === undefined) {
+          return errorResponse(res, 'Setiap jenis tiket harus memiliki nama, harga, dan kuota', 400);
+        }
+        if (Number(ticket.quota) <= 0) {
+          return errorResponse(res, 'Kuota tiket minimal 1', 400);
+        }
+        if (Number(ticket.price) < 0) {
+          return errorResponse(res, 'Harga tiket tidak boleh negatif', 400);
+        }
+      }
+    }
+
+    let bannerUrl: string | undefined = undefined;
+    if (req.file) {
+      bannerUrl = `/uploads/${req.file.filename}`;
+    } else if (req.body.banner_url !== undefined) {
+      bannerUrl = req.body.banner_url;
+    }
+
+    const updatedEvent = await updateEventService(id, userId, {
+      title,
+      category_id,
+      city,
+      location,
+      description,
+      start_date,
+      end_date,
+      banner_url: bannerUrl,
+      tickets: parsedTickets,
+    });
+
+    return successResponse(res, 'Event berhasil diperbarui', updatedEvent, 200);
+  } catch (error: any) {
+    const statusCode =
+      error.message === 'Event tidak ditemukan'
+        ? 404
+        : error.message.includes('Akses ditolak')
+        ? 403
+        : 500;
+    return errorResponse(res, error.message || 'Gagal memperbarui event', statusCode, error);
+  }
+};
+
+export const createEventVoucher = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return errorResponse(res, 'Autentikasi diperlukan. Silakan login sebagai Organizer.', 401);
+    }
+
+    const { id } = req.params;
+    const { code, discount_type, discount_value, start_date, end_date } = req.body;
+
+    if (!code || !discount_type || discount_value === undefined || !end_date) {
+      return errorResponse(
+        res,
+        'Kode voucher, tipe diskon, nominal diskon, dan batas waktu akhir wajib diisi',
+        400
+      );
+    }
+
+    const voucher = await createEventVoucherService(id, userId, {
+      code,
+      discount_type,
+      discount_value,
+      start_date,
+      end_date,
+    });
+
+    return successResponse(res, 'Voucher promo berhasil dibuat', voucher, 201);
+  } catch (error: any) {
+    const statusCode =
+      error.message === 'Event tidak ditemukan'
+        ? 404
+        : error.message.includes('Akses ditolak')
+        ? 403
+        : 400;
+    return errorResponse(res, error.message || 'Gagal membuat voucher', statusCode, error);
+  }
+};
+
+export const getEventVouchers = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return errorResponse(res, 'Autentikasi diperlukan. Silakan login sebagai Organizer.', 401);
+    }
+
+    const { id } = req.params;
+    const vouchers = await getEventVouchersService(id, userId);
+
+    return successResponse(res, 'Daftar voucher berhasil diambil', vouchers, 200);
+  } catch (error: any) {
+    const statusCode =
+      error.message === 'Event tidak ditemukan'
+        ? 404
+        : error.message.includes('Akses ditolak')
+        ? 403
+        : 500;
+    return errorResponse(res, error.message || 'Gagal memuat voucher', statusCode, error);
+  }
+};
+

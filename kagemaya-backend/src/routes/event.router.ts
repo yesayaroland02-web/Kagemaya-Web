@@ -4,7 +4,10 @@ import {
   getEvents, 
   getEventById, 
   checkTicketStock,
-  createEvent 
+  createEvent,
+  updateEvent,
+  createEventVoucher,
+  getEventVouchers
 } from '../controllers/event.controller';
 import { authenticateToken } from '../middlewares/auth.middleware';
 import { authorizeRoles } from '../middlewares/role.middleware';
@@ -27,7 +30,30 @@ router.post(
   createEvent
 );
 
-// 3. Route Dinamis (Parametric) dipasang di bawah
+// 3. Organizer Routes: Edit Event & Manajemen Voucher
+router.patch(
+  '/:id',
+  authenticateToken,
+  authorizeRoles('ORGANIZER'),
+  uploadSingleImage.single('banner'),
+  updateEvent
+);
+
+router.post(
+  '/:id/vouchers',
+  authenticateToken,
+  authorizeRoles('ORGANIZER'),
+  createEventVoucher
+);
+
+router.get(
+  '/:id/vouchers',
+  authenticateToken,
+  authorizeRoles('ORGANIZER'),
+  getEventVouchers
+);
+
+// 4. Route Dinamis (Parametric) dipasang di bawah
 router.get('/:id', getEventById);
 
 export default router;

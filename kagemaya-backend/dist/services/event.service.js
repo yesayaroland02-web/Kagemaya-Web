@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createEventService = exports.validateTicketStockService = exports.getEventByIdService = exports.getCategoriesService = exports.getEventsService = void 0;
+exports.getEventVouchersService = exports.createEventVoucherService = exports.updateEventService = exports.createEventService = exports.validateTicketStockService = exports.getEventByIdService = exports.getCategoriesService = exports.getEventsService = void 0;
 const prisma_1 = require("../lib/prisma");
 const getEventsService = async (params) => {
     const { search, category, city, date, price, sort, page = 1, limit = 6 } = params;
@@ -351,3 +351,159 @@ const createEventService = async (input) => {
     return createdEvent;
 };
 exports.createEventService = createEventService;
+const updateEventService = async (eventId, organizerId, input) => {
+    const existingEvent = await prisma_1.prisma.event.findUnique({
+        where: { id: eventId },
+        include: { ticket_types: true },
+    });
+    if (!existingEvent) {
+        throw new Error('Event tidak ditemukan');
+    }
+    if (existingEvent.organizer_id !== organizerId) {
+        throw new Error('Akses ditolak. Anda bukan penyelenggara event ini.');
+    }
+    let finalCategoryId = existingEvent.category_id;
+    if (input.category_id && input.category_id !== existingEvent.category_id) {
+        let category = await prisma_1.prisma.category.findUnique({
+            where: { id: input.category_id },
+        });
+        if (!category) {
+            category = await prisma_1.prisma.category.findFirst({
+                where: {
+                    OR: [
+                        { slug: input.category_id },
+                        { name: input.category_id },
+                    ],
+                },
+            });
+        }
+        if (category) {
+            finalCategoryId = category.id;
+        }
+    }
+    const startDateObj = input.start_date
+        ? new Date(input.start_date)
+        : existingEvent.start_date;
+    const endDateObj = input.end_date
+        ? new Date(input.end_date)
+        : existingEvent.end_date;
+    if (isNaN(startDateObj.getTime()) || isNaN(endDateObj.getTime())) {
+        throw new Error('Format tanggal mulai atau selesai tidak valid');
+    }
+    if (startDateObj >= endDateObj) {
+        throw new Error('Tanggal selesai harus lebih lambat dari tanggal mulai');
+    }
+    return await prisma_1.prisma.$transaction(async (tx) => {
+        let newAvailableSeats = existingEvent.available_seats;
+        if (input.tickets && Array.isArray(input.tickets) && input.tickets.length > 0) {
+            // Re-calculate PRD Section 8.4 invariant: available_seats = sum(quota)
+            newAvailableSeats = input.tickets.reduce((sum, t) => sum + Number(t.quota), 0);
+            // Re-create updated ticket tiers
+            await tx.ticketType.deleteMany({
+                where: { event_id: eventId },
+            });
+            await tx.ticketType.createMany({
+                data: input.tickets.map((t) => ({
+                    event_id: eventId,
+                    name: t.name,
+                    price: Number(t.price),
+                    quota: Number(t.quota),
+                    available_quota: Number(t.quota),
+                })),
+            });
+        }
+        const updatedEvent = await tx.event.update({
+            where: { id: eventId },
+            data: {
+                title: input.title ?? existingEvent.title,
+                description: input.description ?? existingEvent.description,
+                city: input.city ?? existingEvent.city,
+                location: input.location ?? existingEvent.location,
+                category_id: finalCategoryId,
+                banner_url: input.banner_url !== undefined
+                    ? input.banner_url
+                    : existingEvent.banner_url,
+                start_date: startDateObj,
+                end_date: endDateObj,
+                available_seats: newAvailableSeats,
+            },
+            include: {
+                category: true,
+                ticket_types: {
+                    orderBy: { price: 'asc' },
+                },
+            },
+        });
+        return updatedEvent;
+    });
+};
+exports.updateEventService = updateEventService;
+const createEventVoucherService = async (eventId, organizerId, input) => {
+    const event = await prisma_1.prisma.event.findUnique({
+        where: { id: eventId },
+    });
+    if (!event) {
+        throw new Error('Event tidak ditemukan');
+    }
+    if (event.organizer_id !== organizerId) {
+        throw new Error('Akses ditolak. Anda bukan penyelenggara event ini.');
+    }
+    const cleanCode = input.code.trim().toUpperCase().replace(/\s+/g, '');
+    if (!cleanCode) {
+        throw new Error('Kode voucher wajib diisi');
+    }
+    // Check duplicate voucher code for this event
+    const existingVoucher = await prisma_1.prisma.voucher.findFirst({
+        where: {
+            event_id: eventId,
+            code: cleanCode,
+        },
+    });
+    if (existingVoucher) {
+        throw new Error(`Kode voucher "${cleanCode}" sudah digunakan untuk event ini.`);
+    }
+    const discountType = input.discount_type.toUpperCase() === 'FIXED' ? 'FIXED' : 'PERCENT';
+    const discountValue = Number(input.discount_value);
+    if (isNaN(discountValue) || discountValue <= 0) {
+        throw new Error('Besaran diskon harus lebih dari 0');
+    }
+    if (discountType === 'PERCENT' && discountValue > 100) {
+        throw new Error('Diskon persentase tidak boleh lebih dari 100%');
+    }
+    const startDateObj = input.start_date ? new Date(input.start_date) : new Date();
+    const endDateObj = new Date(input.end_date);
+    if (isNaN(startDateObj.getTime()) || isNaN(endDateObj.getTime())) {
+        throw new Error('Format tanggal voucher tidak valid');
+    }
+    if (startDateObj >= endDateObj) {
+        throw new Error('Masa berlaku voucher (tanggal selesai) harus lebih lambat dari tanggal mulai');
+    }
+    const voucher = await prisma_1.prisma.voucher.create({
+        data: {
+            event_id: eventId,
+            code: cleanCode,
+            discount_type: discountType,
+            discount_value: discountValue,
+            start_date: startDateObj,
+            end_date: endDateObj,
+        },
+    });
+    return voucher;
+};
+exports.createEventVoucherService = createEventVoucherService;
+const getEventVouchersService = async (eventId, organizerId) => {
+    const event = await prisma_1.prisma.event.findUnique({
+        where: { id: eventId },
+    });
+    if (!event) {
+        throw new Error('Event tidak ditemukan');
+    }
+    if (event.organizer_id !== organizerId) {
+        throw new Error('Akses ditolak. Anda bukan penyelenggara event ini.');
+    }
+    return await prisma_1.prisma.voucher.findMany({
+        where: { event_id: eventId },
+        orderBy: { created_at: 'desc' },
+    });
+};
+exports.getEventVouchersService = getEventVouchersService;

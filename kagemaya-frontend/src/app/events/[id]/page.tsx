@@ -1,7 +1,9 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
+import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/axios';
 import { EventDetail, TicketType } from '@/types/event';
 import { formatRupiah, formatDateTime, formatDate, getImageUrl } from '@/lib/utils';
@@ -20,12 +22,16 @@ import {
   Shield,
   Loader2,
   ArrowRight,
+  Edit3,
+  TicketPercent,
+  Sparkles,
 } from 'lucide-react';
 
 export default function EventDetailPage() {
   const params = useParams();
   const router = useRouter();
   const eventId = params.id as string;
+  const { user } = useAuth();
 
   const [event, setEvent] = useState<EventDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -156,6 +162,32 @@ export default function EventDetailPage() {
           type={toast.type}
           onClose={() => setToast(null)}
         />
+      )}
+
+      {/* ── ORGANIZER QUICK CONTROLS ───────────────────── */}
+      {user?.role === 'ORGANIZER' && (user?.id === (event as any).organizer_id || user?.id === event.organizer?.id) && (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-lg bg-kage-gold/10 border border-kage-gold/30 backdrop-blur-sm">
+          <div className="flex items-center gap-2.5 text-xs text-kage-gold font-medium">
+            <Sparkles className="w-4 h-4 text-kage-gold flex-shrink-0" />
+            <span>Panel Penyelenggara: Anda adalah pemilik acara ini</span>
+          </div>
+          <div className="flex items-center gap-2.5">
+            <Link
+              href={`/organizer/events/${event.id}/edit`}
+              className="px-3.5 py-1.5 rounded text-xs font-semibold bg-kage-gold hover:bg-yellow-500 text-kage-black flex items-center gap-1.5 transition shadow-sm"
+            >
+              <Edit3 className="w-3.5 h-3.5" />
+              <span>Edit Event</span>
+            </Link>
+            <Link
+              href={`/organizer/events/${event.id}/vouchers`}
+              className="px-3.5 py-1.5 rounded text-xs font-semibold border border-kage-gold text-kage-gold hover:bg-kage-gold/10 flex items-center gap-1.5 transition"
+            >
+              <TicketPercent className="w-3.5 h-3.5" />
+              <span>Kelola Voucher</span>
+            </Link>
+          </div>
+        </div>
       )}
 
       {/* ── 1. BANNER & HEADER ──────────────────────────── */}
