@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { getImageUrl } from '@/lib/utils';
-import { Search, User as UserIcon, LogOut, ChevronDown, Menu, X, Sparkles, Ticket, Plus } from 'lucide-react';
+import { Search, User as UserIcon, LogOut, ChevronDown, Menu, X, Sparkles, Ticket, Plus, Layers } from 'lucide-react';
 
 export default function Navbar() {
   const { user, logout, isLoading } = useAuth();
@@ -95,13 +95,22 @@ export default function Navbar() {
               <div className="flex items-center gap-3">
                 {/* Dashboard / Tiket Button */}
                 {user.role === 'ORGANIZER' ? (
-                  <Link
-                    href="/organizer/events/create"
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold bg-kage-red hover:bg-kage-vermilion text-white shadow-sm transition"
-                  >
-                    <Plus className="w-3.5 h-3.5" />
-                    <span>Buat Event</span>
-                  </Link>
+                  <div className="flex items-center gap-2">
+                    <Link
+                      href="/organizer/events"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium border border-kage-border-light text-kage-washi hover:border-kage-gold hover:text-kage-gold transition"
+                    >
+                      <Layers className="w-3.5 h-3.5 text-kage-gold" />
+                      <span>Event Saya</span>
+                    </Link>
+                    <Link
+                      href="/organizer/events/create"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold bg-kage-red hover:bg-kage-vermilion text-white shadow-sm transition"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Buat Event</span>
+                    </Link>
+                  </div>
                 ) : (
                   <Link
                     href="/events"
@@ -150,14 +159,24 @@ export default function Navbar() {
 
                       <div className="py-1">
                         {user.role === 'ORGANIZER' && (
-                          <Link
-                            href="/organizer/events/create"
-                            onClick={() => setDropdownOpen(false)}
-                            className="flex items-center gap-2 px-4 py-2 text-xs text-kage-gold hover:text-kage-washi hover:bg-kage-yoru-light transition"
-                          >
-                            <Plus className="w-3.5 h-3.5 text-kage-gold" />
-                            <span>Buat Event Baru</span>
-                          </Link>
+                          <>
+                            <Link
+                              href="/organizer/events"
+                              onClick={() => setDropdownOpen(false)}
+                              className="flex items-center gap-2 px-4 py-2 text-xs text-kage-gold hover:text-kage-washi hover:bg-kage-yoru-light transition"
+                            >
+                              <Layers className="w-3.5 h-3.5 text-kage-gold" />
+                              <span>Event Saya (My Events)</span>
+                            </Link>
+                            <Link
+                              href="/organizer/events/create"
+                              onClick={() => setDropdownOpen(false)}
+                              className="flex items-center gap-2 px-4 py-2 text-xs text-kage-mist hover:text-kage-washi hover:bg-kage-yoru-light transition"
+                            >
+                              <Plus className="w-3.5 h-3.5 text-kage-mist" />
+                              <span>Buat Event Baru</span>
+                            </Link>
+                          </>
                         )}
                         <Link
                           href="/user/profile"
@@ -231,10 +250,28 @@ export default function Navbar() {
           <div className="border-t border-kage-border pt-3">
             {user ? (
               <div className="space-y-2">
+                {user.role === 'ORGANIZER' && (
+                  <>
+                    <Link
+                      href="/organizer/events"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block text-sm text-kage-gold font-medium"
+                    >
+                      Event Saya (My Events)
+                    </Link>
+                    <Link
+                      href="/organizer/events/create"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block text-sm text-kage-mist hover:text-kage-washi"
+                    >
+                      + Buat Event Baru
+                    </Link>
+                  </>
+                )}
                 <Link
                   href="/user/profile"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="block text-sm text-kage-gold font-medium"
+                  className="block text-sm text-kage-mist hover:text-kage-washi"
                 >
                   Profil: {user.name}
                 </Link>

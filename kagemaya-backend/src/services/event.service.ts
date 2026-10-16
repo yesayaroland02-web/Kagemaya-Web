@@ -633,4 +633,53 @@ export const getEventVouchersService = async (
     orderBy: { created_at: 'desc' },
   });
 };
+
+export const getMyOrganizerEventsService = async (organizerId: string) => {
+  const events = await prisma.event.findMany({
+    where: { organizer_id: organizerId },
+    orderBy: { created_at: 'desc' },
+    include: {
+      category: {
+        select: { id: true, name: true, slug: true },
+      },
+      ticket_types: {
+        orderBy: { price: 'asc' },
+        select: {
+          id: true,
+          name: true,
+          price: true,
+          quota: true,
+          available_quota: true,
+        },
+      },
+      vouchers: {
+        select: {
+          id: true,
+          code: true,
+          discount_type: true,
+          discount_value: true,
+          used_count: true,
+          start_date: true,
+          end_date: true,
+        },
+      },
+      _count: {
+        select: {
+          transactions: true,
+          reviews: true,
+        },
+      },
+    },
+  });
+
+  return events.map((event) => {
+    const prices = event.ticket_types.map((t) => t.price);
+    const minPrice = prices.length > 0 ? Math.min(...prices) : 0;
+    return {
+      ...event,
+      starting_price: minPrice,
+      status: 'PUBLISHED',
+    };
+  });
+};
 

@@ -17,6 +17,8 @@ router.post('/', auth_middleware_1.authenticateToken, (0, role_middleware_1.auth
 router.patch('/:id', auth_middleware_1.authenticateToken, (0, role_middleware_1.authorizeRoles)('ORGANIZER'), upload_middleware_1.uploadSingleImage.single('banner'), event_controller_1.updateEvent);
 router.post('/:id/vouchers', auth_middleware_1.authenticateToken, (0, role_middleware_1.authorizeRoles)('ORGANIZER'), event_controller_1.createEventVoucher);
 router.get('/:id/vouchers', auth_middleware_1.authenticateToken, (0, role_middleware_1.authorizeRoles)('ORGANIZER'), event_controller_1.getEventVouchers);
+// Organizer Route: Ambil seluruh event milik EO yang sedang login
+router.get('/organizer/my-events', auth_middleware_1.authenticateToken, (0, role_middleware_1.authorizeRoles)('ORGANIZER'), event_controller_1.getMyOrganizerEvents);
 // 4. Route Dinamis (Parametric) dipasang di bawah
 router.get('/:id', event_controller_1.getEventById);
 exports.default = router;

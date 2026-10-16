@@ -7,7 +7,8 @@ import {
   createEvent,
   updateEvent,
   createEventVoucher,
-  getEventVouchers
+  getEventVouchers,
+  getMyOrganizerEvents
 } from '../controllers/event.controller';
 import { authenticateToken } from '../middlewares/auth.middleware';
 import { authorizeRoles } from '../middlewares/role.middleware';
@@ -51,6 +52,14 @@ router.get(
   authenticateToken,
   authorizeRoles('ORGANIZER'),
   getEventVouchers
+);
+
+// Organizer Route: Ambil seluruh event milik EO yang sedang login
+router.get(
+  '/organizer/my-events',
+  authenticateToken,
+  authorizeRoles('ORGANIZER'),
+  getMyOrganizerEvents
 );
 
 // 4. Route Dinamis (Parametric) dipasang di bawah
