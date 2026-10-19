@@ -1,9 +1,21 @@
+
+import { randomBytes, createHash } from 'crypto';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { z } from 'zod';
+
 import { prisma } from '../lib/prisma';
-import { registerSchema, loginSchema } from '../validations/auth.validation';
 import config from '../config';
+
+import {
+  registerSchema,
+  loginSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+} from '../validations/auth.validation';
+
+import { sendResetPasswordEmail } from './email.service';
+
 
 const generateReferralCode = (name: string): string => {
   const prefix = name.replace(/\s+/g, '').slice(0, 3).toUpperCase();
@@ -154,4 +166,197 @@ export const getAllUsers = async () => {
       created_at: true,
     },
   });
+};
+
+/**
+ * FTRIN-002 - Forgot Password
+ * Membuat token reset dan mengirim email.
+ */
+export const forgotPasswordUser = async (payload: unknown) => {
+  // Validasi email
+  const { email } = forgotPasswordSchema.parse(payload);
+
+  // Pesan umum agar tidak mengungkap keberadaan akun
+  const message =
+    'Jika email terdaftar, tautan reset password akan dikirim.';
+
+  // Cari pengguna tanpa membedakan huruf besar/kecil
+  const user = await prisma.user.findFirst({
+    where: {
+      email: {
+        equals: email,
+        mode: 'insensitive',
+      },
+    },
+  });
+
+  // Jangan ungkap apakah email terdaftar
+  if (!user) {
+    return { message };
+  }
+
+  // Token acak 32 byte = 64 karakter hexadecimal
+  const rawToken = randomBytes(32).toString('hex');
+
+  // Hanya hash token yang disimpan di database
+  const tokenHash = createHash('sha256')
+    .update(rawToken)
+    .digest('hex');
+
+  // Token berlaku selama 30 menit
+  const expiresAt = new Date(
+    Date.now() + 30 * 60 * 1000
+  );
+
+  // Nonaktifkan token lama dan simpan token baru
+  await prisma.$transaction(async (tx) => {
+    await tx.passwordResetToken.updateMany({
+      where: {
+        user_id: user.id,
+        used_at: null,
+      },
+      data: {
+        used_at: new Date(),
+      },
+    });
+
+    await tx.passwordResetToken.create({
+      data: {
+        user_id: user.id,
+        token_hash: tokenHash,
+        expires_at: expiresAt,
+      },
+    });
+  });
+
+  // Buat tautan menuju frontend Kagemaya
+  const resetUrl = new URL(
+    '/reset-password',
+    config.frontendUrl
+  );
+
+  resetUrl.searchParams.set('token', rawToken);
+
+
+  // Kirim email melalui Nodemailer
+  try {
+    await sendResetPasswordEmail(
+      user.email,
+      resetUrl.toString()
+    );
+  } catch (error: unknown) {
+    // Catat kegagalan tanpa menampilkan token
+    // atau kredensial SMTP.
+    console.error(
+      'FTRIN-002: SMTP delivery failed',
+      error instanceof Error ? error.name : 'UnknownError'
+    );
+
+    // Nonaktifkan token yang gagal dikirim.
+    try {
+      await prisma.passwordResetToken.updateMany({
+        where: {
+          token_hash: tokenHash,
+          used_at: null,
+        },
+        data: {
+          used_at: new Date(),
+        },
+      });
+    } catch (cleanupError: unknown) {
+      console.error(
+        'FTRIN-002: Token cleanup failed',
+        cleanupError instanceof Error
+          ? cleanupError.name
+          : 'UnknownError'
+      );
+    }
+
+    // Controller akan memberikan respons umum
+    // agar keberadaan akun tidak terungkap.
+    throw new Error('RESET_EMAIL_DELIVERY_FAILED');
+  }
+
+
+  return { message };
+};
+
+/**
+ * FTRIN-002 - Reset Password
+ * Validasi token dan perubahan password.
+ */
+export const resetPasswordUser = async (payload: unknown) => {
+  // 1. Validasi input
+  const { token, password } = resetPasswordSchema.parse(payload);
+
+  // 2. Hash token reset
+  const tokenHash = createHash('sha256')
+    .update(token)
+    .digest('hex');
+
+  // 3. Cari token yang masih berlaku
+  const resetRecord = await prisma.passwordResetToken.findFirst({
+    where: {
+      token_hash: tokenHash,
+      used_at: null,
+      expires_at: {
+        gt: new Date(),
+      },
+    },
+    select: {
+      id: true,
+      user_id: true,
+    },
+  });
+
+  if (!resetRecord) {
+    throw new Error(
+      'Token reset tidak valid atau sudah kedaluwarsa.'
+    );
+  }
+
+  // 4. Hash password baru
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  // 5. Update password dalam database transaction
+  await prisma.$transaction(async (tx) => {
+    // Klaim token agar tidak dapat digunakan dua kali
+    const claimed = await tx.passwordResetToken.updateMany({
+      where: {
+        id: resetRecord.id,
+        used_at: null,
+        expires_at: { gt: new Date() },
+      },
+      data: {
+        used_at: new Date(),
+      },
+    });
+
+    if (claimed.count !== 1) {
+      throw new Error(
+        'Token reset tidak valid atau sudah digunakan.'
+      );
+    }
+
+    // Perbarui password pengguna
+    await tx.user.update({
+      where: { id: resetRecord.user_id },
+      data: { password: hashedPassword },
+    });
+
+    // Nonaktifkan token reset lainnya
+    await tx.passwordResetToken.updateMany({
+      where: {
+        user_id: resetRecord.user_id,
+        used_at: null,
+      },
+      data: {
+        used_at: new Date(),
+      },
+    });
+  });
+
+  return {
+    message: 'Password berhasil diperbarui. Silakan login kembali.',
+  };
 };
