@@ -8,7 +8,8 @@ import {
   createEventService,
   updateEventService,
   createEventVoucherService,
-  getEventVouchersService
+  getEventVouchersService,
+  getMyOrganizerEventsService
 } from '../services/event.service';
 import { AuthenticatedRequest } from '../middlewares/auth.middleware';
 import { uploadToCloudinary } from '../config/cloudinary';
@@ -286,4 +287,25 @@ export const getEventVouchers = async (req: AuthenticatedRequest, res: Response)
     return errorResponse(res, error.message || 'Gagal memuat voucher', statusCode, error);
   }
 };
+
+export const getMyOrganizerEvents = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return errorResponse(res, 'Autentikasi diperlukan. Silakan login sebagai Organizer.', 401);
+    }
+
+    const events = await getMyOrganizerEventsService(userId);
+
+    return successResponse(
+      res,
+      'Daftar seluruh event milik organizer berhasil diambil',
+      events,
+      200
+    );
+  } catch (error: any) {
+    return errorResponse(res, error.message || 'Gagal memuat event organizer', 500, error);
+  }
+};
+
 

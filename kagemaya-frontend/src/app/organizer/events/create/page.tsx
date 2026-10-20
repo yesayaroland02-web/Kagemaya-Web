@@ -118,6 +118,27 @@ export default function CreateEventPage() {
       } finally {
         setLoadingCategories(false);
       }
+
+      // Restore Form Draft from LocalStorage if available
+      try {
+        const savedDraft = localStorage.getItem('kagemaya_event_create_draft');
+        if (savedDraft) {
+          const d = JSON.parse(savedDraft);
+          if (d.title) setTitle(d.title);
+          if (d.categoryId) setCategoryId(d.categoryId);
+          if (d.city) setCity(d.city);
+          if (d.location) setLocation(d.location);
+          if (d.description) setDescription(d.description);
+          if (d.startDate) setStartDate(d.startDate);
+          if (d.endDate) setEndDate(d.endDate);
+          if (d.tickets && Array.isArray(d.tickets) && d.tickets.length > 0) {
+            setTickets(d.tickets);
+          }
+          setSuccessMessage('Draf formulir Anda sebelumnya berhasil dipulihkan.');
+        }
+      } catch (e) {
+        console.error('Failed to parse saved draft:', e);
+      }
     }
     fetchCategories();
   }, []);
@@ -296,6 +317,7 @@ export default function CreateEventPage() {
       });
 
       const newEventId = response.data?.data?.id;
+      localStorage.removeItem('kagemaya_event_create_draft');
       setSuccessMessage('Event berhasil dipublikasikan secara sukses!');
 
       setTimeout(() => {
@@ -312,6 +334,29 @@ export default function CreateEventPage() {
       setErrorMessage(backendMsg);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  // Simpan Draf Formulir ke LocalStorage
+  const handleSaveDraft = () => {
+    try {
+      const draftData = {
+        title,
+        categoryId,
+        city,
+        location,
+        description,
+        startDate,
+        endDate,
+        tickets,
+      };
+      localStorage.setItem('kagemaya_event_create_draft', JSON.stringify(draftData));
+      setSuccessMessage('Draf event berhasil disimpan di peramban Anda.');
+      setTimeout(() => {
+        router.push('/events');
+      }, 1000);
+    } catch (e) {
+      console.error('Failed to save draft:', e);
     }
   };
 
@@ -380,10 +425,10 @@ export default function CreateEventPage() {
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={() => router.push('/events')}
+              onClick={handleSaveDraft}
               className="px-4 py-2 rounded text-xs font-medium border border-kage-border text-kage-mist hover:text-kage-washi hover:bg-kage-yoru-light transition"
             >
-              Batal
+              Simpan Draf
             </button>
             <button
               type="button"
@@ -805,7 +850,7 @@ export default function CreateEventPage() {
 
                 <button
                   type="button"
-                  onClick={() => router.push('/events')}
+                  onClick={handleSaveDraft}
                   className="w-full py-2 rounded border border-kage-border hover:border-kage-gold text-kage-mist hover:text-kage-washi text-xs font-medium transition"
                 >
                   Simpan Draf & Kembali

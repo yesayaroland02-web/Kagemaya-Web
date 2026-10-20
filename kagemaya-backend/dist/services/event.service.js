@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getEventVouchersService = exports.createEventVoucherService = exports.updateEventService = exports.createEventService = exports.validateTicketStockService = exports.getEventByIdService = exports.getCategoriesService = exports.getEventsService = void 0;
+exports.getMyOrganizerEventsService = exports.getEventVouchersService = exports.createEventVoucherService = exports.updateEventService = exports.createEventService = exports.validateTicketStockService = exports.getEventByIdService = exports.getCategoriesService = exports.getEventsService = void 0;
 const prisma_1 = require("../lib/prisma");
 const getEventsService = async (params) => {
     const { search, category, city, date, price, sort, page = 1, limit = 6 } = params;
@@ -507,3 +507,51 @@ const getEventVouchersService = async (eventId, organizerId) => {
     });
 };
 exports.getEventVouchersService = getEventVouchersService;
+const getMyOrganizerEventsService = async (organizerId) => {
+    const events = await prisma_1.prisma.event.findMany({
+        where: { organizer_id: organizerId },
+        orderBy: { created_at: 'desc' },
+        include: {
+            category: {
+                select: { id: true, name: true, slug: true },
+            },
+            ticket_types: {
+                orderBy: { price: 'asc' },
+                select: {
+                    id: true,
+                    name: true,
+                    price: true,
+                    quota: true,
+                    available_quota: true,
+                },
+            },
+            vouchers: {
+                select: {
+                    id: true,
+                    code: true,
+                    discount_type: true,
+                    discount_value: true,
+                    used_count: true,
+                    start_date: true,
+                    end_date: true,
+                },
+            },
+            _count: {
+                select: {
+                    transactions: true,
+                    reviews: true,
+                },
+            },
+        },
+    });
+    return events.map((event) => {
+        const prices = event.ticket_types.map((t) => t.price);
+        const minPrice = prices.length > 0 ? Math.min(...prices) : 0;
+        return {
+            ...event,
+            starting_price: minPrice,
+            status: 'PUBLISHED',
+        };
+    });
+};
+exports.getMyOrganizerEventsService = getMyOrganizerEventsService;

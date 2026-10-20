@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getEventVouchers = exports.createEventVoucher = exports.updateEvent = exports.createEvent = exports.checkTicketStock = exports.getEventById = exports.getCategories = exports.getEvents = void 0;
+exports.getMyOrganizerEvents = exports.getEventVouchers = exports.createEventVoucher = exports.updateEvent = exports.createEvent = exports.checkTicketStock = exports.getEventById = exports.getCategories = exports.getEvents = void 0;
 const response_1 = require("../utils/response");
 const event_service_1 = require("../services/event.service");
 const cloudinary_1 = require("../config/cloudinary");
@@ -232,3 +232,17 @@ const getEventVouchers = async (req, res) => {
     }
 };
 exports.getEventVouchers = getEventVouchers;
+const getMyOrganizerEvents = async (req, res) => {
+    try {
+        const userId = req.user?.id;
+        if (!userId) {
+            return (0, response_1.errorResponse)(res, 'Autentikasi diperlukan. Silakan login sebagai Organizer.', 401);
+        }
+        const events = await (0, event_service_1.getMyOrganizerEventsService)(userId);
+        return (0, response_1.successResponse)(res, 'Daftar seluruh event milik organizer berhasil diambil', events, 200);
+    }
+    catch (error) {
+        return (0, response_1.errorResponse)(res, error.message || 'Gagal memuat event organizer', 500, error);
+    }
+};
+exports.getMyOrganizerEvents = getMyOrganizerEvents;
