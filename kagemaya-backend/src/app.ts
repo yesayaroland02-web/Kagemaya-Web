@@ -9,6 +9,10 @@ import categoryRouter from './routes/category.router';
 import orderRoutes from './routes/order.route';
 import userRouter from './routes/user.router';
 import rewardRoutes from './routes/reward.routes';
+import transactionRouter from './routes/transaction.router';
+
+// Import Background Jobs
+import { initExpireTransactionCron } from './jobs/expireTransaction.job';
 
 const app = express();
 
@@ -32,9 +36,11 @@ app.get('/', (_req, res) => {
     message: 'Kagemaya Backend API is running 🚀',
     version: '1.0.0',
     endpoints: {
+      auth: '/api/auth',
       events: '/api/events',
       categories: '/api/categories',
-      auth: '/api/auth',
+      transactions: '/api/transactions',
+      me: '/api/me',
     },
   });
 });
@@ -45,9 +51,10 @@ app.use('/api/events', eventRouter);
 app.use('/api/categories', categoryRouter);
 app.use('/api/orders', orderRoutes);
 app.use('/api/me', userRouter);
-app.use(
-  '/api/me',
-  rewardRoutes
-);
+app.use('/api/me', rewardRoutes);
+app.use('/api/transactions', transactionRouter);
+
+// Initialize Background Cron Scheduler (Auto-Expire Transaksi)
+initExpireTransactionCron();
 
 export default app;

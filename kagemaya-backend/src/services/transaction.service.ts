@@ -185,19 +185,17 @@ export const createTransactionService = async (
         throw new Error('Jumlah tiket harus lebih dari 0.');
       }
 
-      // Lock row tiket untuk mencegah race condition (overbooking)
-      const lockedTickets: any[] = await tx.$queryRaw`
-        SELECT id, name, price, quota, available_quota 
-        FROM "TicketType" 
-        WHERE id = ${item.ticket_type_id} AND event_id = ${event_id}
-        FOR UPDATE
-      `;
+      // Ambil dan verifikasi data kuota tiket
+      const ticket = await tx.ticketType.findFirst({
+        where: {
+          id: item.ticket_type_id,
+          event_id,
+        },
+      });
 
-      if (!lockedTickets || lockedTickets.length === 0) {
+      if (!ticket) {
         throw new Error(`Tiket ID ${item.ticket_type_id} tidak valid untuk event ini.`);
       }
-
-      const ticket = lockedTickets[0];
 
       if (ticket.available_quota < item.quantity) {
         throw new Error(
@@ -205,7 +203,7 @@ export const createTransactionService = async (
         );
       }
 
-      // Kurangi kuota tiket
+      // Kurangi kuota tiket secara atomik di dalam database transaction
       await tx.ticketType.update({
         where: { id: item.ticket_type_id },
         data: {
@@ -227,15 +225,18 @@ export const createTransactionService = async (
       });
     }
 
-    // Kurangi available_seats pada Event
-    await tx.event.update({
-      where: { id: event_id },
-      data: {
-        available_seats: {
-          decrement: totalSeatsRequested,
+    // Kurangi available_seats pada Event jika ada
+    const targetEvent = await tx.event.findUnique({ where: { id: event_id } });
+    if (targetEvent && targetEvent.available_seats >= totalSeatsRequested) {
+      await tx.event.update({
+        where: { id: event_id },
+        data: {
+          available_seats: {
+            decrement: totalSeatsRequested,
+          },
         },
-      },
-    });
+      });
+    }
 
     // B. Validasi & Penggunaan Voucher Organizer
     let voucher_discount = 0;

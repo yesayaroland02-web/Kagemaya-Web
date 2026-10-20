@@ -1,4 +1,4 @@
-import cron from 'node-cron';
+import { schedule } from 'node-cron';
 import { autoExpireOldTransactionsService } from '../services/transaction.service';
 
 /**
@@ -9,7 +9,7 @@ import { autoExpireOldTransactionsService } from '../services/transaction.servic
 export const initExpireTransactionCron = () => {
   console.log('⏰ [Scheduler] Memulai Background Cron Job Auto-Expire Transaksi (interval: 1 menit)...');
 
-  cron.schedule('* * * * *', async () => {
+  schedule('* * * * *', async () => {
     try {
       await autoExpireOldTransactionsService();
     } catch (error: any) {
