@@ -247,10 +247,19 @@ export const forgotPasswordUser = async (payload: unknown) => {
   } catch (error: unknown) {
     // Catat kegagalan tanpa menampilkan token
     // atau kredensial SMTP.
-    console.error(
-      'FTRIN-002: SMTP delivery failed',
-      error instanceof Error ? error.name : 'UnknownError'
-    );
+    const smtpError = error as {
+  name?: string;
+  code?: string;
+  command?: string;
+  responseCode?: number;
+} | null;
+
+console.error('FTRIN-002: SMTP delivery failed', {
+  name: smtpError?.name ?? 'UnknownError',
+  code: smtpError?.code ?? 'Tidak tersedia',
+  command: smtpError?.command ?? 'Tidak tersedia',
+  responseCode: smtpError?.responseCode ?? 'Tidak tersedia',
+});
 
     // Nonaktifkan token yang gagal dikirim.
     try {
