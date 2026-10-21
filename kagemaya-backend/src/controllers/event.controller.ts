@@ -1,16 +1,18 @@
 import { Request, Response } from 'express';
-import { errorResponse, successResponse } from '../utils/response';
-import { 
-  getCategoriesService, 
-  getEventByIdService, 
-  getEventsService, 
-  validateTicketStockService,
+import {
   createEventService,
-  updateEventService,
   createEventVoucherService,
+  deleteEventService,
+  getCategoriesService,
+  getEventByIdService,
   getEventVouchersService,
-  getMyOrganizerEventsService
+  getEventsService,
+  getMyOrganizerEventsService,
+  updateEventService,
+  validateTicketStockService
 } from '../services/event.service';
+import { errorResponse, successResponse } from '../utils/response';
+
 import { AuthenticatedRequest } from '../middlewares/auth.middleware';
 import { uploadToCloudinary } from '../config/cloudinary';
 
@@ -308,4 +310,28 @@ export const getMyOrganizerEvents = async (req: AuthenticatedRequest, res: Respo
   }
 };
 
-
+export const deleteEvent = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return errorResponse(res, 'Autentikasi diperlukan. Silahkan login sebagai Organizer')
+    }
+
+    const { id } = req.params;
+    await deleteEventService(id, userId);
+
+    return successResponse(res, 'Event berhasil dihapus', null, 200);
+  } catch (error: any) {
+    const statusCode = 
+      error.message === 'Event tidak ditemukan' ? 404
+      :error.message.includes('Akses ditolak')
+      ? 403
+      : error.message.includes ('transaksi')
+      ? 400
+      : 500;
+
+      return errorResponse (res, error.message || 'Gagal menghapus event', statusCode, error);
+  }
+}
+
+

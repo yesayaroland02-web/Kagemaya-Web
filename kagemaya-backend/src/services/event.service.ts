@@ -682,4 +682,29 @@ export const getMyOrganizerEventsService = async (organizerId: string) => {
     };
   });
 };
-
+
+export const deleteEventService = async (eventId: string, organizerId: string) => {
+  // 1. Cari event beserta jumlah transaksinya
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    include: {
+      _count: {
+        select: { transactions: true },
+      },
+    },
+  });
+
+  if(!event) {
+    throw new Error('Event tidak ditemukan');
+  }
+
+  // 3. Validasi aturan finansial: tidak boleh hapus event yang sudah memiliki transaksi
+  if (event._count.transactions > 0 ) {
+    throw new Error('Event tidak dapat dihapus karena sudah memiliki riwayat transaksi / pembelian tiket.');
+  }
+
+  // 4. Hapus event dari database (relasi tiket, voucher, dll. otomatis terhapus via cascade)
+  return await prisma.event.delete({
+    where: { id: eventId },
+  });
+}

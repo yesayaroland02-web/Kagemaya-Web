@@ -1,27 +1,28 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
-import api from '@/lib/axios';
-import { formatRupiah, getImageUrl } from '@/lib/utils';
-import { 
-  Calendar, 
-  MapPin, 
-  Plus, 
-  Edit3, 
-  TicketPercent, 
-  ExternalLink, 
-  Loader2, 
-  Trash2, 
-  ShieldAlert, 
-  Layers, 
-  Clock, 
+import {
+  Calendar,
+  Clock,
+  Edit3,
+  ExternalLink,
   FileEdit,
+  Layers,
+  Loader2,
+  MapPin,
+  Plus,
+  ShieldAlert,
   Sparkles,
-  Ticket
+  Ticket,
+  TicketPercent,
+  Trash2
 } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import { formatRupiah, getImageUrl } from '@/lib/utils';
+
+import Link from 'next/link';
+import api from '@/lib/axios';
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 interface EventItem {
   id: string;
@@ -58,6 +59,7 @@ export default function MyOrganizerEventsPage() {
   const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterTab, setFilterTab] = useState<'ALL' | 'PUBLISHED' | 'DRAFT'>('ALL');
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // Load events from API & LocalStorage
   const loadOrganizerEvents = async () => {
@@ -123,6 +125,31 @@ export default function MyOrganizerEventsPage() {
       setLoading(false);
     }
   };
+
+  const handleDeletePublishedEvent = async (eventId: string, title: string) => {
+    const confirmDelete = window.confirm(
+      `Apakah Anda yakin ingin menghapus event "${title}"?\n\nTindakan ini tidak dapat dibatalkan.`
+    );
+    if (!confirmDelete) return;
+
+    try {
+      setDeletingId(eventId);
+      // Request ke API Backend /api/events/:id
+      await api.delete(`/events/${eventId}`);
+
+      // Update State tampilan tanpa perlu reload halaman
+      setEvents((prev) => prev.filter((e) => e.id !== eventId));
+      alert(`Event "${title}" berhasil dihapus.`);
+    } catch (err: any) {
+      const errorMsg =
+        err.response?.data?.message ||
+        'Gagal menghapus event. Pastikan event belum memiliki riwayat transaksi.';
+      alert(errorMsg);
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
 
   useEffect(() => {
     if (!authLoading && user && user.role === 'ORGANIZER') {
@@ -417,6 +444,20 @@ export default function MyOrganizerEventsPage() {
                         <Edit3 className="w-3.5 h-3.5" />
                         <span>Edit Event</span>
                       </Link>
+
+                      <button
+                        type = "button"
+                        onClick ={() => handleDeletePublishedEvent(item.id, item.title)}
+                        disabled={deletingId === item.id}
+                        className='p-2 rounded border border-kage-border hover:border-kage-vermilion text-kage-mist-dim hover:text-kage-vermilion text-xs transition disabled:opacity-50'
+                        title = "Hapus Event"
+                        >
+                          {deletingId === item.id ? (
+                            <Loader2 className='w-4 h-4 animate-spin text-kage-vermilion'/>
+                          ):(
+                            <Trash2 className='w-4 h-4' />
+                          )}
+                        </button>
                     </>
                   ) : (
                     <>

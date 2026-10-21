@@ -1,15 +1,17 @@
-import { Router } from 'express';
-import { 
-  getCategories, 
-  getEvents, 
-  getEventById, 
+import {
   checkTicketStock,
   createEvent,
-  updateEvent,
   createEventVoucher,
+  deleteEvent,
+  getCategories,
+  getEventById,
   getEventVouchers,
-  getMyOrganizerEvents
+  getEvents,
+  getMyOrganizerEvents,
+  updateEvent
 } from '../controllers/event.controller';
+
+import { Router } from 'express';
 import { authenticateToken } from '../middlewares/auth.middleware';
 import { authorizeRoles } from '../middlewares/role.middleware';
 import { uploadSingleImage } from '../middlewares/upload.middleware';
@@ -65,4 +67,12 @@ router.get(
 // 4. Route Dinamis (Parametric) dipasang di bawah
 router.get('/:id', getEventById);
 
-export default router;
+
+// Organizer Route: Hapus Event
+router.delete(
+  '/:id',
+  authenticateToken,
+  authorizeRoles('ORGANIZER'),
+  deleteEvent
+)
+export default router;
