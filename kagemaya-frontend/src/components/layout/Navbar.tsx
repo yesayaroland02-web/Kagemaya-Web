@@ -179,6 +179,14 @@ export default function Navbar() {
                           </>
                         )}
                         <Link
+                          href="/user/transactions"
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-2 px-4 py-2 text-xs text-kage-mist hover:text-kage-washi hover:bg-kage-yoru-light transition"
+                        >
+                          <Ticket className="w-3.5 h-3.5 text-kage-gold" />
+                          <span>Riwayat Transaksi</span>
+                        </Link>
+                        <Link
                           href="/user/profile"
                           onClick={() => setDropdownOpen(false)}
                           className="flex items-center gap-2 px-4 py-2 text-xs text-kage-mist hover:text-kage-washi hover:bg-kage-yoru-light transition"
@@ -268,6 +276,13 @@ export default function Navbar() {
                     </Link>
                   </>
                 )}
+                <Link
+                  href="/user/transactions"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block text-sm text-kage-mist hover:text-kage-washi"
+                >
+                  🎟️ Riwayat Transaksi
+                </Link>
                 <Link
                   href="/user/profile"
                   onClick={() => setMobileMenuOpen(false)}
