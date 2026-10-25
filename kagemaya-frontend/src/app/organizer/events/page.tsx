@@ -92,13 +92,12 @@ export default function MyOrganizerEventsPage() {
           ) || 0;
           const minPrice = d.tickets && d.tickets.length > 0
             ? Math.min(...d.tickets.map((t: any) => Number(t.price) || 0))
-            : 0;
-
+              : 0;
           draftList.push({
             id: 'local-draft',
             title: d.title || 'Draf Event Tanpa Judul',
             description: d.description || 'Draf formulir tersimpan di peramban Anda.',
-            banner_url: null,
+            banner_url: d.bannerPreview || null,
             city: d.city || 'Belum Ditentukan',
             location: d.location || 'Lokasi Belum Diisi',
             start_date: d.startDate || undefined,

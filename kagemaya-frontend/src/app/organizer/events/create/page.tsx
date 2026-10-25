@@ -1,26 +1,27 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
-import api from '@/lib/axios';
-import { 
-  Calendar, 
-  MapPin, 
-  Layers, 
-  Image as ImageIcon, 
-  Plus, 
-  Trash2, 
-  AlertCircle, 
-  CheckCircle2, 
-  ArrowLeft, 
-  Upload, 
-  Sparkles,
+import {
+  AlertCircle,
+  ArrowLeft,
+  Calendar,
+  CheckCircle2,
+  Image as ImageIcon,
   Info,
+  Layers,
+  Loader2,
+  MapPin,
+  Plus,
   ShieldAlert,
-  Loader2
+  Sparkles,
+  Trash2,
+  Upload
 } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+
+import Link from 'next/link';
+import api from '@/lib/axios';
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
 
 interface Category {
   id: string;
@@ -34,6 +35,19 @@ interface TicketTier {
   price: number;
   quota: number;
   benefit?: string;
+}
+
+// Fungsi helper untuk mengubah Base64 kembali menjadi File saat form draf dipulihkan
+function base64ToFile(dataurl: string, filename: string): File {
+  const arr = dataurl.split(',');
+  const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/jpeg';
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new File([u8arr], filename, { type: mime });
 }
 
 export default function CreateEventPage() {
@@ -134,12 +148,23 @@ export default function CreateEventPage() {
           if (d.tickets && Array.isArray(d.tickets) && d.tickets.length > 0) {
             setTickets(d.tickets);
           }
-          setSuccessMessage('Draf formulir Anda sebelumnya berhasil dipulihkan.');
+
+           if (d.bannerPreview) {
+              setBannerPreview(d.bannerPreview);
+              try {
+                const restoredFile = base64ToFile(d.bannerPreview, 'draft-banner.jpg');
+                setBannerFile(restoredFile);
+              } catch (err) {
+                console.warn('Gagal merekonstruksi file draf:', err);
+              }
+            }
+            setSuccessMessage('Draf formulir Anda sebelumnya berhasil dipulihkan.');
+          
         }
-      } catch (e) {
-        console.error('Failed to parse saved draft:', e);
-      }
-    }
+            } catch (e) {
+              console.error('Failed to parse saved draft:', e);
+            }
+          }
     fetchCategories();
   }, []);
 
@@ -160,8 +185,13 @@ export default function CreateEventPage() {
 
     setErrorMessage(null);
     setBannerFile(file);
-    const objectUrl = URL.createObjectURL(file);
-    setBannerPreview(objectUrl);
+    
+    // Konversi ke Base64 agar awet disimpan ke LocalStorage
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setBannerPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
   };
 
   // Add Ticket Tier
@@ -349,11 +379,12 @@ export default function CreateEventPage() {
         startDate,
         endDate,
         tickets,
+        bannerPreview, // simpan gambar ke dalam draftData
       };
       localStorage.setItem('kagemaya_event_create_draft', JSON.stringify(draftData));
       setSuccessMessage('Draf event berhasil disimpan di peramban Anda.');
       setTimeout(() => {
-        router.push('/events');
+        router.push('/organizer/events');
       }, 1000);
     } catch (e) {
       console.error('Failed to save draft:', e);

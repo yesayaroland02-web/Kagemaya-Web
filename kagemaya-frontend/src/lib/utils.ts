@@ -36,7 +36,7 @@ export function formatDateTime(dateString: string | Date): string {
 
 export function getImageUrl(path?: string | null): string {
   if (!path) return 'https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?w=800';
-  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data') || path.startsWith('blob:')) {return path};
   const backendBase = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
   return `${backendBase}${cleanPath}`;
