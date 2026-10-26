@@ -151,7 +151,7 @@ model Coupon {
   user            User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
   discount_amount Int
   expires_at      DateTime
-  is_used         Boolean  @default(false)
+  is_used         Boolean  @default(true)
   created_at      DateTime @default(now())
 
   transactions Transaction[]
