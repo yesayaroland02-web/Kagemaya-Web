@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import { ChevronDown, Layers, LogOut, Menu, Plus, Search, Sparkles, Ticket, TrendingUp, User as UserIcon, X } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
 import { getImageUrl } from '@/lib/utils';
-import { Search, User as UserIcon, LogOut, ChevronDown, Menu, X, Sparkles, Ticket, Plus, Layers } from 'lucide-react';
+import { useAuth } from '@/context/AuthContext';
+import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
   const { user, logout, isLoading } = useAuth();
@@ -97,6 +98,13 @@ export default function Navbar() {
                 {user.role === 'ORGANIZER' ? (
                   <div className="flex items-center gap-2">
                     <Link
+                      href="/organizer/dashboard"
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium border border-kage-border-light text-kage-washi hover:border-kage-gold hover:text-kage-gold transition"
+                    >
+                      <TrendingUp className="w-3.5 h-3.5 text-kage-gold" />
+                      <span>Dashboard</span>
+                    </Link>
+                    <Link
                       href="/organizer/events"
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-medium border border-kage-border-light text-kage-washi hover:border-kage-gold hover:text-kage-gold transition"
                     >
@@ -160,6 +168,14 @@ export default function Navbar() {
                       <div className="py-1">
                         {user.role === 'ORGANIZER' && (
                           <>
+                            <Link
+                              href="/organizer/dashboard"
+                              onClick={() => setDropdownOpen(false)}
+                              className="flex items-center gap-2 px-4 py-2 text-xs text-kage-gold hover:text-kage-washi hover:bg-kage-yoru-light transition"
+                            >
+                              <TrendingUp className="w-3.5 h-3.5 text-kage-gold" />
+                              <span>Dashboard Statistik</span>
+                            </Link>
                             <Link
                               href="/organizer/events"
                               onClick={() => setDropdownOpen(false)}
@@ -260,6 +276,13 @@ export default function Navbar() {
               <div className="space-y-2">
                 {user.role === 'ORGANIZER' && (
                   <>
+                    <Link
+                      href="/organizer/dashboard"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block text-sm text-kage-gold font-medium"
+                    >
+                      📊 Dashboard Statistik
+                    </Link>
                     <Link
                       href="/organizer/events"
                       onClick={() => setMobileMenuOpen(false)}

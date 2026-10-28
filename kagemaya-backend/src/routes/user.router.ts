@@ -1,23 +1,36 @@
-import { Router } from 'express';
+import {
+  getMyProfile,
+  updateMyPassword,
+  updateMyProfile,
+} from '../controllers/user.controller';
 
+import { Router } from 'express';
 import {
   authenticateToken,
 } from '../middlewares/auth.middleware';
-
+import {
+  authorizeRoles
+} from '../middlewares/role.middleware';
+import {
+  getOrganizerDashboardStats
+} from '../controllers/dashboard.controller';
 import {
   uploadSingleImage,
 } from '../middlewares/upload.middleware';
-
-import {
-  getMyProfile,
-  updateMyProfile,
-  updateMyPassword,
-} from '../controllers/user.controller';
 
 const router = Router();
 
 // Semua route di bawah membutuhkan token
 router.use(authenticateToken);
+
+// ==========================================
+// ORGANIZER DASHBOARD STATS: GET /api/me/dashboard/stats
+// ==========================================
+router.get(
+  '/dashboard/stats',
+  authorizeRoles('ORGANIZER'),
+  getOrganizerDashboardStats
+);
 
 // GET /api/me/profile
 router.get(
