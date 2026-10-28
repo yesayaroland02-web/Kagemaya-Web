@@ -214,10 +214,10 @@ export default function OrganizerDashboardPage() {
                   </p>
                 </div>
                 <Link
-                  href="/organizer/events"
-                  className="text-xs text-kage-gold hover:underline flex items-center gap-1"
-                >
-                  Lihat Semua Event <ArrowUpRight className="w-3.5 h-3.5" />
+                    href="/organizer/transactions"
+                    className="text-xs text-kage-gold hover:underline flex items-center gap-1"
+                    >
+                    Lihat Semua Transaksi <ArrowUpRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
 

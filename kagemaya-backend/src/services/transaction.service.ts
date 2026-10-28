@@ -1,6 +1,7 @@
+import { DiscountType, PointTransactionType, TransactionStatus } from '@prisma/client';
+
 import { prisma } from '../lib/prisma';
 import { uploadToCloudinary } from '../config/cloudinary';
-import { TransactionStatus, PointTransactionType, DiscountType } from '@prisma/client';
 
 export interface CheckoutItemInput {
   ticket_type_id: string;
@@ -719,4 +720,212 @@ export const autoExpireOldTransactionsService = async () => {
 
   console.log(`[Auto-Expire Cron] Selesai: Berhasil memproses ${processedCount} transaksi kedaluwarsa.`);
   return { count: processedCount };
+};
+
+
+// =========================================================
+// 9. ORGANIZER: GET INCOMING TRANSACTIONS FOR MY EVENTS
+// =========================================================
+export const getOrganizerTransactionsService = async (
+  organizerId: string,
+  statusFilter?: string,
+  page: number = 1,
+  limit: number = 20
+) => {
+  const skip = (page - 1) * limit;
+  // Filter hanya transaksi dari event yang dibuat oleh organizer ini
+  const whereClause: any = {
+    event: {
+      organizer_id: organizerId,
+    },
+  };
+  if (statusFilter && statusFilter !== 'ALL') {
+    if (Object.values(TransactionStatus).includes(statusFilter as TransactionStatus)) {
+      whereClause.status = statusFilter;
+    }
+  }
+  const [total, transactions] = await Promise.all([
+    prisma.transaction.count({ where: whereClause }),
+    prisma.transaction.findMany({
+      where: whereClause,
+      skip,
+      take: limit,
+      orderBy: { created_at: 'desc' },
+      include: {
+        customer: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            profile_picture: true,
+          },
+        },
+        event: {
+          select: {
+            id: true,
+            title: true,
+            city: true,
+            location: true,
+          },
+        },
+        transaction_items: {
+          include: {
+            ticket_type: {
+              select: {
+                id: true,
+                name: true,
+                price: true,
+              },
+            },
+          },
+        },
+      },
+    }),
+  ]);
+  return {
+    transactions,
+    pagination: {
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
+};
+// =========================================================
+// 10. ORGANIZER: ACCEPT TRANSACTION (PATCH /:id/accept)
+// =========================================================
+export const acceptTransactionService = async (
+  transactionId: string,
+  organizerId: string
+) => {
+  const transaction = await prisma.transaction.findUnique({
+    where: { id: transactionId },
+    include: {
+      event: true,
+      customer: true,
+    },
+  });
+  if (!transaction) {
+    throw new Error('Transaksi tidak ditemukan.');
+  }
+  // Validasi Kepemilikan Event
+  if (transaction.event.organizer_id !== organizerId) {
+    throw new Error('Akses ditolak. Anda bukan penyelenggara event ini.');
+  }
+  // Validasi Status Saat Ini
+  if (transaction.status !== TransactionStatus.WAITING_CONFIRMATION) {
+    throw new Error(
+      `Hanya transaksi berstatus WAITING_CONFIRMATION yang dapat diterima. Status saat ini: ${transaction.status}.`
+    );
+  }
+  // Update Status menjadi DONE
+  const updated = await prisma.transaction.update({
+    where: { id: transactionId },
+    data: {
+      status: TransactionStatus.DONE,
+      admin_review_deadline: null,
+    },
+  });
+  return updated;
+};
+// =========================================================
+// 11. ORGANIZER: REJECT TRANSACTION (PATCH /:id/reject)
+// =========================================================
+export const rejectTransactionService = async (
+  transactionId: string,
+  organizerId: string,
+  reason: string
+) => {
+  if (!reason || reason.trim() === '') {
+    throw new Error('Alasan penolakan bukti bayar wajib diisi.');
+  }
+  const transaction = await prisma.transaction.findUnique({
+    where: { id: transactionId },
+    include: {
+      event: true,
+      transaction_items: true,
+    },
+  });
+  if (!transaction) {
+    throw new Error('Transaksi tidak ditemukan.');
+  }
+  // Validasi Kepemilikan Event
+  if (transaction.event.organizer_id !== organizerId) {
+    throw new Error('Akses ditolak. Anda bukan penyelenggara event ini.');
+  }
+  if (transaction.status !== TransactionStatus.WAITING_CONFIRMATION) {
+    throw new Error(
+      `Hanya transaksi berstatus WAITING_CONFIRMATION yang dapat ditolak. Status saat ini: ${transaction.status}.`
+    );
+  }
+  // Rollback Kuota Tiket, Voucher, Kupon, & Poin via Prisma Transaction
+  return await prisma.$transaction(async (tx) => {
+    // 1. Kembalikan Kuota Tiket
+    let totalRestoredSeats = 0;
+    for (const item of transaction.transaction_items) {
+      await tx.ticketType.update({
+        where: { id: item.ticket_type_id },
+        data: {
+          available_quota: {
+            increment: item.quantity,
+          },
+        },
+      });
+      totalRestoredSeats += item.quantity;
+    }
+    // Kembalikan available_seats pada Event
+    await tx.event.update({
+      where: { id: transaction.event_id },
+      data: {
+        available_seats: {
+          increment: totalRestoredSeats,
+        },
+      },
+    });
+    // 2. Pulihkan Kupon Referral jika dipakai
+    if (transaction.coupon_id) {
+      await tx.coupon.update({
+        where: { id: transaction.coupon_id },
+        data: { is_used: false },
+      });
+    }
+    // 3. Kembalikan Poin Pengguna jika digunakan
+    if (transaction.points_used > 0) {
+      const latestPointTx = await tx.pointTransaction.findFirst({
+        where: { user_id: transaction.customer_id },
+        orderBy: { created_at: 'desc' },
+      });
+      const currentBalance = latestPointTx ? latestPointTx.remaining_amount : 0;
+      const newBalance = currentBalance + transaction.points_used;
+      await tx.pointTransaction.create({
+        data: {
+          user_id: transaction.customer_id,
+          transaction_id: transaction.id,
+          amount: transaction.points_used,
+          remaining_amount: newBalance,
+          type: PointTransactionType.REFUND,
+          expires_at: new Date(Date.now() + 90 * 24 * 60 * 60 * 1000), // 3 bulan
+        },
+      });
+    }
+    // 4. Kurangi used_count pada Voucher
+    if (transaction.voucher_id) {
+      await tx.voucher.update({
+        where: { id: transaction.voucher_id },
+        data: {
+          used_count: { decrement: 1 },
+        },
+      });
+    }
+    // 5. Ubah Status Transaksi ke REJECTED
+    const updated = await tx.transaction.update({
+      where: { id: transactionId },
+      data: {
+        status: TransactionStatus.REJECTED,
+        admin_review_deadline: null,
+      },
+    });
+    return updated;
+  });
 };

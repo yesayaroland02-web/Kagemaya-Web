@@ -1,40 +1,61 @@
-import { Router } from 'express';
-import { authenticateToken } from '../middlewares/auth.middleware';
-import { uploadSingleImage } from '../middlewares/upload.middleware';
 import {
+  acceptTransaction,
   calculateCheckout,
+  cancelTransaction,
   createTransaction,
+  getOrganizerTransactions,
   getTransactionById,
   getUserTransactions,
-  uploadPaymentProof,
-  cancelTransaction,
+  rejectTransaction,
+  uploadPaymentProof
 } from '../controllers/transaction.controller';
+
+import { Router } from 'express';
+import { authenticateToken } from '../middlewares/auth.middleware';
+import { authorizeRoles } from '../middlewares/role.middleware'; // <-- Pastikan ini diimpor
+import { uploadSingleImage } from '../middlewares/upload.middleware';
 
 const router = Router();
 
 // Semua rute transaksi membutuhkan autentikasi
 router.use(authenticateToken);
 
-// 1. Kalkulasi Checkout (Dry-run / Preview) - Day 10 & 11
+// =========================================================
+// RUTE KHUSUS ORGANIZER (Wajib authorizeRoles 'ORGANIZER')
+// =========================================================
+// 1. Ambil daftar transaksi event masuk milik organizer
+router.get(
+  '/organizer/incoming-transactions',
+  authorizeRoles('ORGANIZER'),
+  getOrganizerTransactions
+);
+
+// 2. Terima Pembayaran (Accept)
+router.patch(
+  '/:id/accept',
+  authorizeRoles('ORGANIZER'),
+  acceptTransaction
+);
+
+// 3. Tolak Pembayaran (Reject dengan alasan)
+router.patch(
+  '/:id/reject',
+  authorizeRoles('ORGANIZER'),
+  rejectTransaction
+);
+
+// =========================================================
+// RUTE TRANSAKSI UMUM & CUSTOMER
+// =========================================================
 router.post('/calculate', calculateCheckout);
-
-// 2. Buat Transaksi Baru (Locking kuota + simpan transaksi) - Day 10 & 11
 router.post('/', createTransaction);
-
-// 3. Riwayat Transaksi Pengguna (Tab status filter) - Day 13
 router.get('/my-transactions', getUserTransactions);
-
-// 4. Detail Transaksi Berdasarkan ID - Day 10 & 12
 router.get('/:id', getTransactionById);
-
-// 5. Upload Bukti Transfer (Multer + Cloudinary) - Day 12
 router.post(
   '/:id/payment-proof',
   uploadSingleImage.single('payment_proof'),
   uploadPaymentProof
 );
-
-// 6. Batalkan Transaksi oleh Pengguna (Rollback kuota/poin/voucher) - Day 13 & 14
 router.post('/:id/cancel', cancelTransaction);
 
 export default router;

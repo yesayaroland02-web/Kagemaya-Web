@@ -1,14 +1,18 @@
-import { Response } from 'express';
-import { AuthenticatedRequest } from '../middlewares/auth.middleware';
 import {
+  acceptTransactionService,
   calculateCheckoutPriceService,
+  cancelTransactionService,
   createTransactionService,
+  getOrganizerTransactionsService,
   getTransactionByIdService,
   getUserTransactionsService,
-  uploadPaymentProofService,
-  cancelTransactionService,
+  rejectTransactionService,
+  uploadPaymentProofService
 } from '../services/transaction.service';
-import { successResponse, errorResponse } from '../utils/response';
+import { errorResponse, successResponse } from '../utils/response';
+
+import { AuthenticatedRequest } from '../middlewares/auth.middleware';
+import { Response } from 'express';
 
 // =========================================================
 // 1. POST /api/transactions/calculate (Calculation Engine Preview)
@@ -225,6 +229,98 @@ export const cancelTransaction = async (
     return errorResponse(
       res,
       error.message || 'Gagal membatalkan transaksi.',
+      400,
+      error
+    );
+  }
+};
+
+// =========================================================
+// 7. GET /api/transactions/organizer/incoming-transactions
+// =========================================================
+export const getOrganizerTransactions = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
+  try {
+    const organizerId = req.user!.id;
+    const { status, page, limit } = req.query;
+    const result = await getOrganizerTransactionsService(
+      organizerId,
+      status as string,
+      page ? parseInt(page as string, 10) : 1,
+      limit ? parseInt(limit as string, 10) : 20
+    );
+    return successResponse(
+      res,
+      'Daftar transaksi masuk organizer berhasil dimuat.',
+      result.transactions,
+      200,
+      result.pagination
+    );
+  } catch (error: any) {
+    console.error('Error getOrganizerTransactions:', error);
+    return errorResponse(
+      res,
+      error.message || 'Gagal memuat transaksi organizer.',
+      500,
+      error
+    );
+  }
+};
+// =========================================================
+// 8. PATCH /api/transactions/:id/accept
+// =========================================================
+export const acceptTransaction = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
+  try {
+    const organizerId = req.user!.id;
+    const { id } = req.params;
+    const updated = await acceptTransactionService(id, organizerId);
+    return successResponse(
+      res,
+      'Pembayaran transaksi berhasil dikonfirmasi. Tiket resmi telah diterbitkan.',
+      updated,
+      200
+    );
+  } catch (error: any) {
+    console.error('Error acceptTransaction:', error);
+    return errorResponse(
+      res,
+      error.message || 'Gagal menerima transaksi.',
+      400,
+      error
+    );
+  }
+};
+// =========================================================
+// 9. PATCH /api/transactions/:id/reject
+// =========================================================
+export const rejectTransaction = async (
+  req: AuthenticatedRequest,
+  res: Response
+) => {
+  try {
+    const organizerId = req.user!.id;
+    const { id } = req.params;
+    const { reason } = req.body;
+    if (!reason || !reason.trim()) {
+      return errorResponse(res, 'Alasan penolakan bukti bayar wajib disertakan.', 400);
+    }
+    const updated = await rejectTransactionService(id, organizerId, reason);
+    return successResponse(
+      res,
+      'Bukti bayar berhasil ditolak. Kuota tiket dan poin customer telah di-rollback.',
+      updated,
+      200
+    );
+  } catch (error: any) {
+    console.error('Error rejectTransaction:', error);
+    return errorResponse(
+      res,
+      error.message || 'Gagal menolak transaksi.',
       400,
       error
     );

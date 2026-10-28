@@ -177,6 +177,14 @@ export default function Navbar() {
                               <span>Dashboard Statistik</span>
                             </Link>
                             <Link
+                              href="/organizer/transactions"
+                              onClick={() => setDropdownOpen(false)}
+                              className="flex items-center gap-2 px-4 py-2 text-xs text-kage-mist hover:text-kage-washi hover:bg-kage-yoru-light transition"
+                            >
+                              <Ticket className="w-4 h-4 text-kage-gold" />
+                              <span>Transaksi Masuk</span>
+                            </Link>
+                            <Link
                               href="/organizer/events"
                               onClick={() => setDropdownOpen(false)}
                               className="flex items-center gap-2 px-4 py-2 text-xs text-kage-gold hover:text-kage-washi hover:bg-kage-yoru-light transition"
