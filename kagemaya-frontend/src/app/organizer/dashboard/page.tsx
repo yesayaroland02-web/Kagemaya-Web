@@ -9,6 +9,7 @@ import {
   ShieldAlert,
   Ticket,
   TrendingUp,
+  Users,
 } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { formatDateTime, formatRupiah } from '@/lib/utils';
@@ -27,13 +28,22 @@ export default function OrganizerDashboardPage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [daysFilter, setDaysFilter] = useState<number>(30);
+  const [followersCount, setFollowersCount] = useState<number>(0);
 
   const fetchDashboardStats = async (days: number) => {
     try {
       setLoading(true);
-      const res = await api.get(`/me/dashboard/stats?days=${days}`);
-      if (res.data?.data) {
-        setStats(res.data.data);
+      const [statsRes, followersRes] = await Promise.allSettled([
+        api.get(`/me/dashboard/stats?days=${days}`),
+        api.get('/organizers/me/followers'),
+      ]);
+
+      if (statsRes.status === 'fulfilled' && statsRes.value.data?.data) {
+        setStats(statsRes.value.data.data);
+      }
+
+      if (followersRes.status === 'fulfilled' && followersRes.value.data?.data) {
+        setFollowersCount(followersRes.value.data.data.total || 0);
       }
     } catch (err) {
       console.error('Gagal memuat statistik dashboard:', err);
@@ -88,24 +98,31 @@ export default function OrganizerDashboardPage() {
               Selamat Datang, {user?.name || 'Organizer'}
             </h1>
             <p className="text-xs text-kage-mist-dim mt-1">
-              Ringkasan performa penjualan tiket dan metrik event Anda.
+              Ringkasan performa penjualan tiket, audiens pengikut, dan metrik event Anda.
             </p>
           </div>
 
           <div className="flex items-center gap-3">
             <Link
+              href="/organizer/followers"
+              className="px-4 py-2 rounded text-xs font-medium border border-kage-border hover:border-kage-gold text-kage-washi transition flex items-center gap-1.5"
+            >
+              <Users className="w-3.5 h-3.5 text-kage-gold" />
+              <span>Pengikut Saya</span>
+            </Link>
+            <Link
               href="/organizer/events"
               className="px-4 py-2 rounded text-xs font-medium border border-kage-border hover:border-kage-gold text-kage-washi transition flex items-center gap-1.5"
             >
               <Layers className="w-3.5 h-3.5 text-kage-gold" />
-              Kelola Event
+              <span>Kelola Event</span>
             </Link>
             <Link
               href="/organizer/events/create"
               className="px-4 py-2 rounded text-xs font-semibold bg-kage-red hover:bg-kage-vermilion text-white shadow-md flex items-center gap-1.5 transition"
             >
               <Plus className="w-3.5 h-3.5" />
-              Buat Event
+              <span>Buat Event</span>
             </Link>
           </div>
         </div>
@@ -142,8 +159,8 @@ export default function OrganizerDashboardPage() {
           </div>
         ) : (
           <>
-            {/* 3. METRIC CARDS (3 KARTU UTAMA) */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {/* 3. METRIC CARDS (4 KARTU: PENJUALAN, TIKET, EVENT, DAN PENGIKUT) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               
               {/* Card 1: Total Penjualan */}
               <div className="bg-kage-yoru-card border border-kage-border rounded-lg p-5 relative overflow-hidden group hover:border-kage-gold/50 transition">
@@ -153,49 +170,72 @@ export default function OrganizerDashboardPage() {
                     <TrendingUp className="w-4 h-4" />
                   </div>
                 </div>
-                <div className="font-serif text-2xl sm:text-3xl font-bold text-kage-washi">
+                <div className="font-serif text-2xl font-bold text-kage-washi">
                   {formatRupiah(stats?.metrics.total_sales || 0)}
                 </div>
                 <p className="text-[11px] text-kage-mist-dim mt-2">
-                  Akumulasi penjualan dari seluruh transaksi yang telah berhasil.
+                  Akumulasi penjualan transaksi berhasil.
                 </p>
               </div>
 
               {/* Card 2: Tiket Terjual */}
-              <div className="bg-kage-yoru-card border border-kage-border rounded-lg p-5 relative overflow-hidden group hover:border-kage-red/50 transition">
+              <div className="bg-kage-yoru-card border border-kage-border rounded-lg p-5 relative overflow-hidden group hover:border-kage-gold/50 transition">
                 <div className="flex items-center justify-between text-kage-mist-dim text-xs mb-3">
                   <span>Tiket Terjual</span>
                   <div className="p-2 rounded bg-kage-red/10 text-kage-red">
                     <Ticket className="w-4 h-4" />
                   </div>
                 </div>
-                <div className="font-serif text-2xl sm:text-3xl font-bold text-kage-washi">
+                <div className="font-serif text-2xl font-bold text-kage-washi">
                   {stats?.metrics.tickets_sold || 0}{' '}
-                  <span className="text-sm font-sans font-normal text-kage-mist">Tiket</span>
+                  <span className="text-xs font-sans font-normal text-kage-mist">Tiket</span>
                 </div>
                 <p className="text-[11px] text-kage-mist-dim mt-2">
-                  Total lembar tiket terkonfirmasi di semua event Anda.
+                  Total tiket terkonfirmasi di semua event.
                 </p>
               </div>
 
               {/* Card 3: Event Aktif */}
-              <div className="bg-kage-yoru-card border border-kage-border rounded-lg p-5 relative overflow-hidden group hover:border-kage-border-light transition">
+              <div className="bg-kage-yoru-card border border-kage-border rounded-lg p-5 relative overflow-hidden group hover:border-kage-gold/50 transition">
                 <div className="flex items-center justify-between text-kage-mist-dim text-xs mb-3">
                   <span>Event Aktif</span>
                   <div className="p-2 rounded bg-kage-success/10 text-kage-success">
                     <CalendarCheck className="w-4 h-4" />
                   </div>
                 </div>
-                <div className="font-serif text-2xl sm:text-3xl font-bold text-kage-washi">
+                <div className="font-serif text-2xl font-bold text-kage-washi">
                   {stats?.metrics.active_events || 0}{' '}
-                  <span className="text-sm font-sans font-normal text-kage-mist">
+                  <span className="text-xs font-sans font-normal text-kage-mist">
                     / {stats?.metrics.total_events || 0} Total
                   </span>
                 </div>
                 <p className="text-[11px] text-kage-mist-dim mt-2">
-                  Jumlah event yang sedang atau akan berlangsung.
+                  Jumlah event yang sedang/akan berlangsung.
                 </p>
               </div>
+
+              {/* Card 4: Pengikut (Followers) */}
+              <Link
+                href="/organizer/followers"
+                className="bg-kage-yoru-card border border-kage-border rounded-lg p-5 relative overflow-hidden group hover:border-kage-gold transition flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between text-kage-mist-dim text-xs mb-3">
+                    <span>Pengikut (Followers)</span>
+                    <div className="p-2 rounded bg-kage-gold/15 text-kage-gold group-hover:bg-kage-gold group-hover:text-kage-black transition">
+                      <Users className="w-4 h-4" />
+                    </div>
+                  </div>
+                  <div className="font-serif text-2xl font-bold text-kage-gold font-mono">
+                    {followersCount}{' '}
+                    <span className="text-xs font-sans font-normal text-kage-mist">Penonton</span>
+                  </div>
+                </div>
+                <div className="flex items-center justify-between text-[11px] text-kage-mist-dim mt-2 pt-2 border-t border-kage-border/40 group-hover:text-kage-gold transition">
+                  <span>Kelola &amp; Lihat Pengikut</span>
+                  <ArrowUpRight className="w-3.5 h-3.5" />
+                </div>
+              </Link>
 
             </div>
 

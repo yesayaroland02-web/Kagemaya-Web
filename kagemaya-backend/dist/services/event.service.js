@@ -1,16 +1,52 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMyOrganizerEventsService = exports.getEventVouchersService = exports.createEventVoucherService = exports.updateEventService = exports.createEventService = exports.validateTicketStockService = exports.getEventByIdService = exports.getCategoriesService = exports.getEventsService = void 0;
+exports.deleteEventService = exports.getMyOrganizerEventsService = exports.getEventVouchersService = exports.createEventVoucherService = exports.updateEventService = exports.createEventService = exports.validateTicketStockService = exports.getEventByIdService = exports.getCategoriesService = exports.getEventsService = void 0;
 const prisma_1 = require("../lib/prisma");
 const getEventsService = async (params) => {
     const { search, category, city, date, price, sort, page = 1, limit = 6 } = params;
     const skip = (page - 1) * limit;
     const where = {};
-    // 1. Filter Search (Judul / Kota)
-    if (search) {
+    // 1. Filter Search - FTRIN-003
+    // Pencarian berdasarkan judul, kota, dan nama organizer
+    if (search?.trim()) {
+        const keyword = search.trim();
         where.OR = [
-            { title: { contains: search, mode: 'insensitive' } },
-            { city: { contains: search, mode: 'insensitive' } },
+            {
+                title: {
+                    contains: keyword,
+                    mode: 'insensitive',
+                },
+            },
+            {
+                city: {
+                    contains: keyword,
+                    mode: 'insensitive',
+                },
+            },
+            {
+                organizer: {
+                    is: {
+                        OR: [
+                            {
+                                name: {
+                                    contains: keyword,
+                                    mode: 'insensitive',
+                                },
+                            },
+                            {
+                                organizer_profile: {
+                                    is: {
+                                        organization_name: {
+                                            contains: keyword,
+                                            mode: 'insensitive',
+                                        },
+                                    },
+                                },
+                            },
+                        ],
+                    },
+                },
+            },
         ];
     }
     // 2. Filter Kategori (Mendukung ID, Slug, maupun Nama Kategori)
@@ -23,9 +59,39 @@ const getEventsService = async (params) => {
             ],
         };
     }
-    // 3. Filter Kota
+    // 3. Filter Kota - FTRIN-003
+    // Jakarta mencakup seluruh wilayah administratif Jakarta.
+    // Pemilihan subwilayah tetap menggunakan exact match.
+    const jakartaAreas = [
+        'Jakarta',
+        'Jakarta Selatan',
+        'Jakarta Timur',
+        'Jakarta Barat',
+        'Jakarta Utara',
+        'Jakarta Pusat',
+        'Kepulauan Seribu',
+    ];
     if (city && city !== 'all' && city !== 'Semua Kota') {
-        where.city = { equals: city, mode: 'insensitive' };
+        const selectedCity = city.trim();
+        if (selectedCity.toLowerCase() === 'jakarta') {
+            where.AND = [
+                ...(where.AND ?? []),
+                {
+                    OR: jakartaAreas.map((area) => ({
+                        city: {
+                            equals: area,
+                            mode: 'insensitive',
+                        },
+                    })),
+                },
+            ];
+        }
+        else {
+            where.city = {
+                equals: selectedCity,
+                mode: 'insensitive',
+            };
+        }
     }
     // 4. Filter Tanggal
     const now = new Date();
@@ -104,6 +170,17 @@ const getEventsService = async (params) => {
             orderBy,
             include: {
                 category: true,
+                // FTRIN-003: Ambil nama Event Organizer
+                organizer: {
+                    select: {
+                        name: true,
+                        organizer_profile: {
+                            select: {
+                                organization_name: true,
+                            },
+                        },
+                    },
+                },
                 ticket_types: {
                     orderBy: {
                         price: 'asc',
@@ -118,11 +195,16 @@ const getEventsService = async (params) => {
     ]);
     const eventsWithStartingPrice = events.map((event) => {
         const prices = event.ticket_types.map((ticket) => Number(ticket.price));
-        const startingPrice = prices.length > 0 ? Math.min(...prices) : null;
+        const startingPrice = prices.length > 0 ? Math.min(...prices) : 0;
+        // FTRIN-003: Mengambil nama Event Organizer
+        const organizerName = event.organizer.organizer_profile?.organization_name?.trim() ||
+            event.organizer.name;
         return {
             ...event,
+            organizer_name: organizerName,
             starting_price: startingPrice,
             ticket_types: undefined,
+            organizer: undefined,
         };
     });
     return {
@@ -555,3 +637,26 @@ const getMyOrganizerEventsService = async (organizerId) => {
     });
 };
 exports.getMyOrganizerEventsService = getMyOrganizerEventsService;
+const deleteEventService = async (eventId, organizerId) => {
+    // 1. Cari event beserta jumlah transaksinya
+    const event = await prisma_1.prisma.event.findUnique({
+        where: { id: eventId },
+        include: {
+            _count: {
+                select: { transactions: true },
+            },
+        },
+    });
+    if (!event) {
+        throw new Error('Event tidak ditemukan');
+    }
+    // 3. Validasi aturan finansial: tidak boleh hapus event yang sudah memiliki transaksi
+    if (event._count.transactions > 0) {
+        throw new Error('Event tidak dapat dihapus karena sudah memiliki riwayat transaksi / pembelian tiket.');
+    }
+    // 4. Hapus event dari database (relasi tiket, voucher, dll. otomatis terhapus via cascade)
+    return await prisma_1.prisma.event.delete({
+        where: { id: eventId },
+    });
+};
+exports.deleteEventService = deleteEventService;

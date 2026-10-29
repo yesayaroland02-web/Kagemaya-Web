@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMyOrganizerEvents = exports.getEventVouchers = exports.createEventVoucher = exports.updateEvent = exports.createEvent = exports.checkTicketStock = exports.getEventById = exports.getCategories = exports.getEvents = void 0;
-const response_1 = require("../utils/response");
+exports.deleteEvent = exports.getMyOrganizerEvents = exports.getEventVouchers = exports.createEventVoucher = exports.updateEvent = exports.createEvent = exports.checkTicketStock = exports.getEventById = exports.getCategories = exports.getEvents = void 0;
 const event_service_1 = require("../services/event.service");
+const response_1 = require("../utils/response");
 const cloudinary_1 = require("../config/cloudinary");
 const getEvents = async (req, res) => {
     try {
@@ -246,3 +246,24 @@ const getMyOrganizerEvents = async (req, res) => {
     }
 };
 exports.getMyOrganizerEvents = getMyOrganizerEvents;
+const deleteEvent = async (req, res) => {
+    try {
+        const userId = req.user?.id;
+        if (!userId) {
+            return (0, response_1.errorResponse)(res, 'Autentikasi diperlukan. Silahkan login sebagai Organizer');
+        }
+        const { id } = req.params;
+        await (0, event_service_1.deleteEventService)(id, userId);
+        return (0, response_1.successResponse)(res, 'Event berhasil dihapus', null, 200);
+    }
+    catch (error) {
+        const statusCode = error.message === 'Event tidak ditemukan' ? 404
+            : error.message.includes('Akses ditolak')
+                ? 403
+                : error.message.includes('transaksi')
+                    ? 400
+                    : 500;
+        return (0, response_1.errorResponse)(res, error.message || 'Gagal menghapus event', statusCode, error);
+    }
+};
+exports.deleteEvent = deleteEvent;

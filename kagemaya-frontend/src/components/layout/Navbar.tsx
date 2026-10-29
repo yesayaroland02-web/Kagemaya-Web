@@ -1,6 +1,20 @@
 'use client';
 
-import { ChevronDown, Layers, LogOut, Menu, Plus, Search, Sparkles, Ticket, TrendingUp, User as UserIcon, X } from 'lucide-react';
+import {
+  ChevronDown,
+  Layers,
+  LogOut,
+  Menu,
+  Plus,
+  Search,
+  Sparkles,
+  Ticket,
+  TrendingUp,
+  User as UserIcon,
+  X,
+  Bookmark,
+  Users,
+} from 'lucide-react';
 import React, { useEffect, useRef, useState } from 'react';
 
 import Link from 'next/link';
@@ -55,7 +69,7 @@ export default function Navbar() {
                 KAGEMAYA<span className="text-kage-gold text-xs ml-0.5">.ID</span>
               </span>
               <span className="text-[10px] tracking-wider text-kage-mist-dim font-sans uppercase">
-                Sinema 4D & Kreatif
+                Sinema 4D &amp; Kreatif
               </span>
             </div>
           </Link>
@@ -94,6 +108,15 @@ export default function Navbar() {
               <div className="h-8 w-24 bg-kage-yoru rounded animate-pulse" />
             ) : user ? (
               <div className="flex items-center gap-3">
+                {/* Wishlist Icon Quick Shortcut */}
+                <Link
+                  href="/user/wishlist"
+                  className="p-2 text-kage-mist hover:text-kage-gold transition"
+                  title="Wishlist Saya"
+                >
+                  <Bookmark className="w-4 h-4" />
+                </Link>
+
                 {/* Dashboard / Tiket Button */}
                 {user.role === 'ORGANIZER' ? (
                   <div className="flex items-center gap-2">
@@ -177,6 +200,14 @@ export default function Navbar() {
                               <span>Dashboard Statistik</span>
                             </Link>
                             <Link
+                              href="/organizer/followers"
+                              onClick={() => setDropdownOpen(false)}
+                              className="flex items-center gap-2 px-4 py-2 text-xs text-kage-mist hover:text-kage-washi hover:bg-kage-yoru-light transition"
+                            >
+                              <Users className="w-3.5 h-3.5 text-kage-gold" />
+                              <span>Pengikut (Followers)</span>
+                            </Link>
+                            <Link
                               href="/organizer/transactions"
                               onClick={() => setDropdownOpen(false)}
                               className="flex items-center gap-2 px-4 py-2 text-xs text-kage-mist hover:text-kage-washi hover:bg-kage-yoru-light transition"
@@ -203,6 +234,14 @@ export default function Navbar() {
                           </>
                         )}
                         <Link
+                          href="/user/wishlist"
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-2 px-4 py-2 text-xs text-kage-mist hover:text-kage-washi hover:bg-kage-yoru-light transition"
+                        >
+                          <Bookmark className="w-3.5 h-3.5 text-kage-gold" />
+                          <span>Wishlist Saya</span>
+                        </Link>
+                        <Link
                           href="/user/transactions"
                           onClick={() => setDropdownOpen(false)}
                           className="flex items-center gap-2 px-4 py-2 text-xs text-kage-mist hover:text-kage-washi hover:bg-kage-yoru-light transition"
@@ -216,7 +255,7 @@ export default function Navbar() {
                           className="flex items-center gap-2 px-4 py-2 text-xs text-kage-mist hover:text-kage-washi hover:bg-kage-yoru-light transition"
                         >
                           <UserIcon className="w-3.5 h-3.5 text-kage-gold" />
-                          <span>Profil Akun & Rewards</span>
+                          <span>Profil Akun &amp; Rewards</span>
                         </Link>
                       </div>
 
@@ -292,6 +331,13 @@ export default function Navbar() {
                       📊 Dashboard Statistik
                     </Link>
                     <Link
+                      href="/organizer/followers"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block text-sm text-kage-mist hover:text-kage-washi"
+                    >
+                      👥 Pengikut (Followers)
+                    </Link>
+                    <Link
                       href="/organizer/events"
                       onClick={() => setMobileMenuOpen(false)}
                       className="block text-sm text-kage-gold font-medium"
@@ -307,6 +353,13 @@ export default function Navbar() {
                     </Link>
                   </>
                 )}
+                <Link
+                  href="/user/wishlist"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="block text-sm text-kage-mist hover:text-kage-washi"
+                >
+                  🔖 Wishlist Saya
+                </Link>
                 <Link
                   href="/user/transactions"
                   onClick={() => setMobileMenuOpen(false)}

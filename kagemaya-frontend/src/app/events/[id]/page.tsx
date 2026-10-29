@@ -8,6 +8,7 @@ import api from '@/lib/axios';
 import { EventDetail, TicketType } from '@/types/event';
 import { formatRupiah, formatDateTime, formatDate, getImageUrl } from '@/lib/utils';
 import Toast from '@/components/ui/Toast';
+import EventQAWall from '@/components/event/EventQAWall';
 import {
   Calendar,
   MapPin,
@@ -25,6 +26,8 @@ import {
   Edit3,
   TicketPercent,
   Sparkles,
+  Bookmark,
+  Users,
 } from 'lucide-react';
 
 export default function EventDetailPage() {
@@ -37,6 +40,8 @@ export default function EventDetailPage() {
   const [loading, setLoading] = useState(true);
   const [ticketSelections, setTicketSelections] = useState<{ [tierId: string]: number }>({});
   const [validatingStock, setValidatingStock] = useState(false);
+  const [isWishlisted, setIsWishlisted] = useState(false);
+  const [isUpdatingWishlist, setIsUpdatingWishlist] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   const MAX_TOTAL_TICKETS = 5;
@@ -57,10 +62,51 @@ export default function EventDetailPage() {
       }
     }
 
+    async function checkWishlist() {
+      try {
+        const res = await api.get(`/wishlists/${eventId}/check`);
+        if (res.data?.data) {
+          setIsWishlisted(res.data.data.is_wishlisted);
+        }
+      } catch {
+        // user might not be logged in
+      }
+    }
+
     if (eventId) {
       loadEventDetail();
+      checkWishlist();
     }
   }, [eventId]);
+
+  const handleToggleWishlist = async () => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+
+    if (isUpdatingWishlist) return;
+
+    try {
+      setIsUpdatingWishlist(true);
+      if (isWishlisted) {
+        await api.delete(`/wishlists/${eventId}`);
+        setIsWishlisted(false);
+        setToast({ message: 'Event dihapus dari wishlist.', type: 'success' });
+      } else {
+        await api.post(`/wishlists/${eventId}`);
+        setIsWishlisted(true);
+        setToast({ message: 'Event berhasil disimpan ke wishlist!', type: 'success' });
+      }
+    } catch (err: any) {
+      setToast({
+        message: err.response?.data?.message || 'Gagal mengubah status wishlist.',
+        type: 'error',
+      });
+    } finally {
+      setIsUpdatingWishlist(false);
+    }
+  };
 
   const totalSelectedTickets = Object.values(ticketSelections).reduce((a, b) => a + b, 0);
 
@@ -113,11 +159,10 @@ export default function EventDetailPage() {
 
     try {
       setValidatingStock(true);
-      // Validasi ketersediaan kuota tiket real-time ke API Backend Day 5
+      // Validasi ketersediaan kuota tiket real-time ke API Backend
       const res = await api.get(`/events/tickets/${tierId}/availability?qty=${qty}`);
 
       if (res.data?.success) {
-        // Kuota valid, lanjut ke pembayaran
         setToast({
           message: 'Kuota tiket valid! Mengalihkan ke ringkasan pesanan...',
           type: 'success',
@@ -154,6 +199,8 @@ export default function EventDetailPage() {
     );
   }
 
+  const organizerUserId = event.organizer?.id || (event as any).organizer_id;
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
       {toast && (
@@ -165,7 +212,7 @@ export default function EventDetailPage() {
       )}
 
       {/* ── ORGANIZER QUICK CONTROLS ───────────────────── */}
-      {user?.role === 'ORGANIZER' && (user?.id === (event as any).organizer_id || user?.id === event.organizer?.id) && (
+      {user?.role === 'ORGANIZER' && (user?.id === organizerUserId) && (
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-lg bg-kage-gold/10 border border-kage-gold/30 backdrop-blur-sm">
           <div className="flex items-center gap-2.5 text-xs text-kage-gold font-medium">
             <Sparkles className="w-4 h-4 text-kage-gold flex-shrink-0" />
@@ -199,6 +246,22 @@ export default function EventDetailPage() {
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-kage-black via-kage-black/40 to-transparent" />
+
+          {/* Bookmark Button (Top Right of Banner) */}
+          <button
+            type="button"
+            onClick={handleToggleWishlist}
+            disabled={isUpdatingWishlist}
+            title={isWishlisted ? 'Hapus dari Wishlist' : 'Simpan ke Wishlist'}
+            className={`absolute top-4 right-4 z-20 px-3.5 py-2 rounded-full flex items-center gap-2 backdrop-blur-md border text-xs font-medium transition-all shadow-lg ${
+              isWishlisted
+                ? 'bg-kage-gold text-kage-black border-kage-gold font-semibold shadow-kage-gold/20'
+                : 'bg-kage-black/70 text-kage-mist border-kage-border hover:border-kage-gold hover:text-kage-gold'
+            }`}
+          >
+            <Bookmark className={`w-4 h-4 ${isWishlisted ? 'fill-kage-black' : ''}`} />
+            <span>{isWishlisted ? 'Tersimpan di Wishlist' : 'Simpan ke Wishlist'}</span>
+          </button>
 
           {/* Badge & Category Overlay */}
           <div className="absolute bottom-6 left-6 right-6 flex flex-col sm:flex-row sm:items-end justify-between gap-4">
@@ -248,7 +311,7 @@ export default function EventDetailPage() {
               <MapPin className="w-5 h-5 text-kage-gold shrink-0 mt-0.5" />
               <div>
                 <span className="text-[11px] uppercase tracking-wider text-kage-mist-dim block">
-                  Lokasi & Hall
+                  Lokasi &amp; Hall
                 </span>
                 <p className="text-xs font-medium text-kage-washi mt-0.5">
                   {event.location}, {event.city}
@@ -260,7 +323,7 @@ export default function EventDetailPage() {
           {/* Sinopsis / Deskripsi */}
           <div className="space-y-4">
             <h3 className="font-serif text-xl text-kage-washi font-medium border-b border-kage-border pb-2">
-              Sinopsis & Deskripsi Event
+              Sinopsis &amp; Deskripsi Event
             </h3>
             <div className="text-xs sm:text-sm text-kage-mist leading-relaxed whitespace-pre-line font-sans space-y-3">
               <p>{event.description}</p>
@@ -269,11 +332,25 @@ export default function EventDetailPage() {
 
           {/* Organizer Profile Card */}
           <div className="p-6 rounded-lg bg-kage-yoru border border-kage-border space-y-4">
-            <span className="text-[11px] uppercase tracking-wider text-kage-gold font-semibold block">
-              Penyelenggara / Organizer
-            </span>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] uppercase tracking-wider text-kage-gold font-semibold block">
+                Penyelenggara / Organizer
+              </span>
+              {organizerUserId && (
+                <Link
+                  href={`/organizer/${organizerUserId}`}
+                  className="text-xs text-kage-gold hover:underline flex items-center gap-1"
+                >
+                  Lihat Profil Lengkap →
+                </Link>
+              )}
+            </div>
+
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-full bg-kage-yoru-light border border-kage-border flex items-center justify-center overflow-hidden shrink-0">
+              <Link
+                href={organizerUserId ? `/organizer/${organizerUserId}` : '#'}
+                className="w-12 h-12 rounded-full bg-kage-yoru-light border border-kage-border flex items-center justify-center overflow-hidden shrink-0 hover:border-kage-gold transition"
+              >
                 {event.organizer.profile_picture ? (
                   <img
                     src={getImageUrl(event.organizer.profile_picture)}
@@ -285,15 +362,25 @@ export default function EventDetailPage() {
                     {event.organizer.name.charAt(0).toUpperCase()}
                   </span>
                 )}
-              </div>
+              </Link>
               <div className="space-y-1">
-                <h4 className="font-serif text-base text-kage-washi font-medium">
+                <Link
+                  href={organizerUserId ? `/organizer/${organizerUserId}` : '#'}
+                  className="font-serif text-base text-kage-washi font-medium hover:text-kage-gold transition"
+                >
                   {event.organizer.organizer_profile?.organization_name || event.organizer.name}
-                </h4>
+                </Link>
                 <p className="text-xs text-kage-mist leading-relaxed">
                   {event.organizer.organizer_profile?.bio ||
                     'Kolektif independen pemutaran film sinema dan pertunjukan interaktif.'}
                 </p>
+                {event.organizer._count && (
+                  <div className="flex items-center gap-3 pt-1 text-[11px] text-kage-mist-dim font-sans">
+                    <span>{event.organizer._count.following || 0} Pengikut</span>
+                    <span>•</span>
+                    <span>{event.organizer._count.events || 0} Acara</span>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -328,13 +415,16 @@ export default function EventDetailPage() {
                       </div>
                     </div>
                     <p className="text-xs text-kage-mist leading-relaxed italic">
-                      “{rev.comment}”
+                      &ldquo;{rev.comment}&rdquo;
                     </p>
                   </div>
                 ))}
               </div>
             </div>
           )}
+
+          {/* ── CARD DAY 18: Q&A DISCUSSION WALL FORUM ───── */}
+          <EventQAWall eventId={event.id} organizerId={organizerUserId} />
         </div>
 
         {/* Right Column: Sticky Ticket Box (4 Cols) */}
@@ -461,7 +551,7 @@ export default function EventDetailPage() {
 
               <div className="flex items-center justify-center gap-1.5 text-[10px] text-kage-mist-dim">
                 <Shield className="w-3 h-3 text-kage-success" />
-                <span>Pemesanan dienkripsi & tiket dikirim instan</span>
+                <span>Pemesanan dienkripsi &amp; tiket dikirim instan</span>
               </div>
             </div>
           </div>

@@ -10,6 +10,9 @@ import orderRoutes from './routes/order.route';
 import userRouter from './routes/user.router';
 import rewardRoutes from './routes/reward.routes';
 import transactionRouter from './routes/transaction.router';
+import wishlistRouter from './routes/wishlist.router';
+import followRouter from './routes/follow.router';
+import discussionRouter from './routes/discussion.router';
 
 // Import Background Jobs
 import { initExpireTransactionCron } from './jobs/expireTransaction.job';
@@ -41,6 +44,9 @@ app.get('/', (_req, res) => {
       categories: '/api/categories',
       transactions: '/api/transactions',
       me: '/api/me',
+      wishlists: '/api/wishlists',
+      follows: '/api/follows',
+      discussions: '/api/discussions',
     },
   });
 });
@@ -53,6 +59,11 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/me', userRouter);
 app.use('/api/me', rewardRoutes);
 app.use('/api/transactions', transactionRouter);
+
+// CARD DAY 17 & DAY 18 APIs
+app.use('/api/wishlists', wishlistRouter);
+app.use('/api', followRouter); // Mounts /api/follows/:organizerId and /api/organizers/:id
+app.use('/api', discussionRouter); // Mounts /api/events/:id/discussions and /api/discussions/:id/pin
 
 // Initialize Background Cron Scheduler (Auto-Expire Transaksi)
 initExpireTransactionCron();
