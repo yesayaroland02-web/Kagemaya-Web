@@ -121,7 +121,7 @@ function EventsDiscoveryContent() {
             <Search className="w-4 h-4 text-kage-mist-dim absolute left-3 pointer-events-none" />
             <input
               type="text"
-              placeholder="Cari judul film, workshop, sutradara..."
+              placeholder="Cari judul event, kota, atau nama organizer..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full bg-kage-yoru-light border border-kage-border rounded px-3 py-2 pl-9 text-xs text-kage-washi placeholder:text-kage-mist-dim focus:outline-none focus:border-kage-gold transition"
@@ -135,25 +135,36 @@ function EventsDiscoveryContent() {
               </button>
             )}
           </div>
+{/* City Selector - FTRIN-003 */}
+<div className="md:col-span-3 relative flex items-center">
+  <MapPin className="w-4 h-4 text-kage-gold absolute left-3 pointer-events-none" />
 
-          {/* City Selector */}
-          <div className="md:col-span-3 relative flex items-center">
-            <MapPin className="w-4 h-4 text-kage-gold absolute left-3 pointer-events-none" />
-            <select
-              value={city}
-              onChange={(e) => {
-                setCity(e.target.value);
-                setPage(1);
-              }}
-              className="w-full bg-kage-yoru-light border border-kage-border rounded px-3 py-2 pl-9 text-xs text-kage-washi focus:outline-none focus:border-kage-gold transition cursor-pointer"
-            >
-              <option value="">Semua Lokasi / Kota</option>
-              <option value="Jakarta">Jakarta</option>
-              <option value="Bandung">Bandung</option>
-              <option value="Surabaya">Surabaya</option>
-              <option value="Yogyakarta">Yogyakarta</option>
-            </select>
-          </div>
+  <select
+    value={city}
+    onChange={(e) => {
+      setCity(e.target.value);
+      setPage(1);
+    }}
+    className="w-full bg-kage-yoru-light border border-kage-border rounded px-3 py-2 pl-9 text-xs text-kage-washi focus:outline-none focus:border-kage-gold transition cursor-pointer"
+  >
+    <option value="">Semua Lokasi / Kota</option>
+
+    <option value="Jakarta">
+      Jakarta (Semua Wilayah)
+    </option>
+    <option value="Jakarta Selatan">Jakarta Selatan</option>
+    <option value="Jakarta Timur">Jakarta Timur</option>
+    <option value="Jakarta Barat">Jakarta Barat</option>
+    <option value="Jakarta Utara">Jakarta Utara</option>
+    <option value="Jakarta Pusat">Jakarta Pusat</option>
+    <option value="Kepulauan Seribu">Kepulauan Seribu</option>
+
+    <option value="Bandung">Bandung</option>
+    <option value="Surabaya">Surabaya</option>
+    <option value="Yogyakarta">Yogyakarta</option>
+  </select>
+</div>
+
 
           {/* Reset button */}
           <div className="md:col-span-3 flex items-center justify-end">
