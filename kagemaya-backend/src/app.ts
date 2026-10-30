@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
+import reviewRouter from './routes/review.router';
 
 // Import Routers
 import authRouter from './routes/auth.router';
@@ -64,6 +65,9 @@ app.use('/api/transactions', transactionRouter);
 app.use('/api/wishlists', wishlistRouter);
 app.use('/api', followRouter); // Mounts /api/follows/:organizerId and /api/organizers/:id
 app.use('/api', discussionRouter); // Mounts /api/events/:id/discussions and /api/discussions/:id/pin
+
+// CARD DAY 19 - Post-Event Rating & Review
+app.use('/api', reviewRouter);
 
 // Initialize Background Cron Scheduler (Auto-Expire Transaksi)
 initExpireTransactionCron();
