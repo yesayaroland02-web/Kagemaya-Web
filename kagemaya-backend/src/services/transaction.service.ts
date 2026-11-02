@@ -359,6 +359,14 @@ export const createTransactionService = async (
             end_date: true,
             city: true,
             location: true,
+            category: true,
+            organizer: {
+              select: {
+                id: true,
+                name: true,
+                organizer_profile: true,
+              },
+            },
           },
         },
         transaction_items: {
@@ -402,6 +410,7 @@ export const getTransactionByIdService = async (
     include: {
       event: {
         include: {
+          category: true,
           organizer: {
             select: {
               id: true,
@@ -480,6 +489,14 @@ export const getUserTransactionsService = async (
             end_date: true,
             city: true,
             location: true,
+            category: true,
+            organizer: {
+              select: {
+                id: true,
+                name: true,
+                organizer_profile: true,
+              },
+            },
           },
         },
         transaction_items: {

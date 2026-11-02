@@ -21,6 +21,7 @@ import {
   QrCode,
   ShieldAlert,
   Info,
+  Ticket,
 } from 'lucide-react';
 
 interface TransactionDetail {
@@ -289,6 +290,30 @@ export default function PaymentProofPage() {
               Terima kasih! Bukti transfer Anda telah kami terima. Penyelenggara/Admin akan memverifikasi dalam waktu maksimal 1x24 jam.
             </p>
           </div>
+        </div>
+      )}
+
+      {/* ── JIKA STATUS SUDAH DONE (LUNAS & DITERIMA EO) ── */}
+      {transaction.status === 'DONE' && (
+        <div className="p-5 rounded-xl bg-kage-success/15 border border-kage-success/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-lg">
+          <div className="flex items-start gap-3">
+            <CheckCircle2 className="w-6 h-6 text-kage-success shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <h4 className="text-xs font-bold text-kage-success uppercase tracking-wider">
+                Pembayaran Diterima &amp; Terkonfirmasi EO
+              </h4>
+              <p className="text-xs text-kage-washi leading-relaxed">
+                Selamat! Pembayaran Anda telah diterima oleh pihak penyelenggara. E-Tiket resmi Anda sudah aktif dan siap digunakan.
+              </p>
+            </div>
+          </div>
+          <Link
+            href={`/transactions/${transaction.id}/ticket`}
+            className="w-full sm:w-auto px-5 py-2.5 rounded-lg bg-kage-gold hover:bg-yellow-500 text-kage-black text-xs font-bold transition flex items-center justify-center gap-2 shrink-0 shadow-md"
+          >
+            <Ticket className="w-4 h-4" />
+            <span>Lihat E-Tiket Resmi</span>
+          </Link>
         </div>
       )}
 

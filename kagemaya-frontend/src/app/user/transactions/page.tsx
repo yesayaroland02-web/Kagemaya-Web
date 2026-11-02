@@ -7,6 +7,8 @@ import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/axios';
 import { formatRupiah, formatDateTime, formatDate, getImageUrl } from '@/lib/utils';
 import Toast from '@/components/ui/Toast';
+import TicketDisplay from '@/components/ticket/TicketDisplay';
+import { TicketData } from '@/types/ticket';
 import {
   Ticket,
   Calendar,
@@ -20,6 +22,7 @@ import {
   RefreshCw,
   Eye,
   FileCheck,
+  ExternalLink,
 } from 'lucide-react';
 
 interface TransactionItem {
@@ -43,6 +46,11 @@ interface TransactionRecord {
   payment_deadline: string;
   payment_proof_url?: string | null;
   created_at: string;
+  customer?: {
+    id?: string;
+    name?: string;
+    email?: string;
+  };
   event: {
     id: string;
     title: string;
@@ -50,6 +58,16 @@ interface TransactionRecord {
     start_date: string;
     city: string;
     location: string;
+    category?: {
+      name: string;
+    };
+    organizer?: {
+      id?: string;
+      name: string;
+      organizer_profile?: {
+        organization_name?: string;
+      } | null;
+    };
   };
   transaction_items: TransactionItem[];
 }
@@ -62,6 +80,7 @@ export default function UserTransactionsPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<string>('ALL');
   const [cancelingId, setCancelingId] = useState<string | null>(null);
+  const [selectedTicketTx, setSelectedTicketTx] = useState<TicketData | null>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
 
   // Tab Definitions
@@ -104,6 +123,27 @@ export default function UserTransactionsPage() {
       fetchTransactions(activeTab);
     }
   }, [user, authLoading, activeTab]);
+
+  // Handle ESC key and scroll lock for Ticket Modal
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedTicketTx(null);
+      }
+    };
+
+    if (selectedTicketTx) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedTicketTx]);
 
   // Handle Cancel Transaction (Rollback Engine Day 14)
   const handleCancel = async (txId: string) => {
@@ -372,19 +412,62 @@ export default function UserTransactionsPage() {
                     )}
 
                     {tx.status === 'DONE' && (
-                      <Link
-                        href={`/events/${tx.event?.id}`}
-                        className="px-3.5 py-1.5 rounded text-xs font-semibold bg-kage-success/20 text-kage-success border border-kage-success/40 hover:bg-kage-success/30 transition flex items-center gap-1"
-                      >
-                        <FileCheck className="w-3.5 h-3.5" />
-                        <span>Tiket Aktif</span>
-                      </Link>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const enrichedTx: TicketData = {
+                              ...(tx as unknown as TicketData),
+                              customer: tx.customer || {
+                                id: user?.id,
+                                name: user?.name,
+                                email: user?.email,
+                              },
+                            };
+                            setSelectedTicketTx(enrichedTx);
+                          }}
+                          className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-kage-gold hover:bg-yellow-500 text-kage-black transition flex items-center gap-1.5 shadow-sm"
+                          title="Tampilkan E-Tiket Resmi"
+                        >
+                          <Ticket className="w-3.5 h-3.5" />
+                          <span>Lihat E-Tiket</span>
+                        </button>
+
+                        <Link
+                          href={`/transactions/${tx.id}/ticket`}
+                          className="p-1.5 rounded-lg border border-kage-border hover:border-kage-gold text-kage-mist hover:text-kage-gold transition"
+                          title="Buka Halaman Tiket Penuh"
+                        >
+                          <ExternalLink className="w-3.5 h-3.5" />
+                        </Link>
+                      </div>
                     )}
                   </div>
                 </div>
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* Modal E-Tiket Cepat (Interactive Popup) */}
+      {selectedTicketTx && (
+        <div
+          className="fixed inset-0 z-[100] overflow-y-auto bg-black/85 backdrop-blur-md p-3 sm:p-6 flex justify-center items-start animate-in fade-in duration-200"
+          onClick={() => setSelectedTicketTx(null)}
+          role="dialog"
+          aria-modal="true"
+        >
+          <div
+            className="relative w-full max-w-2xl my-2 sm:my-8"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <TicketDisplay
+              ticket={selectedTicketTx}
+              showCloseButton={true}
+              onClose={() => setSelectedTicketTx(null)}
+            />
+          </div>
         </div>
       )}
     </div>
