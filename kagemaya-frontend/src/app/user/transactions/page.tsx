@@ -282,7 +282,7 @@ export default function UserTransactionsPage() {
                     <div className="space-y-1 overflow-hidden">
                       <Link
                         href={`/events/${tx.event?.id}`}
-                        className="font-serif text-sm font-medium text-kage-washi hover:text-kage-gold transition truncate block"
+                        className="font-serif text-sm font-medium text-kage-washi hover:text-kage-gold transition break-words leading-snug block"
                       >
                         {tx.event?.title}
                       </Link>

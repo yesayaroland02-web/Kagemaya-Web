@@ -340,7 +340,7 @@ export default function MyOrganizerEventsPage() {
                 className="p-5 rounded-lg border border-kage-border bg-kage-black/60 hover:border-kage-border-light transition flex flex-col md:flex-row items-start md:items-center justify-between gap-6"
               >
                 {/* Left: Thumbnail & Details */}
-                <div className="flex items-start gap-4 flex-1">
+                <div className="flex items-start gap-4 flex-1 min-w-0">
                   <div className="w-24 h-16 sm:w-28 sm:h-20 rounded bg-kage-yoru-light border border-kage-border overflow-hidden flex-shrink-0 relative">
                     {item.banner_url ? (
                       <img
@@ -371,25 +371,25 @@ export default function MyOrganizerEventsPage() {
                       )}
 
                       {item.category && (
-                        <span className="text-[11px] text-kage-mist-dim border-l border-kage-border pl-2">
+                        <span className="text-[11px] text-kage-mist-dim border-l border-kage-border pl-2 break-words">
                           {item.category.name}
                         </span>
                       )}
                     </div>
 
-                    <h2 className="font-serif text-base sm:text-lg font-medium text-kage-washi truncate">
+                    <h2 className="font-serif text-base sm:text-lg font-medium text-kage-washi break-words leading-snug">
                       {item.title}
                     </h2>
 
-                    <div className="flex flex-wrap items-center gap-4 text-xs text-kage-mist-dim">
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-kage-mist-dim">
                       <span className="flex items-center gap-1">
-                        <MapPin className="w-3.5 h-3.5 text-kage-gold" />
-                        <span>{item.city}</span>
+                        <MapPin className="w-3.5 h-3.5 text-kage-gold shrink-0" />
+                        <span className="break-words">{item.city}</span>
                       </span>
 
                       {item.start_date && (
                         <span className="flex items-center gap-1">
-                          <Calendar className="w-3.5 h-3.5 text-kage-gold" />
+                          <Calendar className="w-3.5 h-3.5 text-kage-gold shrink-0" />
                           <span>
                             {new Date(item.start_date).toLocaleDateString('id-ID', {
                               day: 'numeric',
@@ -401,12 +401,12 @@ export default function MyOrganizerEventsPage() {
                       )}
 
                       <span className="flex items-center gap-1">
-                        <Layers className="w-3.5 h-3.5 text-kage-gold" />
+                        <Layers className="w-3.5 h-3.5 text-kage-gold shrink-0" />
                         <span>{item.available_seats} Kursi</span>
                       </span>
 
                       {item.starting_price !== undefined && item.starting_price > 0 && (
-                        <span className="text-kage-vermilion font-medium">
+                        <span className="text-kage-vermilion font-medium whitespace-nowrap">
                           Mulai {formatRupiah(item.starting_price)}
                         </span>
                       )}
@@ -415,12 +415,12 @@ export default function MyOrganizerEventsPage() {
                 </div>
 
                 {/* Right: Actions */}
-                <div className="flex items-center gap-2.5 w-full md:w-auto justify-end border-t md:border-t-0 pt-3 md:pt-0 border-kage-border">
+                <div className="flex items-center gap-2.5 w-full md:w-auto justify-end border-t md:border-t-0 pt-3 md:pt-0 border-kage-border shrink-0">
                   {item.status === 'PUBLISHED' ? (
                     <>
                       <Link
                         href={`/events/${item.id}`}
-                        className="p-2 rounded border border-kage-border hover:border-kage-gold text-kage-mist hover:text-kage-washi text-xs transition"
+                        className="p-2 rounded border border-kage-border hover:border-kage-gold text-kage-mist hover:text-kage-washi text-xs transition shrink-0"
                         title="Lihat Detail Acara"
                       >
                         <ExternalLink className="w-4 h-4" />
@@ -428,7 +428,7 @@ export default function MyOrganizerEventsPage() {
 
                       <Link
                         href={`/organizer/events/${item.id}/vouchers`}
-                        className="px-3 py-1.5 rounded border border-kage-border hover:border-kage-gold text-kage-gold hover:bg-kage-gold/10 text-xs font-medium flex items-center gap-1.5 transition"
+                        className="px-3 py-1.5 rounded border border-kage-border hover:border-kage-gold text-kage-gold hover:bg-kage-gold/10 text-xs font-medium flex items-center gap-1.5 transition whitespace-nowrap shrink-0"
                         title="Kelola Voucher Promo"
                       >
                         <TicketPercent className="w-3.5 h-3.5" />
@@ -437,7 +437,7 @@ export default function MyOrganizerEventsPage() {
 
                       <Link
                         href={`/organizer/events/${item.id}/edit`}
-                        className="px-3.5 py-1.5 rounded bg-kage-gold hover:bg-yellow-500 text-kage-black text-xs font-semibold flex items-center gap-1.5 transition shadow-sm"
+                        className="px-3.5 py-1.5 rounded bg-kage-gold hover:bg-yellow-500 text-kage-black text-xs font-semibold flex items-center gap-1.5 transition shadow-sm whitespace-nowrap shrink-0"
                         title="Edit Event"
                       >
                         <Edit3 className="w-3.5 h-3.5" />
@@ -445,25 +445,25 @@ export default function MyOrganizerEventsPage() {
                       </Link>
 
                       <button
-                        type = "button"
-                        onClick ={() => handleDeletePublishedEvent(item.id, item.title)}
+                        type="button"
+                        onClick={() => handleDeletePublishedEvent(item.id, item.title)}
                         disabled={deletingId === item.id}
-                        className='p-2 rounded border border-kage-border hover:border-kage-vermilion text-kage-mist-dim hover:text-kage-vermilion text-xs transition disabled:opacity-50'
-                        title = "Hapus Event"
-                        >
-                          {deletingId === item.id ? (
-                            <Loader2 className='w-4 h-4 animate-spin text-kage-vermilion'/>
-                          ):(
-                            <Trash2 className='w-4 h-4' />
-                          )}
-                        </button>
+                        className="p-2 rounded border border-kage-border hover:border-kage-vermilion text-kage-mist-dim hover:text-kage-vermilion text-xs transition disabled:opacity-50 shrink-0"
+                        title="Hapus Event"
+                      >
+                        {deletingId === item.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin text-kage-vermilion" />
+                        ) : (
+                          <Trash2 className="w-4 h-4" />
+                        )}
+                      </button>
                     </>
                   ) : (
                     <>
                       <button
                         type="button"
                         onClick={handleRemoveDraft}
-                        className="p-2 rounded border border-kage-border hover:border-kage-vermilion text-kage-mist-dim hover:text-kage-vermilion text-xs transition"
+                        className="p-2 rounded border border-kage-border hover:border-kage-vermilion text-kage-mist-dim hover:text-kage-vermilion text-xs transition shrink-0"
                         title="Hapus Draf"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -471,7 +471,7 @@ export default function MyOrganizerEventsPage() {
 
                       <Link
                         href="/organizer/events/create"
-                        className="px-4 py-1.5 rounded bg-kage-gold hover:bg-yellow-500 text-kage-black text-xs font-semibold flex items-center gap-1.5 transition shadow-sm"
+                        className="px-4 py-1.5 rounded bg-kage-gold hover:bg-yellow-500 text-kage-black text-xs font-semibold flex items-center gap-1.5 transition shadow-sm whitespace-nowrap shrink-0"
                       >
                         <FileEdit className="w-3.5 h-3.5" />
                         <span>Lanjutkan & Terbitkan</span>

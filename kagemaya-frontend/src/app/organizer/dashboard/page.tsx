@@ -283,7 +283,7 @@ export default function OrganizerDashboardPage() {
                           <td className="py-3 px-3 font-medium text-kage-washi">
                             {tx.customer_name}
                           </td>
-                          <td className="py-3 px-3 text-kage-mist truncate max-w-xs">
+                          <td className="py-3 px-3 text-kage-mist break-words leading-snug max-w-xs">
                             {tx.event_title}
                           </td>
                           <td className="py-3 px-3 font-semibold text-kage-washi">

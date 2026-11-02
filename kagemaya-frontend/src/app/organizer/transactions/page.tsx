@@ -297,8 +297,8 @@ export default function OrganizerTransactionsPage() {
 
                       {/* Event & Item Tiket */}
                       <td className="py-3.5 px-4 max-w-xs">
-                        <div className="font-medium text-kage-washi truncate">{tx.event?.title}</div>
-                        <div className="text-[11px] text-kage-gold mt-0.5">
+                        <div className="font-medium text-kage-washi break-words leading-snug">{tx.event?.title}</div>
+                        <div className="text-[11px] text-kage-gold mt-0.5 break-words">
                           {tx.transaction_items?.map((it) => `${it.quantity}x ${it.ticket_type.name}`).join(', ')}
                         </div>
                       </td>
