@@ -578,26 +578,72 @@ export const updateEventService = async (
     let newAvailableSeats = existingEvent.available_seats;
 
     if (input.tickets && Array.isArray(input.tickets) && input.tickets.length > 0) {
-      // Re-calculate PRD Section 8.4 invariant: available_seats = sum(quota)
+      // Ambil semua ticket type yang sudah direferensikan di TransactionItem
+      // agar tidak melanggar foreign key constraint RESTRICT saat deleteMany
+      const usedTicketTypeIds = (
+        await tx.transactionItem.findMany({
+          where: { ticket_type: { event_id: eventId } },
+          select: { ticket_type_id: true },
+          distinct: ['ticket_type_id'],
+        })
+      ).map((r) => r.ticket_type_id);
+
+      // Ticket type yang AMAN dihapus: tidak dipakai transaksi DAN tidak ada di input baru
+      const inputNames = input.tickets.map((t) => t.name.trim().toLowerCase());
+      const safeToDeleteIds = existingEvent.ticket_types
+        .filter(
+          (tt) =>
+            !usedTicketTypeIds.includes(tt.id) &&
+            !inputNames.includes(tt.name.trim().toLowerCase())
+        )
+        .map((tt) => tt.id);
+
+      if (safeToDeleteIds.length > 0) {
+        await tx.ticketType.deleteMany({
+          where: { id: { in: safeToDeleteIds } },
+        });
+      }
+
+      // Hitung ulang available_seats dari total kuota input tiket baru
       newAvailableSeats = input.tickets.reduce(
         (sum, t) => sum + Number(t.quota),
         0
       );
 
-      // Re-create updated ticket tiers
-      await tx.ticketType.deleteMany({
-        where: { event_id: eventId },
-      });
+      // Upsert setiap tiket:
+      //   - Nama sama → update (price, quota, available_quota proporsional)
+      //   - Nama baru → create
+      for (const t of input.tickets) {
+        const normalizedName = t.name.trim();
+        const existingTT = existingEvent.ticket_types.find(
+          (tt) => tt.name.trim().toLowerCase() === normalizedName.toLowerCase()
+        );
 
-      await tx.ticketType.createMany({
-        data: input.tickets.map((t) => ({
-          event_id: eventId,
-          name: t.name,
-          price: Number(t.price),
-          quota: Number(t.quota),
-          available_quota: Number(t.quota),
-        })),
-      });
+        if (existingTT) {
+          const quotaDiff = Number(t.quota) - existingTT.quota;
+          const newAvailableQuota = Math.max(0, existingTT.available_quota + quotaDiff);
+
+          await tx.ticketType.update({
+            where: { id: existingTT.id },
+            data: {
+              name: normalizedName,
+              price: Number(t.price),
+              quota: Number(t.quota),
+              available_quota: newAvailableQuota,
+            },
+          });
+        } else {
+          await tx.ticketType.create({
+            data: {
+              event_id: eventId,
+              name: normalizedName,
+              price: Number(t.price),
+              quota: Number(t.quota),
+              available_quota: Number(t.quota),
+            },
+          });
+        }
+      }
     }
 
     const updatedEvent = await tx.event.update({
