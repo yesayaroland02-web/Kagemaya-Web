@@ -1,34 +1,35 @@
 'use client';
 
-import React, { useEffect, useState, useMemo } from 'react';
-import Link from 'next/link';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
-import { useAuth } from '@/context/AuthContext';
-import api from '@/lib/axios';
-import { EventDetail, TicketType, EventVoucher } from '@/types/event';
-import { formatRupiah, formatDate, getImageUrl } from '@/lib/utils';
-import Toast from '@/components/ui/Toast';
 import {
-  Ticket,
-  Calendar,
-  MapPin,
-  Tag,
-  Gift,
-  Coins,
-  ShieldCheck,
-  ArrowRight,
-  Loader2,
-  CheckCircle2,
-  XCircle,
   AlertCircle,
-  Plus,
-  Minus,
-  Sparkles,
-  TicketPercent,
-  Copy,
+  ArrowRight,
+  Calendar,
   Check,
+  CheckCircle2,
   Clock,
+  Coins,
+  Copy,
+  Gift,
+  Loader2,
+  MapPin,
+  Minus,
+  Plus,
+  ShieldCheck,
+  Sparkles,
+  Tag,
+  Ticket,
+  TicketPercent,
+  XCircle,
 } from 'lucide-react';
+import { EventDetail, EventVoucher, TicketType } from '@/types/event';
+import React, { useEffect, useMemo, useState } from 'react';
+import { formatDate, formatRupiah, getImageUrl } from '@/lib/utils';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
+
+import Link from 'next/link';
+import Toast from '@/components/ui/Toast';
+import api from '@/lib/axios';
+import { useAuth } from '@/context/AuthContext';
 
 interface UserCoupon {
   id: string;
@@ -208,7 +209,7 @@ export default function CheckoutPage() {
 
     if (codeOverride) {
       setVoucherCodeInput(targetCode);
-    }
+    }git 
 
     try {
       setCheckingVoucher(true);
