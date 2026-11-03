@@ -209,7 +209,7 @@ export default function CheckoutPage() {
 
     if (codeOverride) {
       setVoucherCodeInput(targetCode);
-    }git 
+    } 
 
     try {
       setCheckingVoucher(true);
