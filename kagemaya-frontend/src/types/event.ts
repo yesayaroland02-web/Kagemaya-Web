@@ -39,6 +39,15 @@ export interface EventReview {
   };
 }
 
+export interface EventVoucher {
+  id: string;
+  code: string;
+  discount_type: 'PERCENT' | 'FIXED';
+  discount_value: number;
+  start_date: string;
+  end_date: string;
+}
+
 export interface EventDetail {
   id: string;
   title: string;
@@ -65,6 +74,7 @@ export interface EventDetail {
     };
   };
   ticket_types: TicketType[];
+  vouchers?: EventVoucher[];
   reviews: EventReview[];
   starting_price: number;
   is_sold_out: boolean;

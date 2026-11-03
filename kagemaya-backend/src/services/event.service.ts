@@ -295,6 +295,7 @@ export const getEventByIdService = async (id: string) => {
         where: {
           end_date: { gte: new Date() },
         },
+        orderBy: { created_at: 'desc' },
         select: {
           id: true,
           code: true,

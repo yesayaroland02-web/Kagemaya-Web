@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/axios';
-import { EventDetail, TicketType } from '@/types/event';
+import { EventDetail, TicketType, EventVoucher } from '@/types/event';
 import { formatRupiah, formatDate, getImageUrl } from '@/lib/utils';
 import Toast from '@/components/ui/Toast';
 import {
@@ -24,6 +24,10 @@ import {
   Plus,
   Minus,
   Sparkles,
+  TicketPercent,
+  Copy,
+  Check,
+  Clock,
 } from 'lucide-react';
 
 interface UserCoupon {
@@ -62,6 +66,7 @@ export default function CheckoutPage() {
   } | null>(null);
   const [voucherError, setVoucherError] = useState<string | null>(null);
   const [checkingVoucher, setCheckingVoucher] = useState(false);
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   // Kupon Referral User
   const [userCoupons, setUserCoupons] = useState<UserCoupon[]>([]);
@@ -185,11 +190,24 @@ export default function CheckoutPage() {
     }
   }, [usePointsToggle, calculations.subtotal, calculations.voucherDiscount, calculations.couponDiscount, pointBalance]);
 
+  // Salin Kode Voucher
+  const handleCopyCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCode(code);
+    setToast({ message: `Kode voucher "${code}" berhasil disalin!`, type: 'info' });
+    setTimeout(() => setCopiedCode(null), 2000);
+  };
+
   // Validasi Voucher Organizer ke backend
-  const handleApplyVoucher = async () => {
-    if (!voucherCodeInput.trim()) {
+  const handleApplyVoucher = async (codeOverride?: string) => {
+    const targetCode = (codeOverride || voucherCodeInput).trim().toUpperCase();
+    if (!targetCode) {
       setVoucherError('Masukkan kode voucher.');
       return;
+    }
+
+    if (codeOverride) {
+      setVoucherCodeInput(targetCode);
     }
 
     try {
@@ -200,12 +218,12 @@ export default function CheckoutPage() {
       const res = await api.post('/transactions/calculate', {
         event_id: eventId,
         items: [{ ticket_type_id: selectedTierId, quantity }],
-        voucher_code: voucherCodeInput.trim(),
+        voucher_code: targetCode,
       });
 
       if (res.data?.success && res.data.data.applied_voucher) {
         setAppliedVoucher(res.data.data.applied_voucher);
-        setToast({ message: `Voucher "${voucherCodeInput}" berhasil diterapkan!`, type: 'success' });
+        setToast({ message: `Voucher "${targetCode}" berhasil diterapkan!`, type: 'success' });
       } else {
         setVoucherError('Voucher tidak dapat diterapkan pada pesanan ini.');
       }
@@ -449,13 +467,153 @@ export default function CheckoutPage() {
               <span>Voucher Organizer & Kupon Referral</span>
             </div>
 
-            {/* Form Input Voucher Organizer */}
-            <div className="space-y-2">
+            {/* 1. SECTION VOUCHER PENYELENGGARA TERSEDIA */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-xs text-kage-washi font-medium flex items-center gap-1.5">
+                  <TicketPercent className="w-4 h-4 text-kage-gold" />
+                  <span>Voucher Tersedia dari Penyelenggara:</span>
+                </label>
+                {event.vouchers && event.vouchers.length > 0 && (
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-kage-gold/10 border border-kage-gold/20 text-kage-gold font-medium">
+                    {event.vouchers.length} Tersedia
+                  </span>
+                )}
+              </div>
+
+              {event.vouchers && event.vouchers.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {event.vouchers.map((v) => {
+                    const isApplied = appliedVoucher?.code?.toUpperCase() === v.code.toUpperCase();
+                    const isUpcoming = new Date(v.start_date) > new Date();
+                    const isApplyingThis = checkingVoucher && voucherCodeInput === v.code.toUpperCase();
+
+                    // Perhitungan estimasi diskon
+                    const estimatedDiscount =
+                      v.discount_type === 'PERCENT'
+                        ? Math.floor((calculations.subtotal * v.discount_value) / 100)
+                        : Math.min(v.discount_value, calculations.subtotal);
+
+                    return (
+                      <div
+                        key={v.id}
+                        className={`relative rounded-lg p-3.5 border transition-all duration-200 flex flex-col justify-between overflow-hidden ${
+                          isApplied
+                            ? 'bg-kage-gold/10 border-kage-gold shadow-md shadow-kage-gold/5 ring-1 ring-kage-gold/40'
+                            : isUpcoming
+                            ? 'bg-kage-yoru-light/40 border-kage-border/50 opacity-60'
+                            : 'bg-kage-yoru-light/90 border-kage-border hover:border-kage-gold/50 hover:bg-kage-yoru-light'
+                        }`}
+                      >
+                        {/* Aksen Tepi Tiket */}
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="space-y-1">
+                            {/* Nilai Diskon */}
+                            <div className="flex items-center gap-1.5">
+                              <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-kage-red/90 text-white uppercase tracking-wider">
+                                {v.discount_type === 'PERCENT'
+                                  ? `${v.discount_value}% OFF`
+                                  : `POTONGAN ${formatRupiah(v.discount_value)}`}
+                              </span>
+                            </div>
+
+                            {/* Estimasi Potongan */}
+                            <p className="text-[11px] text-kage-mist leading-tight">
+                              Hemat hingga{' '}
+                              <strong className="text-kage-gold font-sans">
+                                {formatRupiah(estimatedDiscount)}
+                              </strong>
+                            </p>
+                          </div>
+
+                          {/* Tombol Aksi Gunakan / Terpasang */}
+                          <div>
+                            {isApplied ? (
+                              <button
+                                type="button"
+                                onClick={handleRemoveVoucher}
+                                className="px-2.5 py-1 rounded text-[11px] font-semibold bg-kage-gold text-kage-black hover:bg-yellow-500 transition flex items-center gap-1 shadow-sm"
+                                title="Klik untuk membatalkan penggunaan voucher"
+                              >
+                                <Check className="w-3 h-3 stroke-[3]" />
+                                <span>Terpasang</span>
+                              </button>
+                            ) : isUpcoming ? (
+                              <span className="px-2 py-1 rounded text-[10px] bg-kage-border text-kage-mist-dim font-medium">
+                                Segera Hadir
+                              </span>
+                            ) : (
+                              <button
+                                type="button"
+                                disabled={checkingVoucher}
+                                onClick={() => handleApplyVoucher(v.code)}
+                                className="px-2.5 py-1 rounded text-[11px] font-semibold bg-kage-yoru border border-kage-gold/70 text-kage-gold hover:bg-kage-gold hover:text-kage-black transition disabled:opacity-50 flex items-center gap-1"
+                              >
+                                {isApplyingThis ? (
+                                  <Loader2 className="w-3 h-3 animate-spin" />
+                                ) : (
+                                  <span>Gunakan</span>
+                                )}
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Garis Pembatas Tiket Perforasi */}
+                        <div className="my-2.5 border-t border-dashed border-kage-border/80" />
+
+                        {/* Bagian Bawah: Kode Voucher & Periode */}
+                        <div className="flex items-center justify-between text-[11px]">
+                          {/* Kode Voucher dengan Salin */}
+                          <div className="flex items-center gap-1">
+                            <span className="font-mono font-bold text-xs px-2 py-0.5 rounded bg-kage-black border border-kage-border text-kage-washi tracking-wide">
+                              {v.code}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => handleCopyCode(v.code)}
+                              className="p-1 text-kage-mist hover:text-kage-gold transition rounded hover:bg-kage-black/40"
+                              title="Salin kode voucher"
+                            >
+                              {copiedCode === v.code ? (
+                                <Check className="w-3.5 h-3.5 text-kage-success" />
+                              ) : (
+                                <Copy className="w-3.5 h-3.5" />
+                              )}
+                            </button>
+                          </div>
+
+                          {/* Masa Berlaku */}
+                          <div className="flex items-center gap-1 text-[10px] text-kage-mist-dim font-sans">
+                            <Clock className="w-3 h-3 text-kage-mist-dim" />
+                            <span>
+                              {isUpcoming
+                                ? `Mulai ${formatDate(v.start_date)}`
+                                : `s/d ${formatDate(v.end_date)}`}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : (
+                <div className="p-3.5 rounded-lg border border-dashed border-kage-border/70 bg-kage-yoru-light/30 flex items-center gap-3 text-xs text-kage-mist-dim">
+                  <Tag className="w-4 h-4 text-kage-mist-dim shrink-0" />
+                  <span>
+                    Belum ada voucher publik dari penyelenggara untuk event ini. Anda tetap dapat memasukkan kode promo manual di bawah jika memilikinya.
+                  </span>
+                </div>
+              )}
+            </div>
+
+            {/* Form Input Manual Voucher Organizer */}
+            <div className="space-y-2 pt-2 border-t border-kage-border/50">
               <label className="text-xs text-kage-mist flex items-center justify-between">
-                <span>Kode Voucher Penyelenggara:</span>
+                <span>Punya kode voucher lain?</span>
                 {appliedVoucher && (
                   <span className="text-kage-success text-[11px] flex items-center gap-1 font-medium">
-                    <CheckCircle2 className="w-3 h-3" /> Aktif (-{formatRupiah(calculations.voucherDiscount)})
+                    <CheckCircle2 className="w-3 h-3" /> Aktif: {appliedVoucher.code} (-{formatRupiah(calculations.voucherDiscount)})
                   </span>
                 )}
               </label>
@@ -480,7 +638,7 @@ export default function CheckoutPage() {
                 ) : (
                   <button
                     type="button"
-                    onClick={handleApplyVoucher}
+                    onClick={() => handleApplyVoucher()}
                     disabled={checkingVoucher || !voucherCodeInput.trim()}
                     className="px-4 py-2 rounded bg-kage-gold text-kage-black font-semibold text-xs hover:bg-yellow-500 disabled:opacity-50 transition flex items-center gap-1.5"
                   >
