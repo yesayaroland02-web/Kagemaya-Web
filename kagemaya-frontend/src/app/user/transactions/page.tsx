@@ -1,14 +1,12 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/axios';
 import { formatRupiah, formatDateTime, formatDate, getImageUrl } from '@/lib/utils';
 import Toast from '@/components/ui/Toast';
-import TicketDisplay from '@/components/ticket/TicketDisplay';
-import { TicketData } from '@/types/ticket';
 import {
   Ticket,
   Calendar,
@@ -22,7 +20,8 @@ import {
   RefreshCw,
   Eye,
   FileCheck,
-  ExternalLink,
+  Star,
+  MessageSquarePlus,
 } from 'lucide-react';
 
 interface TransactionItem {
@@ -56,6 +55,7 @@ interface TransactionRecord {
     title: string;
     banner_url?: string | null;
     start_date: string;
+    end_date: string;
     city: string;
     location: string;
     category?: {
@@ -83,6 +83,15 @@ export default function UserTransactionsPage() {
   const [selectedTicketTx, setSelectedTicketTx] = useState<TicketData | null>(null);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
 
+  // Review modal state
+  const [reviewModal, setReviewModal] = useState<{ eventId: string; eventTitle: string } | null>(null);
+
+  // Map: eventId → 'loading' | 'reviewed' | 'not_reviewed'
+  const [reviewStatus, setReviewStatus] = useState<Record<string, 'loading' | 'reviewed' | 'not_reviewed'>>({});
+
+  // Prevent double-fetch on strict mode
+  const checkingRef = useRef<Set<string>>(new Set());
+
   // Tab Definitions
   const tabs = [
     { key: 'ALL', label: 'Semua Pesanan' },
@@ -104,8 +113,10 @@ export default function UserTransactionsPage() {
   const fetchTransactions = async (tabKey: string) => {
     try {
       setLoading(true);
-      const queryParam = tabKey !== 'ALL' ? `?status=${tabKey}` : '';
-      const res = await api.get(`/transactions/my-transactions${queryParam}`);
+      const params: Record<string, string> = {};
+      if (tabKey !== 'ALL') params.status = tabKey;
+
+      const res = await api.get('/transactions/my-transactions', { params });
 
       if (res.data?.success) {
         setTransactions(res.data.data || []);
@@ -145,7 +156,59 @@ export default function UserTransactionsPage() {
     };
   }, [selectedTicketTx]);
 
-  // Handle Cancel Transaction (Rollback Engine Day 14)
+  // 3. Cek status review per event (setelah transaksi ter-load)
+  useEffect(() => {
+    if (!user || transactions.length === 0) return;
+
+    const doneFinishedTxs = transactions.filter(
+      (tx) =>
+        tx.status === 'DONE' &&
+        tx.event?.end_date &&
+        new Date(tx.event.end_date).getTime() <= Date.now()
+    );
+
+    if (doneFinishedTxs.length === 0) return;
+
+    for (const tx of doneFinishedTxs) {
+      const eventId = tx.event.id;
+
+      // Skip jika sudah dicek / sedang dicek
+      if (reviewStatus[eventId] !== undefined) continue;
+      if (checkingRef.current.has(eventId)) continue;
+
+      checkingRef.current.add(eventId);
+
+      // Set loading sementara
+      setReviewStatus((prev) => ({ ...prev, [eventId]: 'loading' }));
+
+      // Cek ke API
+      (async () => {
+        try {
+          const res = await api.get(`/events/${eventId}/reviews`, {
+            params: { page: 1, limit: 50 },
+          });
+          const reviews: Array<{ customer?: { id: string } }> =
+            res.data?.data?.reviews || [];
+          const hasReviewed = reviews.some((r) => r.customer?.id === user.id);
+
+          setReviewStatus((prev) => ({
+            ...prev,
+            [eventId]: hasReviewed ? 'reviewed' : 'not_reviewed',
+          }));
+        } catch {
+          // Jika gagal fetch, anggap belum review (server akan handle duplikat)
+          setReviewStatus((prev) => ({
+            ...prev,
+            [eventId]: 'not_reviewed',
+          }));
+        } finally {
+          checkingRef.current.delete(eventId);
+        }
+      })();
+    }
+  }, [transactions, user?.id]);
+
+  // Handle Cancel Transaction
   const handleCancel = async (txId: string) => {
     const confirmCancel = window.confirm(
       'Apakah Anda yakin ingin membatalkan pesanan ini? Kuota tiket, kupon, dan saldo poin yang digunakan akan segera dikembalikan.'
@@ -161,7 +224,6 @@ export default function UserTransactionsPage() {
           message: 'Transaksi berhasil dibatalkan. Kuota tiket dan poin Anda telah dipulihkan.',
           type: 'success',
         });
-        // Refresh list
         fetchTransactions(activeTab);
       }
     } catch (err: any) {
@@ -170,6 +232,21 @@ export default function UserTransactionsPage() {
     } finally {
       setCancelingId(null);
     }
+  };
+
+  // Handle Review Success
+  const handleReviewSuccess = (eventId: string) => {
+    setReviewStatus((prev) => ({ ...prev, [eventId]: 'reviewed' }));
+    setToast({
+      message: 'Ulasan berhasil dikirim! Terima kasih atas penilaian Anda.',
+      type: 'success',
+    });
+  };
+
+  // Helper: apakah event sudah selesai?
+  const isEventFinished = (endDate: string | undefined) => {
+    if (!endDate) return false;
+    return new Date(endDate).getTime() <= Date.now();
   };
 
   // Helper Badge Status
@@ -233,6 +310,16 @@ export default function UserTransactionsPage() {
         />
       )}
 
+      {/* Review Modal */}
+      {reviewModal && (
+        <ReviewModal
+          eventId={reviewModal.eventId}
+          eventTitle={reviewModal.eventTitle}
+          onClose={() => setReviewModal(null)}
+          onSuccess={handleReviewSuccess}
+        />
+      )}
+
       {/* Header Halaman */}
       <div className="space-y-1">
         <h1 className="font-serif text-2xl sm:text-3xl text-kage-washi font-medium">
@@ -292,6 +379,9 @@ export default function UserTransactionsPage() {
             const isWaitingPayment = tx.status === 'WAITING_PAYMENT';
             const isExpired = tx.status === 'EXPIRED';
             const isCanceled = tx.status === 'CANCELED';
+            const isDone = tx.status === 'DONE';
+            const eventFinished = isDone && isEventFinished(tx.event?.end_date);
+            const rStatus = tx.event?.id ? reviewStatus[tx.event.id] : undefined;
 
             return (
               <div
@@ -361,26 +451,38 @@ export default function UserTransactionsPage() {
                   </div>
                 </div>
 
-                {/* Baris Bawah: Aksi & Informasi Kedaluwarsa */}
+                {/* Baris Bawah: Aksi & Informasi */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-kage-border/50">
-                  {/* Feedback Status Khusus */}
-                  <div>
+                  {/* Info Status Kiri */}
+                  <div className="text-[11px] flex items-center gap-1">
                     {isWaitingPayment && (
-                      <span className="text-[11px] text-kage-gold flex items-center gap-1">
+                      <span className="text-kage-gold flex items-center gap-1">
                         <Clock className="w-3.5 h-3.5" />
                         Batas transfer: {formatDateTime(tx.payment_deadline)}
                       </span>
                     )}
                     {(isExpired || isCanceled) && (
-                      <span className="text-[11px] text-kage-mist-dim flex items-center gap-1">
+                      <span className="text-kage-mist-dim flex items-center gap-1">
                         <CheckCircle2 className="w-3.5 h-3.5 text-kage-success" />
                         Kuota tiket dan saldo poin telah dipulihkan secara otomatis.
                       </span>
                     )}
+                    {eventFinished && rStatus === 'not_reviewed' && (
+                      <span className="text-kage-gold/80 flex items-center gap-1">
+                        <Star className="w-3.5 h-3.5 fill-kage-gold text-kage-gold" />
+                        Acara telah selesai — bagikan ulasan Anda!
+                      </span>
+                    )}
+                    {eventFinished && rStatus === 'reviewed' && (
+                      <span className="text-kage-success flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        Ulasan sudah dikirim. Terima kasih!
+                      </span>
+                    )}
                   </div>
 
-                  {/* Tombol Aksi */}
-                  <div className="flex items-center gap-2 self-end sm:self-auto">
+                  {/* Tombol Aksi Kanan */}
+                  <div className="flex items-center gap-2 self-end sm:self-auto flex-wrap justify-end">
                     {isWaitingPayment && (
                       <>
                         <button
@@ -412,35 +514,46 @@ export default function UserTransactionsPage() {
                     )}
 
                     {tx.status === 'DONE' && (
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const enrichedTx: TicketData = {
-                              ...(tx as unknown as TicketData),
-                              customer: tx.customer || {
-                                id: user?.id,
-                                name: user?.name,
-                                email: user?.email,
-                              },
-                            };
-                            setSelectedTicketTx(enrichedTx);
-                          }}
-                          className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-kage-gold hover:bg-yellow-500 text-kage-black transition flex items-center gap-1.5 shadow-sm"
-                          title="Tampilkan E-Tiket Resmi"
-                        >
-                          <Ticket className="w-3.5 h-3.5" />
-                          <span>Lihat E-Tiket</span>
-                        </button>
+                      <Link
+                        href={`/events/${tx.event?.id}`}
+                        className="px-3.5 py-1.5 rounded text-xs font-semibold bg-kage-success/20 text-kage-success border border-kage-success/40 hover:bg-kage-success/30 transition flex items-center gap-1"
+                      >
+                        <FileCheck className="w-3.5 h-3.5" />
+                        <span>Tiket Aktif</span>
+                      </Link>
+                    )}
 
-                        <Link
-                          href={`/transactions/${tx.id}/ticket`}
-                          className="p-1.5 rounded-lg border border-kage-border hover:border-kage-gold text-kage-mist hover:text-kage-gold transition"
-                          title="Buka Halaman Tiket Penuh"
-                        >
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </Link>
-                      </div>
+                    {/* Sedang memeriksa status review */}
+                    {eventFinished && rStatus === 'loading' && (
+                      <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded text-xs text-kage-mist border border-kage-border">
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        Memeriksa...
+                      </span>
+                    )}
+
+                    {/* Belum review → Tombol Tulis Ulasan */}
+                    {eventFinished && rStatus === 'not_reviewed' && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setReviewModal({
+                            eventId: tx.event.id,
+                            eventTitle: tx.event.title,
+                          })
+                        }
+                        className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded text-xs font-semibold bg-kage-gold hover:bg-yellow-400 text-kage-black transition shadow-sm"
+                      >
+                        <MessageSquarePlus className="w-3.5 h-3.5" />
+                        Tulis Ulasan
+                      </button>
+                    )}
+
+                    {/* Sudah review → Badge */}
+                    {eventFinished && rStatus === 'reviewed' && (
+                      <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded text-xs font-medium bg-kage-success/10 text-kage-success border border-kage-success/30">
+                        <Star className="w-3.5 h-3.5 fill-kage-success" />
+                        Sudah Diulas
+                      </span>
                     )}
                   </div>
                 </div>
