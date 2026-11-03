@@ -580,63 +580,52 @@ export const updateEventService = async (
     let newAvailableSeats = existingEvent.available_seats;
 
     if (input.tickets && Array.isArray(input.tickets) && input.tickets.length > 0) {
-      // Re-calculate PRD Section 8.4 invariant: available_seats = sum(quota)
+      // Ambil semua ticket type yang sudah direferensikan di TransactionItem
+      // agar tidak melanggar foreign key constraint RESTRICT saat deleteMany
+      const usedTicketTypeIds = (
+        await tx.transactionItem.findMany({
+          where: { ticket_type: { event_id: eventId } },
+          select: { ticket_type_id: true },
+          distinct: ['ticket_type_id'],
+        })
+      ).map((r) => r.ticket_type_id);
+
+      // Ticket type yang AMAN dihapus: tidak dipakai transaksi DAN tidak ada di input baru
+      const inputNames = input.tickets.map((t) => t.name.trim().toLowerCase());
+      const safeToDeleteIds = existingEvent.ticket_types
+        .filter(
+          (tt) =>
+            !usedTicketTypeIds.includes(tt.id) &&
+            !inputNames.includes(tt.name.trim().toLowerCase())
+        )
+        .map((tt) => tt.id);
+
+      if (safeToDeleteIds.length > 0) {
+        await tx.ticketType.deleteMany({
+          where: { id: { in: safeToDeleteIds } },
+        });
+      }
+
+      // Hitung ulang available_seats dari total kuota input tiket baru
       newAvailableSeats = input.tickets.reduce(
         (sum, t) => sum + Number(t.quota),
         0
       );
 
-      const existingTiers = existingEvent.ticket_types || [];
-      const incomingTicketIds = new Set(
-        input.tickets.map((t) => t.id).filter((id) => Boolean(id))
-      );
+      // Re-create updated ticket tiers
+      await tx.ticketType.deleteMany({
+        where: { event_id: eventId },
+      });
 
-      // Check which existing tiers can be safely deleted or if they have transactions
-      const tiersToDelete = existingTiers.filter((t) => !incomingTicketIds.has(t.id));
-      for (const tier of tiersToDelete) {
-        const hasTransactions = await tx.transactionItem.findFirst({
-          where: { ticket_type_id: tier.id },
-        });
-        if (hasTransactions) {
-          throw new Error(
-            `Tipe tiket '${tier.name}' tidak dapat dihapus karena sudah memiliki transaksi terkait.`
-          );
-        }
-        await tx.ticketType.delete({
-          where: { id: tier.id },
-        });
-      }
-
-      // Upsert / update existing ticket types & insert new ones
-      for (const t of input.tickets) {
-        if (t.id && existingTiers.some((et) => et.id === t.id)) {
-          const oldTier = existingTiers.find((et) => et.id === t.id);
-          const quotaDifference = Number(t.quota) - (oldTier ? oldTier.quota : 0);
-          const newAvailableQuota = oldTier
-            ? Math.max(0, oldTier.available_quota + quotaDifference)
-            : Number(t.quota);
-
-          await tx.ticketType.update({
-            where: { id: t.id },
-            data: {
-              name: t.name,
-              price: Number(t.price),
-              quota: Number(t.quota),
-              available_quota: newAvailableQuota,
-            },
-          });
-        } else {
-          await tx.ticketType.create({
-            data: {
-              event_id: eventId,
-              name: t.name,
-              price: Number(t.price),
-              quota: Number(t.quota),
-              available_quota: Number(t.quota),
-            },
-          });
-        }
-      }
+      await tx.ticketType.createMany({
+        data: input.tickets.map((t) => ({
+          event_id: eventId,
+          name: t.name,
+          price: Number(t.price),
+          quota: Number(t.quota),
+          available_quota: Number(t.quota),
+        })),
+      });
     }
 
     const updatedEvent = await tx.event.update({
