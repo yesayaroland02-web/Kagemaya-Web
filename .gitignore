@@ -6,6 +6,8 @@
 # Dependencies
 **/node_modules/
 
+/kagemaya-backend/node_modules/
+
 # Next.js build
 **/.next/
 **/out/
