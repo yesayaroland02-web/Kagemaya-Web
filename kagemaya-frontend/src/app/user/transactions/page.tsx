@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useEffect, useState } from 'react';
@@ -5,7 +6,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import api from '@/lib/axios';
-import { formatRupiah, formatDateTime, formatDate, getImageUrl } from '@/lib/utils';
+import {
+  formatRupiah,
+  formatDateTime,
+  formatDate,
+  getImageUrl,
+} from '@/lib/utils';
 import Toast from '@/components/ui/Toast';
 import TicketDisplay from '@/components/ticket/TicketDisplay';
 import { TicketData } from '@/types/ticket';
@@ -86,7 +92,8 @@ export default function UserTransactionsPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<string>('ALL');
   const [cancelingId, setCancelingId] = useState<string | null>(null);
-  const [selectedTicketTx, setSelectedTicketTx] = useState<TicketData | null>(null);
+  const [selectedTicketTx, setSelectedTicketTx] =
+    useState<TicketData | null>(null);
   const [toast, setToast] = useState<{
     message: string;
     type: 'success' | 'error' | 'info';
@@ -110,8 +117,11 @@ export default function UserTransactionsPage() {
   const fetchTransactions = async (tabKey: string) => {
     try {
       setLoading(true);
+
       const queryParam = tabKey !== 'ALL' ? `?status=${tabKey}` : '';
-      const res = await api.get(`/transactions/my-transactions${queryParam}`);
+      const res = await api.get(
+        `/transactions/my-transactions${queryParam}`
+      );
 
       if (res.data?.success) {
         setTransactions(res.data.data || []);
@@ -162,6 +172,7 @@ export default function UserTransactionsPage() {
 
     try {
       setCancelingId(txId);
+
       const res = await api.post(`/transactions/${txId}/cancel`);
 
       if (res.data?.success) {
@@ -170,7 +181,8 @@ export default function UserTransactionsPage() {
             'Transaksi berhasil dibatalkan. Kuota tiket dan poin Anda telah dipulihkan.',
           type: 'success',
         });
-        fetchTransactions(activeTab);
+
+        await fetchTransactions(activeTab);
       }
     } catch (err: any) {
       const msg =
@@ -461,7 +473,7 @@ export default function UserTransactionsPage() {
                         </button>
 
                         <Link
-                          href={`/events/${tx.event?.id}/review`}
+                          href="/user/reviews"
                           className="px-3.5 py-1.5 rounded-lg text-xs font-semibold border border-kage-gold/50 text-kage-gold hover:bg-kage-gold/10 transition flex items-center gap-1.5"
                         >
                           <Star className="w-3.5 h-3.5" />
@@ -507,3 +519,4 @@ export default function UserTransactionsPage() {
     </div>
   );
 }
+
